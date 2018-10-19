@@ -1,0 +1,20 @@
+	{
+			"SeasonNumber" : 3,
+            "EpisodesCount" : 5, 
+            "Episodes" : [
+				{
+                    "Title" : "The Law of Vacant Places", 
+                    "Length" : "1h 7min", 
+                    "Rating" : 8.7, 
+                    "Cast" : [ "Ewan McGregor" , "Carrie Coon" ],
+                    "Description" : "A twisted sibling rivalry leads to murder, mobsters and cutthroat competitive bridge in a small Midwestern town."
+				},
+				{
+                    "Title" : "The Principle of Restricted Choice", 
+                    "Length" : "52min", 
+                    "Rating" : 8.3, 
+                    "Cast" : [ "Ewan McGregor" , "Carrie Coon" ],
+                    "Description" : "Gloria deals with the aftermath of the crime, Varga makes a move, and Ray and Nikki move on to their next plan."
+				}
+			]
+    },

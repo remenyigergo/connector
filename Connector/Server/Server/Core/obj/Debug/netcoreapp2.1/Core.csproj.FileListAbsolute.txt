@@ -1,0 +1,9 @@
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\bin\Debug\netcoreapp2.1\Core.deps.json
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\bin\Debug\netcoreapp2.1\Core.dll
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.csprojAssemblyReference.cache
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.csproj.CoreCompileInputs.cache
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.AssemblyInfoInputs.cache
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.AssemblyInfo.cs
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\bin\Debug\netcoreapp2.1\Core.pdb
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.dll
+C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Core\obj\Debug\netcoreapp2.1\Core.pdb

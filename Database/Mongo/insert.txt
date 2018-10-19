@@ -1,0 +1,104 @@
+*** SERIES ***
+
+{ 
+    "SeriesId" : "1", 
+    "Title" : "Fargo", 
+    "Seasons" : [{
+			"SeasonNumber" : 1,
+            "EpisodesCount" : 3, 
+            "Episodes" : [
+				{
+                    "Title" : "The Crocodile's Dilemma", 
+                    "Length" : "1h 9min", 
+                    "Rating" : 9.4, 
+                    "Cast" : [ "Billy Bob Thornton" , "Allison Tolman" ],
+                    "Description" : "A ruthless, manipulative man meets a small town insurance salesman and sets him on a path of destruction."
+				},
+				{
+                    "Title" : "The Rooster Prince", 
+                    "Length" : "52min", 
+                    "Rating" : 8.5, 
+                    "Cast" : [ "Billy Bob Thornton" , "Allison Tolman" ],
+                    "Description" : "Molly begins to suspect that Lester is involved in the murders, but her boss points her in a different direction. Meanwhile, Malvo investigates the plot against a man known as the Supermarket King."
+				},
+				{
+                    "Title" : "A Muddy Road", 
+                    "Length" : "50min", 
+                    "Rating" : 8.8, 
+                    "Cast" : [ "Billy Bob Thornton" , "Allison Tolman" ],
+                    "Description" : "Malvo flips the script on the blackmail operation. Molly sets a trap, and Gus debates whether he should come clean. Lester's return to work has complicated repercussions."
+				}
+			]
+    },
+	{
+			"SeasonNumber" : 2,
+            "EpisodesCount" : 2, 
+            "Episodes" : [
+				{
+                    "Title" : "Waiting for Dutch", 
+                    "Length" : "53min", 
+                    "Rating" : 9.0, 
+                    "Cast" : [ "Kirsten Dunst" , "Patrick Wilson" ],
+                    "Description" : "In a small Minnesota town, a shooting at a diner disrupts the lives of a state officer, a married couple, and a North Dakota crime syndicate."
+				},
+				{
+                    "Title" : "Before the Law", 
+                    "Length" : "1h 2min", 
+                    "Rating" : 8.7, 
+                    "Cast" : [ "Kirsten Dunst" , "Patrick Wilson" ],
+                    "Description" : "The Gerhardts receive a surprising offer, while two unlikely murderers do their best to clean up their mess."
+				}
+			]
+    },
+	
+	], 
+    "Runtime" : 53, 
+    "Rating" : 9.0, 
+    "Year" : 2014, 
+    "Category" : [
+        "Crime", 
+        "Drama", 
+        "Thriller"
+    ], 
+    "Description" : "Various chronicles of deception, intrigue and murder in and around frozen Minnesota. Yet all of these tales mysteriously lead back one way or another to Fargo, North Dakota."
+}
+
+
+//ELÉG JÓL FELÉPÍTETT BACKUP
+
+{ 
+    "SeriesId" : "1", 
+    "Title" : "Fargo", 
+    "Seasons" : [{
+        "Season1" : [{
+            "EpisodesCount" : 3, 
+            "Episodes" : [{
+                "Episode1" : [{
+                    "Title" : "The Crocodile's Dilemma", 
+                    "Length" : "1h 9min", 
+                    "Rating" : 9.4, 
+                    "Cast" : [
+                        {
+                            "Billy Bob Thornton" : "Lorne Malvo"
+                        }, 
+                        {
+                            "Allison Tolman" : "Molly Solverson"
+                        }
+                    ], 
+                    "Description" : "A ruthless, manipulative man meets a small town insurance salesman and sets him on a path of destruction."
+                }]
+            }]
+        }]
+    }], 
+    "Runtime" : 53, 
+    "Rating" : 9.0, 
+    "Year" : 2014, 
+    "Category" : [
+        "Crime", 
+        "Drama", 
+        "Thriller"
+    ], 
+    "Description" : "Various chronicles of deception, intrigue and murder in and around frozen Minnesota. Yet all of these tales mysteriously lead back one way or another to Fargo, North Dakota."
+}
+
+//////////
