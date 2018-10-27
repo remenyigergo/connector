@@ -22,7 +22,7 @@ namespace Server.Service.Controllers
         [HttpPost("{id}")]
         public async Task AddSeries([FromBody]MongoSeries mongoSeries)
         {
-            await _seriesRepository.AddSeries(mongoSeries);
+//            await _seriesRepository.AddSeries(mongoSeries);
         }
 
         [HttpPost("addseason/{seriesid}")]
