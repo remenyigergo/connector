@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
+using Server.Models;
 
 
 namespace Server.SqlDataManager
@@ -14,52 +15,61 @@ namespace Server.SqlDataManager
 
         public SqlStoreCatalogDataAccessManager() { }
 
-        //public async Task<StoreCatalog> Get(StoreVersionedKey key)
-        //{
-        //    StoreCatalog storeCatalog = null;
+        public async Task<User> Get()
+        {
+            User user = null;
 
-        //    var commandText = "SELECT [StoreID],[SeqNumber],[StorageUrl],[ParsedStorageURL],[CreatedAt] FROM " + SchemaName + "." +
-        //                      tableName + " WHERE [StoreID] = @storeid AND [SeqNumber]=@seqNumber";
+            //var commandText = "SELECT [StoreID],[SeqNumber],[StorageUrl],[ParsedStorageURL],[CreatedAt] FROM " + SchemaName + "." +
+            //                  tableName + " WHERE [StoreID] = @storeid AND [SeqNumber]=@seqNumber";
 
-        //    var parameters = new List<DbParameter>
-        //    {
-        //        GetParameter("@storeid", key.StoreID),
-        //        GetParameter("@seqNumber", key.SequenceNumber)
-        //    };
+            var commandText = "SELECT * FROM " + SchemaName + "." +
+                              tableName;
 
-        //    using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
-        //    {
-        //        if (select.HasRows)
-        //        {
-        //            while (select.Read())
-        //            {
-        //                storeCatalog = new StoreCatalog();
-        //                storeCatalog.Key = key;
-        //                storeCatalog.StorageUrl = select["StorageURL"].ToString();
-        //                storeCatalog.ParsedStorageUrl = select["ParsedStorageURL"].ToString();
-        //                storeCatalog.CreatedAt = Convert.ToDateTime(select["CreatedAt"]);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //    return storeCatalog;
-        //}
+            //var parameters = new List<DbParameter>
+            //{
+            //    GetParameter("@storeid", key.StoreID),
+            //    GetParameter("@seqNumber", key.SequenceNumber)
+            //};
 
-        public async Task<bool> Insert(int value)
+            var parameters = new List<DbParameter>();
+
+            using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
+            {
+                if (select.HasRows)
+                {
+                    while (select.Read())
+                    {
+                        user = new User();
+                        user.Id = Int32.Parse(select["id"].ToString());
+                        user.Username = select["username"].ToString();
+                        user.Password = select["pw"].ToString();
+                        user.Email = select["email"].ToString();
+                        user.ModuleId = Int32.Parse(select["moduleId"].ToString());
+                        user.SettingId = Int32.Parse(select["settingId"].ToString());
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return user;
+        }
+
+        public async Task<bool> Insert(User value)
         {
             var commandText = "INSERT INTO " + SchemaName + "." + tableName +
-                              " ([username]) VALUES (" + value + ")";
+                              " ([id],[username],[pw],[email],[moduleId],[settingId]) VALUES " +
+                              "(@id, @username, @pw, @email, @moduleId, @settingId)";
 
             var parameters = new List<DbParameter>
             {
-                GetParameter("@username", value),
-                //GetParameter("@seqNumber", value.Key.SequenceNumber),
-                //GetParameter("@storageURL", value.StorageUrl),
-                //GetParameter("@parsedStorageURL", value.ParsedStorageUrl),
-                //GetParameter("@createdAt", DateTime.UtcNow)
+                GetParameter("@id", value.Id),
+                GetParameter("@username", value.Username),
+                GetParameter("@pw", value.Password),
+                GetParameter("@email", value.Email),
+                GetParameter("@moduleId", value.ModuleId),
+                GetParameter("@settingId", value.SettingId)
             };
 
             var effectedRows = await ExecuteNonQuery(commandText, parameters, CommandType.Text);

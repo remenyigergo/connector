@@ -11,7 +11,7 @@ namespace Core.DataManager.Mongo.Models
     {
         public string Title;
         public string Length;
-        public double Rating;
+        public double? Rating;
         public List<string> Cast;
         public string Description;
     }

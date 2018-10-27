@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Server.Models;
 using Server.Services;
 
 namespace Server.Controllers
@@ -35,16 +36,7 @@ namespace Server.Controllers
             return "value";
         }
 
-        // GET api/users
-        [HttpGet("{id}/users")]
-        public string GetUsers()
-        {
-            var query = "select * from users";
-
-
-
-            return "ez a getusers";
-        }
+        
 
         //// POST api/values
         //[HttpPost]
@@ -71,21 +63,22 @@ namespace Server.Controllers
         // INSERT A TÁBLÁBA PRÓBA
 
         [HttpPost("{id}/insertsql")]
-        public void InsertSql()
+        public void InsertSql([FromBody] User user)
         {
             Values insertValue = new Values();
 
-            insertValue.InsertIntoSqL();
+            insertValue.InsertIntoSqL(user);
             
         }
 
-        [HttpPost("{id}/insertmongo")]
-        public void InsertMongo()
+        [HttpGet("users")]
+        public async Task<User> GetUsers()
         {
             Values insertValue = new Values();
 
-            insertValue.InsertIntoMongo();
+            return await insertValue.GetUsers();
 
         }
+
     }
 }

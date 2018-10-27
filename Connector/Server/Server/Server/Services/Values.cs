@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.DataManager.Mongo;
 using Core.DataManager.SQL;
+using Server.Models;
 using Server.SqlDataManager;
 
 
@@ -18,15 +19,17 @@ namespace Server.Services
         //public BaseMongoDataAccessManager MongoManager = new BaseMongoDataAccessManager();
         
 
-        public void InsertIntoSqL()
+        public void InsertIntoSqL(User user)
         {
-            var s = SqlCatalogDataAccessManager.Insert(2);
+            var s = SqlCatalogDataAccessManager.Insert(user);
         }
 
-        public void InsertIntoMongo()
+        public async Task<User> GetUsers()
         {
-            //var s = MongoCatalogDataAccessManager.
+            return await SqlCatalogDataAccessManager.Get();
         }
+
+        
     }
 
     

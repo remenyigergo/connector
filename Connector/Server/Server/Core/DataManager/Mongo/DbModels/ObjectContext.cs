@@ -61,12 +61,20 @@ namespace Core.DataManager.Mongo.DbModels
             }
         }
 
-        public IMongoCollection<Series> Series
+        public IMongoCollection<MongoSeries> Series
+        {
+            get
+            {
+                return _MongoDatabase.GetCollection<MongoSeries>("series");
+            }
+        }
+
+        public IMongoCollection<Episode> Episodes
         {
 
             get
             {
-                return _MongoDatabase.GetCollection<Series>("series");
+                return _MongoDatabase.GetCollection<Episode>("episodes");
             }
         }
     }

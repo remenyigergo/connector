@@ -7,7 +7,12 @@
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
     <PackageReference Include="NetFusion.Settings" Version="3.2.89" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>

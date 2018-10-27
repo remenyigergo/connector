@@ -20,9 +20,9 @@ namespace Server.Service.Controllers
 
         #region POST
         [HttpPost("{id}")]
-        public async Task AddSeries([FromBody]Series series)
+        public async Task AddSeries([FromBody]MongoSeries mongoSeries)
         {
-            await _seriesRepository.AddSeries(series);
+            await _seriesRepository.AddSeries(mongoSeries);
         }
 
         [HttpPost("addseason/{seriesid}")]
@@ -36,20 +36,20 @@ namespace Server.Service.Controllers
 
 
         #region GET
-        [HttpGet("series/")]
-        public async Task<List<Series>> GetAllSeries()
+        [HttpGet("mongoSeries/")]
+        public async Task<List<MongoSeries>> GetAllSeries()
         {
             return await _seriesRepository.GetAllSeries();
         }
 
         [HttpGet("{id}")]
-        public async Task<List<Series>> GetSeriesById(int id)
+        public async Task<List<MongoSeries>> GetSeriesById(int id)
         {
             return await _seriesRepository.GetSeriesById(id);
         }
 
         [HttpGet("{name}")]
-        public async Task<List<Series>> GetSeriesByTitle(string title)
+        public async Task<List<MongoSeries>> GetSeriesByTitle(string title)
         {
             return await _seriesRepository.GetSeriesByTitle(title);
         }

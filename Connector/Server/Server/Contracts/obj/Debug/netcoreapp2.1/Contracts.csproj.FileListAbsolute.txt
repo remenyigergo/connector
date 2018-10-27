@@ -1,9 +1,0 @@
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\bin\Debug\netcoreapp2.1\Contracts.deps.json
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\bin\Debug\netcoreapp2.1\Contracts.dll
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\bin\Debug\netcoreapp2.1\Contracts.pdb
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.csprojAssemblyReference.cache
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.csproj.CoreCompileInputs.cache
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.AssemblyInfoInputs.cache
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.AssemblyInfo.cs
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.dll
-C:\Iskola\Debreceni Egyetem\Szakdolgozat\Connector\Server\Server\Contracts\obj\Debug\netcoreapp2.1\Contracts.pdb

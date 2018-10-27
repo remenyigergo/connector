@@ -133,7 +133,7 @@ namespace Core.DataManager.SQL
 
         protected async Task<DbDataReader> GetDataReader(string procedureName, List<DbParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
         {
-            var i = await ExecuteNonQuery(null, null);
+            
             DbDataReader ds;
 
             Stopwatch sw = new Stopwatch();
