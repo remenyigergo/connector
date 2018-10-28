@@ -10,6 +10,7 @@ using Core.Dependency;
 using Microsoft.Extensions.DependencyInjection;
 using Series.Parsers;
 using Series.Parsers.IMDB;
+using Series.Parsers.Trakt;
 using Series.Parsers.TvMaze;
 using Series.Parsers.TvMaze.Models;
 
@@ -31,16 +32,20 @@ namespace Series.Service
         
         public async Task ImportSeries(string title)
         {
-            await CheckSeriesImport(title);
+            await IsSeriesImported(title);
 
-            var series = await new TvMazeParser().ImportSeries(title);
+            //var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
+            var tvMazeSeries = new InternalSeries();
+            tvMazeSeries = null;
 
-            if (series != null)
+            if (tvMazeSeries != null)
             {
-                await _repo.AddTvMazeSeries(series);
+                await _repo.AddTvMazeSeries(tvMazeSeries);
             }
             else
             {
+                var traktSeries = new TraktParser().ImportTraktSeries(title);
+
                 var internalSeries = await new IMDBParser().ImportSeries(title);
                 await _repo.AddIMDBSeries(internalSeries);
             }
@@ -49,13 +54,13 @@ namespace Series.Service
         public async Task UpdateSeries(string title)
         {
             
-            var tvMazeSeries = await new TvMazeParser().ImportSeries(title);
+            var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
             await CheckSeriesUpdate(tvMazeSeries);
             await _repo.Update(tvMazeSeries);
 
         }
 
-        public async Task CheckSeriesImport(string title)
+        public async Task IsSeriesImported(string title)
         {
             var isAdded = await _repo.IsSeriesAdded(title);
             if (isAdded)

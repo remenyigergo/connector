@@ -13,7 +13,7 @@ namespace Series.Parsers.TvMaze
         private const string _endpoint = "http://api.tvmaze.com";
 
         //LESZEDJÜK AZ APIN KERESZTÜL ÉS ÁTALAKÍTJUK SAJÁT SOROZAT FORMÁTUMRA
-        public async Task<Contracts.Models.Series.InternalSeries> ImportSeries(string title)
+        public async Task<Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title)
         {
             var tvMazeSeries = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
             var firstSeries = tvMazeSeries[0];
