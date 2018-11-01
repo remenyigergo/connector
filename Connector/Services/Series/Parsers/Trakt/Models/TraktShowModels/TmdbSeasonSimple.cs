@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Series.Parsers.Trakt.Models.TraktShowModels
 {
-    public class TraktSeasonSimple
+    public class TmdbSeasonSimple
     {
         public string Id;
         public string Air_date;

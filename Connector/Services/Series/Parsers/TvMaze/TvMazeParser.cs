@@ -25,7 +25,7 @@ namespace Series.Parsers.TvMaze
                 return new InternalSeries()
                 {                    
                     SeriesId = firstSeries.Show.Id,
-                    Runtime = firstSeries.Show.Runtime,
+                    Runtime = new List<string>() { firstSeries.Show.Runtime },
                     Title = firstSeries.Show.Name,
                     Seasons = seasons,
                     Categories = firstSeries.Show.Genres,
@@ -54,8 +54,8 @@ namespace Series.Parsers.TvMaze
                         //Rating = episode.Rating,
                         Description = episode.Summary,
                         Length = episode.Runtime,
-                        Episode = int.Parse(episode.Number),
-                        Season = int.Parse(episode.Season)
+                        EpisodeNumber = int.Parse(episode.Number),
+                        SeasonNumber = int.Parse(episode.Season)
                     });
                 }
                 return episodeList;
@@ -96,7 +96,7 @@ namespace Series.Parsers.TvMaze
             var episodeList = await ImportEpisodes(id);
             foreach (InternalEpisode episode in episodeList)
             {
-                seasons[episode.Season].Episodes.Add(episode);
+                seasons[episode.SeasonNumber].Episodes.Add(episode);
             }
         }
 
@@ -106,7 +106,7 @@ namespace Series.Parsers.TvMaze
 //            seasonList.Values = seasonList.Values.OrderBy(s => s.SeasonNumber).ToList();
 //            foreach (var internalSeason in seasonList)
 //            {
-//                internalSeason.Episodes = internalSeason.Episodes.OrderBy(e => e.Episode).ToList();
+//                internalSeason.Episodes = internalSeason.Episodes.OrderBy(e => e.EpisodeNumber).ToList();
 //            }
 //        }
     }

@@ -15,6 +15,7 @@ namespace Core.DataManager.Mongo.IRepository
         Task<List<MongoSeries>> GetSeriesById(int id);
         Task<List<MongoSeries>> GetSeriesByTitle(string name);
         Task AddTvMazeSeries(InternalSeries series);
+        Task AddInternalSeries(InternalSeries series);
         Task AddIMDBSeries(InternalSeries series);
         Task AddEpisodes(List<InternalEpisode> episodes);
         Task AddSeason(Season season, int seriesId);

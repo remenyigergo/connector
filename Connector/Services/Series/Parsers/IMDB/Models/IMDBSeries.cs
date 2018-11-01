@@ -8,7 +8,7 @@ namespace Series.Parsers.IMDB.Models
     public class IMDBSeries
     {
         public string Title;
-        public string Runtime;
+        public List<string> Runtime;
         public int TotalSeasons;
         public string Actors;
         public string ImdbId;

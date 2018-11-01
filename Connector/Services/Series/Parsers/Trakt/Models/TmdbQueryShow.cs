@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Series.Parsers.Trakt.Models
 {
-    public class TraktQueryShow
+    public class TmdbQueryShow
     {
         public string Page;
-        public List<TraktShow> Results;
+        public List<TmdbShow> Results;
     }
 
 }

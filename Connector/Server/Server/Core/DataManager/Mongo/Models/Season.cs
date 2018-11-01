@@ -18,5 +18,10 @@ namespace Core.DataManager.Mongo.Models
         public int EpisodesCount;
         [BsonElement("Episodes")]
         public List<Episode> Episodes;
+        [BsonElement("Airdate")]
+        public string Airdate;
+        [BsonElement("Name")]
+        public string Name;
+
     }
 }

@@ -50,7 +50,7 @@ namespace Core.DataManager.Mongo.Repository
                         Rating = episode.Rating,
                         Description = episode.Description,
                         Length = episode.Length,
-                        Cast = null
+                        //Cast = null TODO
                     };
                     episodeslist.Add(mongoEpisode);
                 }
@@ -70,6 +70,57 @@ namespace Core.DataManager.Mongo.Repository
 
             await _context.Series.InsertOneAsync(mongoSeries.Result);
         }
+
+
+        public async Task AddInternalSeries(InternalSeries internalSeries)
+        {
+            List<Season> mongoSeasonList = new List<Season>();
+
+            //Átalakítjuk a szezont mongo modellre
+            foreach (var season in internalSeries.Seasons)
+            {
+                List<Episode> episodeslist = new List<Episode>(season.EpisodesCount);
+                foreach (var episode in season.Episodes)
+                {
+                    var mongoEpisode = new Episode()
+                    {
+                        Title = episode.Title,
+                        Rating = episode.Rating,
+                        Description = episode.Description,
+                        Length = episode.Length,
+                        //Cast = null
+
+                        Air_date = episode.Air_date,
+                        TMDB_Show_id = episode.Show_id,
+                        Vote_count = episode.Vote_count,
+                        Crew = episode.Crew,
+                        Guest_stars = episode.Guest_stars 
+                    };
+                    episodeslist.Add(mongoEpisode);
+                }
+
+                var mongoSeason = new Season()
+                {
+                    EpisodesCount = season.EpisodesCount,
+                    SeasonNumber = season.SeasonNumber,
+                    Episodes = episodeslist,
+                    
+                    Airdate = season.Airdate,
+                    Name = season.Name,
+                    
+                };
+
+                mongoSeasonList.Add(mongoSeason);
+            }
+
+            
+
+            //Valódi mongoSeries, ami letárolásra kerül
+            var mongoSeries = ConvertInternalToMongoSeries(internalSeries);
+
+            await _context.Series.InsertOneAsync(mongoSeries.Result);
+        }
+
         public async Task AddIMDBSeries(InternalSeries internalSeries)
         {
             var mongoSeries = ConvertInternalToMongoSeries(internalSeries);
@@ -88,7 +139,7 @@ namespace Core.DataManager.Mongo.Repository
                         Rating = episode.Rating,
                         Length = episode.Length,
                         Description = episode.Description,
-                        Cast = new List<string>()
+                        //Cast = new List<string>()
                     };
                 await _context.Episodes.InsertOneAsync(mongoEpisode);
             }
@@ -207,12 +258,24 @@ namespace Core.DataManager.Mongo.Repository
                     SeriesId = internalSeries.Id,
                     Runtime = internalSeries.Runtime,
                     TotalSeasons = internalSeries.TotalSeasons,
-                    ImdbId = internalSeries.SeriesId,
                     Category = internalSeries.Categories,
                     Description = internalSeries.Description,
                     Rating = internalSeries.Rating,
                     Year = internalSeries.Year,
-                    LastUpdated = internalSeries.LastUpdated
+                    LastUpdated = internalSeries.LastUpdated,
+
+                    Created_by = internalSeries.Created_by,
+                    Episode_run_time = internalSeries.Episode_run_time,
+                    First_air_date = internalSeries.First_air_date,
+                    Genres = internalSeries.Genres,
+                    Original_language = internalSeries.Original_language,
+                    LastEpisodeSimpleToAir = internalSeries.LastEpisodeSimpleToAir,
+                    Networks = internalSeries.Networks,
+                    Popularity = internalSeries.Popularity,
+                    Production_companies = internalSeries.Production_companies,
+                    Status = internalSeries.Status,
+                    Type = internalSeries.Type,
+                    Vote_count = internalSeries.Vote_count
                 };
             return mongoSeries;
         }

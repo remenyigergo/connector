@@ -29,35 +29,55 @@ namespace Series.Service
         {
             _seriesParser = seriesParser;
         }
-        
+
         public async Task ImportSeries(string title)
         {
             await IsSeriesImported(title);
 
-            //var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
-            var tvMazeSeries = new InternalSeries();
-            tvMazeSeries = null;
+            var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
+            //var tvMazeSeries = new InternalSeries();
+            //tvMazeSeries = null;
 
-            if (tvMazeSeries != null)
+            if (tvMazeInternalSeries != null)
             {
-                await _repo.AddTvMazeSeries(tvMazeSeries);
+                var tmdbInternalSeries = await new TmdbParser().ImportTmdbSeries(title);
+                //FELTÖLTÖM AZ ÜRES PROPERTYKET
+                //TODO: GENRE/CATEGORY DUPLICATE TÖRLÉSE
+                tvMazeInternalSeries.Created_by = tmdbInternalSeries.Created_by;
+                tvMazeInternalSeries.Episode_run_time = tmdbInternalSeries.Episode_run_time;
+                tvMazeInternalSeries.First_air_date = tmdbInternalSeries.First_air_date;
+                tvMazeInternalSeries.Created_by = tmdbInternalSeries.Created_by;
+                tvMazeInternalSeries.Genres = tmdbInternalSeries.Genres;
+                tvMazeInternalSeries.LastEpisodeSimpleToAir = tmdbInternalSeries.LastEpisodeSimpleToAir;
+                tvMazeInternalSeries.Created_by = tmdbInternalSeries.Created_by;
+                tvMazeInternalSeries.Networks = tmdbInternalSeries.Networks;
+                tvMazeInternalSeries.Original_language = tmdbInternalSeries.Original_language;
+                tvMazeInternalSeries.Popularity = tmdbInternalSeries.Popularity;
+                tvMazeInternalSeries.Production_companies = tmdbInternalSeries.Production_companies;
+                tvMazeInternalSeries.Rating = tmdbInternalSeries.Rating;
+                tvMazeInternalSeries.Vote_count = tmdbInternalSeries.Vote_count;
+                tvMazeInternalSeries.Status = tmdbInternalSeries.Status;
+                tvMazeInternalSeries.Year = tmdbInternalSeries.Year;
+                tvMazeInternalSeries.Type = tmdbInternalSeries.Type;
+                tvMazeInternalSeries.Original_language = tmdbInternalSeries.Original_language;
+
+                await _repo.AddInternalSeries(tvMazeInternalSeries);
             }
             else
             {
-                var traktSeries = new TraktParser().ImportTraktSeries(title);
+                var traktSeries = await new TmdbParser().ImportTmdbSeries(title);
 
-                var internalSeries = await new IMDBParser().ImportSeries(title);
-                await _repo.AddIMDBSeries(internalSeries);
+                //var internalSeries = await new IMDBParser().ImportSeries(title); EZ MÁR NEM FOG KELLENI, IMDB(OMDB) KUKA
+                await _repo.AddIMDBSeries(traktSeries);
+                //TODO: MONGO ADD TRAKT SERIES
             }
         }
 
         public async Task UpdateSeries(string title)
         {
-            
             var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
             await CheckSeriesUpdate(tvMazeSeries);
             await _repo.Update(tvMazeSeries);
-
         }
 
         public async Task IsSeriesImported(string title)
@@ -65,7 +85,7 @@ namespace Series.Service
             var isAdded = await _repo.IsSeriesAdded(title);
             if (isAdded)
             {
-                throw new InternalException((int)CoreCodes.AlreadyImported, "The series has been already imported.");
+                throw new InternalException((int) CoreCodes.AlreadyImported, "The series has been already imported.");
             }
         }
 
@@ -75,9 +95,8 @@ namespace Series.Service
 
             if (isUpToDate)
             {
-                throw new InternalException((int)CoreCodes.UpToDate, "The series is up to date.");
+                throw new InternalException((int) CoreCodes.UpToDate, "The series is up to date.");
             }
         }
-
     }
 }

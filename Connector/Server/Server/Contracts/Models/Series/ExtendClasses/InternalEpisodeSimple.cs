@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Series.Parsers.Trakt.Models
 {
-    public class TraktEpisodeSimple
+    public class InternalEpisodeSimple
     {
         public string Air_date;
-        public string Episode_number;
-        public string Season_number;
+        public int Episode_number;
+        public int Season_number;
         public string Name;
         public string Overview;
-        public string Vote_average;
-        public string Vote_count;
+        public double? Vote_average;
+        public int Vote_count;
     }
 }
