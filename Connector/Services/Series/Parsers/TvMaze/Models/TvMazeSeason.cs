@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Contracts.Models.Series;
-using Core.DataManager.Mongo.Models;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 

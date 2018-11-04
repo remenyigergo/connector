@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DataManager.Mongo.DbModels;
 using Core.DataManager.Mongo.IRepository;
-using Core.DataManager.Mongo.Models;
 using Core.DataManager.Mongo.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.WireProtocol.Messages;
+using Series.DataManagement.MongoDB.Models.Series;
 
 namespace Server.Service.Controllers
 {

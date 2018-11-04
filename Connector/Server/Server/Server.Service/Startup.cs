@@ -32,11 +32,11 @@ namespace Server
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.Configure<Settings>(o => { o.IConfigurationRoot = Configuration; } );
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IFeedRepository, FeedRepository>();
-            services.AddTransient<IChatRepository, ChatRepository>();
-            services.AddTransient<ISeriesRepository, SeriesRepository>();
+//            services.Configure<Settings>(o => { o.IConfigurationRoot = Configuration; } );
+//            services.AddTransient<IUserRepository, UserRepository>();
+//            services.AddTransient<IFeedRepository, FeedRepository>();
+//            services.AddTransient<IChatRepository, ChatRepository>();
+//            services.AddTransient<ISeriesRepository, SeriesRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

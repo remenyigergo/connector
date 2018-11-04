@@ -6,6 +6,9 @@
         CommonGenericError = -1000,
         MalformedRequest = 100,
         AlreadyImported = 600,
-        UpToDate = 601
+        UpToDate = 601,
+        AlreadyAdded = 602,
+        NotAdded = 603,
+        AlreadyStarted = 604,
     }
 }

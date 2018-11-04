@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Series.DataManagement.MongoDB;
+using Series.DataManagement.MongoDB.Repositories;
 
 namespace Series.Service
 {
@@ -30,7 +32,7 @@ namespace Series.Service
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.Configure<Settings>(o => { o.IConfigurationRoot = Configuration; });
+            services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IFeedRepository, FeedRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
