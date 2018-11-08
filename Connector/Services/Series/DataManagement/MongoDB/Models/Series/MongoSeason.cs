@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace Series.DataManagement.MongoDB.Models.Series
 {
     
-    public class Season
+    public class MongoSeason
     {
         
         [BsonElement("SeasonNumber")]
@@ -12,7 +12,7 @@ namespace Series.DataManagement.MongoDB.Models.Series
         [BsonElement("EpisodesCount")]
         public int EpisodesCount;
         [BsonElement("Episodes")]
-        public List<Episode> Episodes;
+        public List<MongoEpisode> Episodes;
         [BsonElement("Summary")]
         public string Summary;
         [BsonElement("Airdate")]

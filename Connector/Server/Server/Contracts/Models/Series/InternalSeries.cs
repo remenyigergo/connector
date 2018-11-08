@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Contracts.Models.Series.ExtendClasses;
+using Contracts.Models.Series.ExtendClasses.Cast;
 using Series.Parsers.Trakt.Models;
 using Series.Parsers.Trakt.Models.TraktShowModels;
 
@@ -19,6 +21,7 @@ namespace Contracts.Models.Series
         public string Description { get; set; }
         public int TotalSeasons { get; set; }
         public string LastUpdated { get; set; }
+        public InternalShowCast Cast { get; set; }
         //TODO: EXTERNAL ID FELKÉRÉS
 
         //TMDB

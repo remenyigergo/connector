@@ -6,8 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Contracts.Models.Series;
+using Contracts.Models.Series.ExtendClasses;
+using Contracts.Models.Series.ExtendClasses.Cast;
 using Core.NetworkManager;
 using Series.Parsers.TMDB.Models;
+using Series.Parsers.TMDB.Models.TmdbShowModels;
 using Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper;
 using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
 using Series.Parsers.Trakt.Models;
@@ -34,73 +37,51 @@ namespace Series.Parsers.TMDB
             var tmdbShowForID = tmdbQueryShow.Results[0];
             var tmdbShowSimple = await new WebClientManager().Get<TmdbShow>($"{_endpoint}/3/tv/{tmdbShowForID.Id}?api_key={_key}&language={_lang}");
 
-            List<TmdbSeason> _tmdbSeasons = new List<TmdbSeason>();
 
-            int i = 0;
+            var seasons = GetSeasons(tmdbShowSimple, tmdbShowForID.Id);
             
-//            while (i != tmdbShowSimple.Seasons.Count)
-//            {                
-//                //TODO: NULLCHECK
-//                if (tmdbShowSimple.Seasons[i].Name != tmdbShowSimple.Seasons.Last().Name)
-//                {
-//                    try
-//                    {
-//                        var notSimpleTmdbSeason =
-//                            await new WebClientManager().Get<TmdbSeason>(
-//                                $"{_endpoint}/3/tv/{tmdbShowForID.Id}/season/{i}?api_key={_key}&language={_lang}");
-//                        _tmdbSeasons.Add(notSimpleTmdbSeason);
-//                        i++;
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        Console.WriteLine(e);
-//                        throw;
-//                    }
-//                    
-//                    
-//                }
-//                else
-//                {
-//                    break;
-//                }
-//            }
-
-
-            foreach (var season in tmdbShowSimple.Seasons)
-            {
-                var notSimpleTmdbSeason =
-                            await new WebClientManager().Get<TmdbSeason>(
-                                $"{_endpoint}/3/tv/{tmdbShowForID.Id}/season/{season.SeasonNumber}?api_key={_key}&language={_lang}");
-                        _tmdbSeasons.Add(notSimpleTmdbSeason);
-            }
-            var convertedInternalSeasons =  InternalConverter.ConvertTmdbSeasonToInternalSeason(_tmdbSeasons);
 
             return new InternalSeries()
             {
                 Id = tmdbShowSimple.Id,
-                Runtime = tmdbShowSimple.Episode_run_time.Select(x=>x.Length.ToString()).ToList(),
+                Runtime = tmdbShowSimple.EpisodeRunTime.Select(x=>x.Length.ToString()).ToList(),
                 Title = tmdbShowSimple.Name,
-                Seasons = convertedInternalSeasons,
+                Seasons = await seasons,
                 Categories = tmdbShowSimple.Genres.Select(x => x.Name).ToList(),
                 Description = tmdbShowSimple.Overview,
-                Rating = tmdbShowSimple.Vote_average,
-                CreatedBy = tmdbShowSimple.Created_by.Select(x => new InternalCreator() { Name = x.Name }).ToList(),
-                EpisodeRunTime = tmdbShowSimple.Episode_run_time,
-                FirstAirDate = tmdbShowSimple.First_air_date,
+                Rating = tmdbShowSimple.VoteAverage,
+                CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator() { Name = x.Name }).ToList(),
+                EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
+                FirstAirDate = tmdbShowSimple.FirstAirDate,
                 Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre() { Name = x.Name }).ToList(),
-                LastEpisodeSimpleToAir = InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.Last_Episode_To_Air),
+                LastEpisodeSimpleToAir = InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.LastEpisodeToAir),
                 Networks = InternalConverter.ConvertTmdbNetworkToInternal(tmdbShowSimple.Networks),
                 Popularity = tmdbShowSimple.Popularity,
-                ProductionCompanies = InternalConverter.ConvertTmdbProductionCompanyToInternal(tmdbShowSimple.Production_companies),
+                ProductionCompanies = InternalConverter.ConvertTmdbProductionCompanyToInternal(tmdbShowSimple.ProductionCompanies),
                 Status = tmdbShowSimple.Status,
                 Type = tmdbShowSimple.Type,
-                VoteCount = tmdbShowSimple.Vote_count,
-                OriginalLanguage = tmdbShowSimple.Original_language,
+                VoteCount = tmdbShowSimple.VoteCount,
+                OriginalLanguage = tmdbShowSimple.OriginalLanguage,
                 //TODO: CAST FELSZEDÉSE
             };
 
-            return null;
         }
+
+        public async Task<List<InternalSeason>> GetSeasons(TmdbShow tmdbShowSimple, string id)
+        {
+            List<TmdbSeason> _tmdbSeasons = new List<TmdbSeason>();
+
+            foreach (var season in tmdbShowSimple.Seasons)
+            {
+                var notSimpleTmdbSeason =
+                    await new WebClientManager().Get<TmdbSeason>(
+                        $"{_endpoint}/3/tv/{Int32.Parse(id)}/season/{season.SeasonNumber}?api_key={_key}&language={_lang}");
+                _tmdbSeasons.Add(notSimpleTmdbSeason);
+            }
+            return InternalConverter.ConvertTmdbSeasonToInternalSeason(_tmdbSeasons);
+        }
+
+        
 
         
     }

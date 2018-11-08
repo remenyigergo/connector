@@ -1,18 +1,33 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel
 {
     public class TmdbEpisode
     {
-        public string Air_date;
-        public int Episode_number;
+        [JsonProperty("air_date")]
+        public string AirDate;
+
+        [JsonProperty("episode_number")]
+        public int EpisodeNumber;
         public string Name;
         public string Overview;
-        public int Season_number;
-        public string Show_id;
-        public double? Vote_average;
-        public int Vote_count;
+
+        [JsonProperty("season_number")]
+        public int SeasonNumber;
+
+        [JsonProperty("show_id")]
+        public string ShowId;
+
+        [JsonProperty("vote_average")]
+        public double? VoteAverage;
+
+        [JsonProperty("vote_count")]
+        public int VoteCount;
+
         public List<Crew> Crew;
-        public List<Guest> Guest_stars;
+
+        [JsonProperty("guest_stars")]
+        public List<Guest> GuestStars;
     }
 }

@@ -33,16 +33,16 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                     {
                         Title = tmdbEpisode.Name,
                         Length = "",
-                        Rating = tmdbEpisode.Vote_average,
+                        Rating = tmdbEpisode.VoteAverage,
                         Description = tmdbEpisode.Overview,
-                        SeasonNumber = tmdbEpisode.Season_number,
-                        EpisodeNumber = tmdbEpisode.Episode_number,
+                        SeasonNumber = tmdbEpisode.SeasonNumber,
+                        EpisodeNumber = tmdbEpisode.EpisodeNumber,
                         
-                        AirDate = tmdbEpisode.Air_date,
-                        TmdbShowId = tmdbEpisode.Show_id,
-                        VoteCount = tmdbEpisode.Vote_count,
+                        AirDate = tmdbEpisode.AirDate,
+                        TmdbShowId = tmdbEpisode.ShowId,
+                        VoteCount = tmdbEpisode.VoteCount,
                         Crew = ConvertTmdbCrewToInternal(tmdbEpisode.Crew),
-                        GuestStars = ConvertTmdbGuestsToInternal(tmdbEpisode.Guest_stars),
+                        GuestStars = ConvertTmdbGuestsToInternal(tmdbEpisode.GuestStars),
                     });
                 }
                 internalSeason.Episodes = episodesConverted;
@@ -86,22 +86,22 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
         {
             return new InternalEpisodeSimple()
             {
-                Air_date = tmdbEpisode.Air_date,
-                Episode_number = tmdbEpisode.Episode_number,
-                Season_number = tmdbEpisode.Season_number,
+                Air_date = tmdbEpisode.AirDate,
+                Episode_number = tmdbEpisode.EpisodeNumber,
+                Season_number = tmdbEpisode.SeasonNumber,
                 Name = tmdbEpisode.Name,
                 Overview = tmdbEpisode.Overview,
-                Vote_average = tmdbEpisode.Vote_average,
-                Vote_count = tmdbEpisode.Vote_count
+                Vote_average = tmdbEpisode.VoteAverage,
+                Vote_count = tmdbEpisode.VoteCount
             };
         }
 
-        public static List<InternalCrew> ConvertTmdbCrewToInternal(List<Crew> crew)
+        public static List<InternalEpisodeCrew> ConvertTmdbCrewToInternal(List<Crew> crew)
         {
-            List<InternalCrew> crewList =new List<InternalCrew>();
+            List<InternalEpisodeCrew> crewList =new List<InternalEpisodeCrew>();
             foreach (var crewMember in crew)
             {
-                crewList.Add(new InternalCrew()
+                crewList.Add(new InternalEpisodeCrew()
                 {
                     Name = crewMember.Name,
                     Department = crewMember.Department,
@@ -111,12 +111,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             return crewList;
         }
 
-        public static List<InternalGuest> ConvertTmdbGuestsToInternal(List<Guest> guests)
+        public static List<InternalEpisodeGuest> ConvertTmdbGuestsToInternal(List<Guest> guests)
         {
-            List<InternalGuest> guestList = new List<InternalGuest>();
+            List<InternalEpisodeGuest> guestList = new List<InternalEpisodeGuest>();
             foreach (var guest in guests)
             {
-                guestList.Add(new InternalGuest()
+                guestList.Add(new InternalEpisodeGuest()
                 {
                     Name = guest.Name,
                     Character = guest.Character
@@ -133,7 +133,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                 networkList.Add(new InternalNetwork()
                 {
                     Name = network.Name,
-                    Origin_country = network.Origin_country
+                    Origin_country = network.OriginCountry
                 });
             }
             return networkList;
@@ -148,7 +148,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                 companyList.Add(new InternalProductionCompany()
                 {
                     Name = productionCompany.Name,
-                    Origin_country = productionCompany.Origin_country
+                    Origin_country = productionCompany.OriginCountry
                 });
             }
             return companyList;

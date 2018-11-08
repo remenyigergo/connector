@@ -13,9 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{07
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{4C29327E-26EF-46DA-9C1F-26A57825B608}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Series.Service", "..\..\Services\Series.Service\Series.Service.csproj", "{65E2DBE9-F6CE-4B6F-9D50-36248817B542}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Series.Service", "..\..\Services\Series.Service\Series.Service.csproj", "{65E2DBE9-F6CE-4B6F-9D50-36248817B542}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Series", "..\..\Services\Series\Series.csproj", "{4D40D245-3D9C-484A-AE81-B1D6CC0FA887}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Series", "..\..\Services\Series\Series.csproj", "{4D40D245-3D9C-484A-AE81-B1D6CC0FA887}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopClient", "..\..\DesktopClient\DesktopClient.csproj", "{BB06FEE7-7404-4501-AC63-983EB13674FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{4D40D245-3D9C-484A-AE81-B1D6CC0FA887}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D40D245-3D9C-484A-AE81-B1D6CC0FA887}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D40D245-3D9C-484A-AE81-B1D6CC0FA887}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB06FEE7-7404-4501-AC63-983EB13674FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB06FEE7-7404-4501-AC63-983EB13674FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB06FEE7-7404-4501-AC63-983EB13674FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB06FEE7-7404-4501-AC63-983EB13674FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

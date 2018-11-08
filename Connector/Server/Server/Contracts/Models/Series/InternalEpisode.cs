@@ -18,8 +18,8 @@ namespace Contracts.Models.Series
         public string AirDate;
         public string TmdbShowId;
         public int VoteCount;
-        public List<InternalCrew> Crew;
-        public List<InternalGuest> GuestStars;
+        public List<InternalEpisodeCrew> Crew;
+        public List<InternalEpisodeGuest> GuestStars;
 
     }
 }

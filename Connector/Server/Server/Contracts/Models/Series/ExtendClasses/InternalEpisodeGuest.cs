@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Series.Parsers.Trakt.Models.TraktShowModels.SeasonModel
 {
-    public class InternalGuest
+    public class InternalEpisodeGuest
     {
         public string Character;
         public string Name;

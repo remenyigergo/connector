@@ -1,0 +1,11 @@
+			([0-9]*?[a-z][A-Z]*[0-9]*)*
+
+Ezekkel törölni kellene minden névben:
+s[0-9]{1,3}e[0-9]{1,3} - évad/epizód 
+[0-9]{3,4}p - 1080p, 720p
+x264
+h264
+HDTV
+WEB-DL
+DD5.1
+Az utolsó karaktereket amig kötöjel nincs.

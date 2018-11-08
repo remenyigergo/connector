@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.Models.Series;
@@ -6,39 +7,42 @@ using Core.DataManager.Mongo;
 using Core.DataManager.Mongo.DbModels;
 using Core.DataManager.Mongo.Extensions;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using NetFusion.Common.Extensions.Collections;
 using Newtonsoft.Json;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
+using Series.Parsers.TvMaze;
 using Series.Service.Models;
-using Season = Series.DataManagement.MongoDB.Models.Series.Season;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {
     public class SeriesRepository : BaseMongoDbDataManager, ISeriesRepository
     {
         public IMongoCollection<MongoSeries> Series => Database.GetCollection<MongoSeries>("series");
-        private IMongoCollection<Episode> Episodes => Database.GetCollection<Episode>("episodes");
+        private IMongoCollection<MongoEpisode> Episodes => Database.GetCollection<MongoEpisode>("episodes");
         private IMongoCollection<SeenEpisode> SeenEpisodes => Database.GetCollection<SeenEpisode>("SeenEpisodes");
         private IMongoCollection<AddedSeries> AddedSeries => Database.GetCollection<AddedSeries>("AddedSeries");
-        private IMongoCollection<EpisodeStarted> EpisodeStarted => Database.GetCollection<EpisodeStarted>("EpisodeStarted");
+
+        private IMongoCollection<EpisodeStarted> EpisodeStarted =>
+            Database.GetCollection<EpisodeStarted>("EpisodeStarted");
 
         public SeriesRepository(IOptions<MongoDbSettings> settings) : base(settings)
         {
             //_context = new BaseMongoDbDataManager(settings);
         }
 
-        public async Task
-            AddSeason(Season season,
-                int seriesId) //OLYAT TUDUNK CSINÁLNI, HOGY HA EZ NEM MEGY, HOGY KIKÉREM A SOROZATOT,
-            // KIVESZEM AZ ÉVADOKAT EGY LISTÁBA, A LISTÁT MEGPÓTOLOM AZZAL AMIT BE AKARUNK ADNI, ÉS INSERTÁLOM ÚJ SOROZATKÉNT
-            // viszont így felmerül az a hibalehetőség, hogy majd a megtekintett epizódok nem töltődnek be, amíg 
-            // kitörlődve van az adott sorozat a csere miatt, szóval nem a legjobb eddig ez így.
+        public async Task AddSeason(MongoSeason mongoSeason, int seriesId)
+        //OLYAT TUDUNK CSINÁLNI, HOGY HA EZ NEM MEGY, HOGY KIKÉREM A SOROZATOT,
+        // KIVESZEM AZ ÉVADOKAT EGY LISTÁBA, A LISTÁT MEGPÓTOLOM AZZAL AMIT BE AKARUNK ADNI, ÉS INSERTÁLOM ÚJ SOROZATKÉNT
+        // viszont így felmerül az a hibalehetőség, hogy majd a megtekintett epizódok nem töltődnek be, amíg 
+        // kitörlődve van az adott sorozat a csere miatt, szóval nem a legjobb eddig ez így.
         {
-//            var series = GetSeriesById(seriesId).Result;
-//            var filter = Builders<MongoSeries>.Filter.Eq(series[0].SeriesId, seriesId);
-//            var update = Builders<MongoSeries>.Update.AddToSet(s => s.Seasons, season);
-//            var result = await Series.FindOneAndUpdateAsync(filter, update);
+            //            var series = GetSeriesById(seriesId).Result;
+            //            var filter = Builders<MongoSeries>.Filter.Eq(series[0].SeriesId, seriesId);
+            //            var update = Builders<MongoSeries>.Update.AddToSet(s => s.Seasons, mongoSeason);
+            //            var result = await Series.FindOneAndUpdateAsync(filter, update);
         }
 
 
@@ -47,8 +51,8 @@ namespace Series.DataManagement.MongoDB.Repositories
             //Valódi mongoSeries, ami letárolásra kerül
             var mongoSeries = ConvertInternalToMongoSeries(internalSeries);
 
-//            var json = JsonConvert.SerializeObject(internalSeries);
-//            var mongoSeries = JsonConvert.DeserializeObject<MongoSeries>(json);
+            //            var json = JsonConvert.SerializeObject(internalSeries);
+            //            var mongoSeries = JsonConvert.DeserializeObject<MongoSeries>(json);
 
             await Series.InsertOneAsync(mongoSeries);
         }
@@ -58,13 +62,13 @@ namespace Series.DataManagement.MongoDB.Repositories
             foreach (var episode in episodeList)
             {
                 var mongoEpisode =
-                    new Episode()
+                    new MongoEpisode()
                     {
                         Title = episode.Title,
                         Rating = episode.Rating,
                         Length = episode.Length,
                         Description = episode.Description,
-                        //Cast = new List<string>()
+                        //MongoCast = new List<string>()
                     };
                 await Episodes.InsertOneAsync(mongoEpisode);
             }
@@ -121,13 +125,13 @@ namespace Series.DataManagement.MongoDB.Repositories
         //            return series;
         //        }
 
-        //public async Task<Series> GetSeriesByTitle(string title)  //EZ JÓ ÍGY?    - MŰKÖDNI MŰKÖDIK
+        //public async Task<Series> GetSeriesByTitle(string showTitle)  //EZ JÓ ÍGY?    - MŰKÖDNI MŰKÖDIK
         //{
         //    var seriesList = GetAllSeries().Result;
 
         //    foreach (var internalSeries in seriesList)
         //    {
-        //        if (internalSeries.Title == title)
+        //        if (internalSeries.Title == showTitle)
         //        {
         //            return internalSeries;
         //        }
@@ -138,7 +142,7 @@ namespace Series.DataManagement.MongoDB.Repositories
 
         public async Task<List<MongoSeries>> GetSeriesByTitle(string title)
         {
-            var coll = IMongoCollectionExtensions.AsQueryable<MongoSeries>(Series.Database.GetCollection<MongoSeries>("series"));
+            var coll = Series.AsQueryable();
 
             var series = coll.Where(b => b.Title == title).ToList();
             return series;
@@ -162,9 +166,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task<bool> IsUpToDate(string title, string updateCode)
         {
             var series = (await Series.FindAsync(x => x.Title == title)).FirstOrDefault();
-            //var a = await Series.Find(x => x.Title == title).Project(x => new MongoSeries() { LastUpdated = x.LastUpdated }).ToListAsync();            
+            //var a = await Series.Find(x => x.Title == showTitle).Project(x => new MongoSeries() { LastUpdated = x.LastUpdated }).ToListAsync();            
             var a = await Series.FindAndProject(x => x.Title == title, x => x.LastUpdated);
-            
+
             if (a.FirstOrDefault() == updateCode)
             {
                 return true;
@@ -188,7 +192,7 @@ namespace Series.DataManagement.MongoDB.Repositories
                 Year = internalSeries.Year,
                 LastUpdated = internalSeries.LastUpdated,
                 Seasons = seasons,
-
+                Cast = internalSeries.Cast,
                 CreatedBy = internalSeries.CreatedBy,
                 EpisodeRunTime = internalSeries.EpisodeRunTime,
                 FirstAirDate = internalSeries.FirstAirDate,
@@ -205,15 +209,15 @@ namespace Series.DataManagement.MongoDB.Repositories
             return mongoSeries;
         }
 
-        public List<Season> ConvertInternalSeasonToMongoSeason(List<InternalSeason> internalSeasons)
+        public List<MongoSeason> ConvertInternalSeasonToMongoSeason(List<InternalSeason> internalSeasons)
         {
-            var seasonsList = new List<Season>();
+            var seasonsList = new List<MongoSeason>();
             foreach (var internalSeason in internalSeasons)
             {
-                var episodeList = new List<Episode>();
+                var episodeList = new List<MongoEpisode>();
                 foreach (var episode in internalSeason.Episodes)
                 {
-                    episodeList.Add(new Episode()
+                    episodeList.Add(new MongoEpisode()
                     {
                         Title = episode.Title,
                         Length = episode.Length,
@@ -229,7 +233,7 @@ namespace Series.DataManagement.MongoDB.Repositories
                     });
                 }
 
-                seasonsList.Add(new Season()
+                seasonsList.Add(new MongoSeason()
                 {
                     SeasonNumber = internalSeason.SeasonNumber,
                     EpisodesCount = internalSeason.EpisodesCount,
@@ -277,7 +281,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             bool isNull = episodeStartedModel.GetType().GetProperties()
                 .All(p => p.GetValue(episodeStartedModel) != null);
 
-//            if (!isNull) { return EpisodeStarted.InsertOneAsync(episodeStartedModel); } return null;
+            //            if (!isNull) { return EpisodeStarted.InsertOneAsync(episodeStartedModel); } return null;
             return null;
         }
 
@@ -286,9 +290,80 @@ namespace Series.DataManagement.MongoDB.Repositories
             throw new System.NotImplementedException();
         }
 
+
         public Task<bool> IsEpisodeStarted(EpisodeStarted episodeStartedModel)
         {
             return null;
+        }
+
+        public async Task<bool> GetShow(EpisodeStarted episodeStarted, string showTitle)
+        {
+            var show = await Series.FindAsynchronous(series => series.Title.ToLower() == showTitle.ToLower());
+
+            if (show != null)
+            {
+                //var episode = await EpisodeStarted.FindAsynchronous(ep => ep.Seriesid == Int32.Parse(show[0].Id));
+
+                var coll = EpisodeStarted.Database.GetCollection<EpisodeStarted>("EpisodeStarted").AsQueryable<EpisodeStarted>();
+                List<EpisodeStarted> series = new List<EpisodeStarted>();
+                if (!coll.Empty())
+                {
+                    series = coll.Where(b => b.Seriesid.ToString() == show[0].SeriesId.ToString()).ToList();
+                }
+                
+                if (series.Count > 0)
+                {
+                    EpisodeStarted ep = new EpisodeStarted()
+                    {
+                        Userid = episodeStarted.Userid,
+                        Seriesid = episodeStarted.Seriesid,
+                        SeasonNumber = episodeStarted.SeasonNumber,
+                        EpisodeNumber = episodeStarted.EpisodeNumber,
+                        Date = episodeStarted.Date,
+                        TimeElapsed = episodeStarted.TimeElapsed,
+                        WatchedPercentage = episodeStarted.WatchedPercentage
+                    };
+                    await EpisodeStarted.ReplaceOneAsync(
+                        s => s.Seriesid == ep.Seriesid && s.SeasonNumber == ep.SeasonNumber &&
+                             s.EpisodeNumber == ep.EpisodeNumber, ep);
+                }
+                else
+                {
+                    //var episodestarted = new EpisodeStarted()
+                    //{
+                    //    Userid = episodeStarted.Userid,
+                    //    Seriesid = episodeStarted.Seriesid,
+                    //    SeasonNumber = episodeStarted.SeasonNumber,
+                    //    EpisodeNumber = episodeStarted.EpisodeNumber,
+                    //    Date = episodeStarted.Date,
+                    //    TimeElapsed = episodeStarted.TimeElapsed,
+                    //    WatchedPercentage = episodeStarted.WatchedPercentage
+                    //};
+                    var episodestarted = new EpisodeStarted() {};
+
+                    await EpisodeStarted.InsertOneAsync(episodestarted);
+                }
+
+            }
+            else
+            {
+                await new TvMazeParser().ImportSeriesFromTvMaze(showTitle);
+            }
+
+            return false;
+        }
+
+        public async Task<bool> IsShowExist(string title)
+        {
+            //Meg kell nézni mindkét sorozat oldalon
+            var isExistOnTvMaze = await new TvMazeParser().IsShowExist(title);
+
+            if (!isExistOnTvMaze)
+            {
+                //todo megnézni hogy létezik e a sorozat tmdb-n
+            }
+
+            return isExistOnTvMaze;
         }
     }
 }

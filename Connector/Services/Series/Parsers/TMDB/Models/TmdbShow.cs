@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Series.Parsers.TMDB.Models.TmdbShowModels;
 
 namespace Series.Parsers.TMDB.Models
@@ -6,21 +7,46 @@ namespace Series.Parsers.TMDB.Models
     public class TmdbShow
     {
         public string Id;
-        public List<Creator> Created_by;
-        public List<string> Episode_run_time;
-        public string First_air_date;
+
+
+        [JsonProperty("created_by")]
+        public List<Creator> CreatedBy;
+
+        [JsonProperty("episode_run_time")]
+        public List<string> EpisodeRunTime;
+
+        [JsonProperty("first_air_date")]
+        public string FirstAirDate;
+
         public List<Genre> Genres;
-        public string Original_language;
-        public TmdbEpisodeSimple Last_Episode_To_Air;
+
+        [JsonProperty("original_language")]
+        public string OriginalLanguage;
+
+        [JsonProperty("last_episode_to_air")]
+        public TmdbEpisodeSimple LastEpisodeToAir;
+
         public string Name;
+
         public List<Network> Networks;
+
         public string Overview;
+
         public string Popularity;
-        public List<ProductionCompany> Production_companies;
+
+        [JsonProperty("production_companies")]
+        public List<ProductionCompany> ProductionCompanies;
+
         public List<TmdbSeasonSimple> Seasons;
+
         public string Status;
+
         public string Type;
-        public double? Vote_average;
-        public int Vote_count;
+
+        [JsonProperty("vote_average")]
+        public double? VoteAverage;
+
+        [JsonProperty("vote_count")]
+        public int VoteCount;
     } 
 }

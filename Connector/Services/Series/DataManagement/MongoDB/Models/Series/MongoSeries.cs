@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Contracts.Models.Series.ExtendClasses;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Series.Parsers.Trakt.Models;
@@ -14,7 +15,7 @@ namespace Series.DataManagement.MongoDB.Models.Series
         public string Id { get; set; }
         public string SeriesId { get; set; }
         public string Title { get; set; }
-        public List<Season> Seasons { get; set; }
+        public List<MongoSeason> Seasons { get; set; }
         public List<string> Runtime { get; set; }
         public double? Rating { get; set; }
         public string Year { get; set; }
@@ -22,7 +23,7 @@ namespace Series.DataManagement.MongoDB.Models.Series
         public string Description { get; set; }
         public int TotalSeasons { get; set; }
         public string LastUpdated { get; set; }
-
+        public InternalShowCast Cast { get; set; }
 
 
         //public List<string> ExternalIds { get; set; } TODO

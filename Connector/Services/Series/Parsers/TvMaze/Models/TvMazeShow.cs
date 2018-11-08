@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Series.Parsers.TMDB.Models.TmdbShowModels;
 
 namespace Series.Parsers.TvMaze.Models
 {
@@ -14,5 +15,6 @@ namespace Series.Parsers.TvMaze.Models
         public string Status;
         public string Summary;
         public string Updated;
+        public TvMazeShowCast Cast;
     }
 }

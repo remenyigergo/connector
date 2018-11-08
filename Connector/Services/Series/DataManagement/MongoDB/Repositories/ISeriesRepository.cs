@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Contracts.Models.Series;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.Service.Models;
-using Season = Series.DataManagement.MongoDB.Models.Series.Season;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {
@@ -14,7 +13,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<List<MongoSeries>> GetSeriesByTitle(string name);
         Task AddInternalSeries(InternalSeries series);
         Task AddEpisodes(List<InternalEpisode> episodes);
-        Task AddSeason(Season season, int seriesId);
+        Task AddSeason(MongoSeason mongoSeason, int seriesId);
         Task DeleteSeriesById(int id);
         Task<bool> IsSeriesImported(string title);
         Task<bool> IsUpToDate(string title, string updateCode);
@@ -25,5 +24,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<bool> IsSeriesAddedToUser(int userid, int seriesid);
         Task MarkEpisodeStarted(EpisodeStartedModel episodeStartedModel);
         Task<bool> IsEpisodeStarted(EpisodeStartedModel episodeStartedModel);
+
+        Task<bool> GetShow(EpisodeStarted episodeStarted,string title);
+        Task<bool> IsShowExist(string title);
     }
 }
+

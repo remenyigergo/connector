@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Series.Parsers.Trakt.Models.TraktShowModels.SeasonModel
 {
-    public class InternalCrew
+    public class InternalEpisodeCrew
     {
         public string Department;
         public string Job;

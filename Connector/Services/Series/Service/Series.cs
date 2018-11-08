@@ -33,8 +33,7 @@ namespace Series.Service
             await IsSeriesImported(title);
 
             var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
-            //var tvMazeSeries = new InternalSeries();
-            //tvMazeSeries = null;
+            
             await _repo.AddInternalSeries(tvMazeInternalSeries);
 
             if (tvMazeInternalSeries != null)
@@ -109,6 +108,16 @@ namespace Series.Service
             {
                 throw new InternalException((int)CoreCodes.UpToDate, "The series is up to date.");
             }
+        }
+
+        public async Task<bool> GetShow(EpisodeStarted episodeStarted, string title)
+        {
+            return await _repo.GetShow(episodeStarted, title);
+        }
+
+        public async Task<bool> IsShowExist(string title)
+        {
+            return await _repo.IsShowExist(title);
         }
     }
 }
