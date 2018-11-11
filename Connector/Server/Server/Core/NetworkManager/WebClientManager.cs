@@ -13,42 +13,44 @@ namespace Core.NetworkManager
     {
         public async Task<T> Get<T>(string url)
         {
-            WebClient c = new WebClient();
-            var data = await c.DownloadStringTaskAsync(new Uri(url));
-            return JsonConvert.DeserializeObject<T>(data);
+            using (var c = new WebClient())
+            {
+                var data = await c.DownloadStringTaskAsync(new Uri(url));
+                return JsonConvert.DeserializeObject<T>(data);
+            }
         }
 
-        public async Task<string> Post<T>(string url, PostRequestModel body)
-        {
-            HttpClient c = new HttpClient();
+        //public async Task<string> Post<T>(string url, PostRequestModel body)
+        //{
+        //    HttpClient c = new HttpClient();
 
-            try
-            {
-                string json = JsonConvert.SerializeObject(body);
-                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                var request = await c.PostAsync(new Uri(url), httpContent);
+        //    try
+        //    {
+        //        string json = JsonConvert.SerializeObject(body);
+        //        var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+        //        var request = await c.PostAsync(new Uri(url), httpContent);
 
-                var response = await request.Content.ReadAsStringAsync();
+        //        var response = await request.Content.ReadAsStringAsync();                
 
-                return response;
-            }
-            catch (TaskCanceledException ex)
-            {
-                if (ex.CancellationToken.IsCancellationRequested)
-                {
-                    return "cancelledout";
-                }
-                else
-                {
-                    return "timed out";
-                }
-            }
+        //        return response;
+        //    }
+        //    catch (TaskCanceledException ex)
+        //    {
+        //        if (ex.CancellationToken.IsCancellationRequested)
+        //        {
+        //            return "cancelledout";
+        //        }
+        //        else
+        //        {
+        //            return "timed out";
+        //        }
+        //    }
             
-            //var data = await c.DownloadStringTaskAsync(new Uri(url));
-            //return JsonConvert.DeserializeObject<T>(data);
-        }
+        //    //var data = await c.DownloadStringTaskAsync(new Uri(url));
+        //    //return JsonConvert.DeserializeObject<T>(data);
+        //}
 
-        public async Task<string> PostCheckShowExist<T>(string url, InternalImportRequest body)
+        public async Task<int> Post<T>(string url, InternalImportRequest body)
         {
             
             HttpClient c = new HttpClient();
@@ -58,7 +60,23 @@ namespace Core.NetworkManager
 
             var response = await request.Content.ReadAsStringAsync();
 
-            return response;
+            return Int32.Parse(response);
+            //return bool.TryParse(response, out var result);
         }
+
+        public async Task<string> GetShowPost<T>(string url, InternalImportRequest body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+
+            return response;
+            //return bool.TryParse(response, out var result);
+        }
+
     }
 }

@@ -19,7 +19,7 @@ namespace Series.Parsers.IMDB
             
             return new Contracts.Models.Series.InternalSeries()
             {
-                SeriesId = IMDBSeries.ImdbId,
+                TvMazeId = IMDBSeries.ImdbId,
                 Runtime = IMDBSeries.Runtime,
                 Description = IMDBSeries.Plot,
                 Rating = IMDBSeries.ImdbRating,

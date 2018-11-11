@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Contracts.Exceptions;
 using Contracts.Models.Series;
 using Contracts.Models.Series.ExtendClasses;
 using Contracts.Models.Series.ExtendClasses.Cast;
@@ -29,41 +30,57 @@ namespace Series.Parsers.TMDB
         private const string _endpoint = "https://api.themoviedb.org";
         private const string _lang = "en-US";
         private const string _key = "e9443688992dbb4fa3940ed77a0a8e1d";
-        
+
 
         public async Task<InternalSeries> ImportTmdbSeries(string title)
         {
-            var tmdbQueryShow = await new WebClientManager().Get<TmdbQueryShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
-            var tmdbShowForID = tmdbQueryShow.Results[0];
-            var tmdbShowSimple = await new WebClientManager().Get<TmdbShow>($"{_endpoint}/3/tv/{tmdbShowForID.Id}?api_key={_key}&language={_lang}");
-
-
-            var seasons = GetSeasons(tmdbShowSimple, tmdbShowForID.Id);
-            
-
-            return new InternalSeries()
+            try
             {
-                Id = tmdbShowSimple.Id,
-                Runtime = tmdbShowSimple.EpisodeRunTime.Select(x=>x.Length.ToString()).ToList(),
-                Title = tmdbShowSimple.Name,
-                Seasons = await seasons,
-                Categories = tmdbShowSimple.Genres.Select(x => x.Name).ToList(),
-                Description = tmdbShowSimple.Overview,
-                Rating = tmdbShowSimple.VoteAverage,
-                CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator() { Name = x.Name }).ToList(),
-                EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
-                FirstAirDate = tmdbShowSimple.FirstAirDate,
-                Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre() { Name = x.Name }).ToList(),
-                LastEpisodeSimpleToAir = InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.LastEpisodeToAir),
-                Networks = InternalConverter.ConvertTmdbNetworkToInternal(tmdbShowSimple.Networks),
-                Popularity = tmdbShowSimple.Popularity,
-                ProductionCompanies = InternalConverter.ConvertTmdbProductionCompanyToInternal(tmdbShowSimple.ProductionCompanies),
-                Status = tmdbShowSimple.Status,
-                Type = tmdbShowSimple.Type,
-                VoteCount = tmdbShowSimple.VoteCount,
-                OriginalLanguage = tmdbShowSimple.OriginalLanguage,
-                //TODO: CAST FELSZEDÉSE
-            };
+                var tmdbQueryShow =
+                    await new WebClientManager().Get<TmdbQueryShow>(
+                        $"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+
+                var tmdbShowForID = tmdbQueryShow.Results[0];
+
+                var tmdbShowSimple =
+                    await new WebClientManager().Get<TmdbShow>(
+                        $"{_endpoint}/3/tv/{tmdbShowForID.Id}?api_key={_key}&language={_lang}");
+
+
+                var seasons = GetSeasons(tmdbShowSimple, tmdbShowForID.Id);
+
+
+                return new InternalSeries()
+                {
+                    TmdbId = tmdbShowSimple.Id,
+                    Runtime = tmdbShowSimple.EpisodeRunTime.Select(x => x.Length.ToString()).ToList(),
+                    Title = tmdbShowSimple.Name,
+                    Seasons = await seasons,
+                    Categories = tmdbShowSimple.Genres.Select(x => x.Name).ToList(),
+                    Description = tmdbShowSimple.Overview,
+                    Rating = tmdbShowSimple.VoteAverage,
+                    CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator() { Name = x.Name }).ToList(),
+                    EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
+                    FirstAirDate = tmdbShowSimple.FirstAirDate,
+                    Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre() { Name = x.Name }).ToList(),
+                    LastEpisodeSimpleToAir =
+                        InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.LastEpisodeToAir),
+                    Networks = InternalConverter.ConvertTmdbNetworkToInternal(tmdbShowSimple.Networks),
+                    Popularity = tmdbShowSimple.Popularity,
+                    ProductionCompanies =
+                        InternalConverter.ConvertTmdbProductionCompanyToInternal(tmdbShowSimple.ProductionCompanies),
+                    Status = tmdbShowSimple.Status,
+                    Type = tmdbShowSimple.Type,
+                    VoteCount = tmdbShowSimple.VoteCount,
+                    OriginalLanguage = tmdbShowSimple.OriginalLanguage,
+                    //TODO: CAST FELSZEDÉSE
+                };
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                throw new InternalException(605, "Series not found on TMDB.");
+            }
+
 
         }
 
@@ -81,8 +98,16 @@ namespace Series.Parsers.TMDB
             return InternalConverter.ConvertTmdbSeasonToInternalSeason(_tmdbSeasons);
         }
 
-        
 
-        
+        public async Task<bool> IsShowExistInTmdb(string title)
+        {
+            var show = await new WebClientManager().Get<TmdbShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+            if (show != null)
+            {
+                return show.Name == title;
+            }
+            return false;
+        }
+
     }
 }

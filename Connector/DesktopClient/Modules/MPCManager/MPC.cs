@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DesktopClient.Modules.Helper;
+using Contracts.Requests;
 using DesktopClient.MPCManager;
-using Series.Service.Response;
+using DesktopClient.Modules.Helpers;
 
-namespace DesktopClient.MPCManager
+namespace DesktopClient.Modules.MPCManager
 {
     class MPC : IMPCManager
     {
         public async Task<bool> IsMediaRunning()
         {
+            //TODO Ne csak 64bites MPC-t találjunk meg 
             var process = new ProcessManager().FindProcessByName("mpc-hc64");
 
             if (process != null)
@@ -25,26 +22,39 @@ namespace DesktopClient.MPCManager
             return false;
         }
 
-        
+
 
         public async Task<bool> RecognizeMedia(Process playerProcess)
         {
-            if (playerProcess.MainModule.FileVersionInfo.FileDescription == "MPC-HC")
+
+            var name = Helper.GetTitle(playerProcess.MainWindowTitle);
+            var showExistInMongo = await Helper.Parse(name);
+            
+            switch (showExistInMongo)
             {
-                var titleNameWithoutVersion = new Helper().DeleteVersionName(playerProcess.MainWindowTitle);
-                var cleaned = new Helper().Cleaning(titleNameWithoutVersion);
+                case -1:
+                    return false; //EKKOR NINCS ILYEN SOROZAT
 
-                if (cleaned[0] != null)
-                {
+                case 1:
+                    var imr = new InternalMarkRequest()
+                    {
+                        SeriesId = await Helper.GetShow(name),
+                        SeasonNumber = Helper.GetSeasonNumber(playerProcess.MainWindowTitle),
+                        EpisodeNumber = Helper.GetEpisodeNumber(playerProcess.MainWindowTitle)
+                    };
+                    await Helper.MarkRequest(imr);
+                    break;
 
-                    var show = await new Helper().TryNames(cleaned);
-                    return show != -1;
-                }
-                
+                case 2:
+                case 3:
+                    await Helper.ImportRequest(name);
+                    break;
 
-                return true;
+                case -2:
+                    return false; //EKKOR REQUEST HIBA VOLT
+
+                default: return false;
             }
-
             return false;
         }
 

@@ -11,7 +11,8 @@ namespace Contracts.Models.Series
     {
         //TVMAZE
         public string Id { get; set; }
-        public string SeriesId { get; set; }
+        public string TvMazeId { get; set; }
+        public string TmdbId { get; set; }
         public string Title { get; set; }
         public List<InternalSeason> Seasons { get; set; }
         public List<string> Runtime { get; set; }
@@ -40,10 +41,10 @@ namespace Contracts.Models.Series
 
         public void Merge(InternalSeries from)
         {
-            CreatedBy = from.CreatedBy;
+            Id = from.TvMazeId;
+            TmdbId = from.TmdbId;
             EpisodeRunTime = from.EpisodeRunTime;
             FirstAirDate = from.FirstAirDate;
-            CreatedBy = from.CreatedBy;
             Genres = from.Genres;
             LastEpisodeSimpleToAir = from.LastEpisodeSimpleToAir;
             CreatedBy = from.CreatedBy;
@@ -57,7 +58,7 @@ namespace Contracts.Models.Series
             Year = from.Year;
             Type = from.Type;
             OriginalLanguage = from.OriginalLanguage;
-            TotalSeasons = from.TotalSeasons;
+            TotalSeasons = from.TotalSeasons;            
 
             foreach (var season in from.Seasons)
             {

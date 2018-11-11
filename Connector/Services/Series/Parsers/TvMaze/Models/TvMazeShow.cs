@@ -5,6 +5,7 @@ namespace Series.Parsers.TvMaze.Models
 {
     public class TvMazeShow
     {
+
         public string Id;
         public string Runtime;
         public string Name;

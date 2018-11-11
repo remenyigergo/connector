@@ -10,7 +10,7 @@ namespace DesktopClient.MPCManager
     {
         Task<bool> IsMediaRunning();
         Task<bool> RecognizeMedia(Process process);
-        //Task<bool> IsItValidShow(string title);  átkerült a  helperbe
+        //Task<bool> IsTheShowExist(string title);  átkerült a  helperbe
 
     }
 }

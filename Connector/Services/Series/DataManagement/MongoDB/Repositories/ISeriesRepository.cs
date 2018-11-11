@@ -26,7 +26,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<bool> IsEpisodeStarted(EpisodeStartedModel episodeStartedModel);
 
         Task<bool> GetShow(EpisodeStarted episodeStarted,string title);
-        Task<bool> IsShowExist(string title);
+        Task<bool> IsShowExistInMongoDb(string title);
+        Task<InternalSeries> GetSeries(string title);
     }
 }
 

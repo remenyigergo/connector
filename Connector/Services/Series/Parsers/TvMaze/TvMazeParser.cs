@@ -21,27 +21,37 @@ namespace Series.Parsers.TvMaze
         //LESZEDJÜK AZ APIN KERESZTÜL ÉS ÁTALAKÍTJUK SAJÁT SOROZAT FORMÁTUMRA
         public async Task<Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title)
         {
-            var tvMazeSeries = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
-            var firstSeries = tvMazeSeries[0];
-            var seasons = await ImportSeasons(firstSeries.Show.Name, Int32.Parse(firstSeries.Show.Id));    //ÖSSZES SZEZON
-            var cast = await GetCast(Int32.Parse(firstSeries.Show.Id));
-
-            //A végleges belső MongoSeries modelje
-            if (firstSeries != null && seasons != null)
+            try
             {
-                return new InternalSeries()
+                var tvMazeSeries =
+                    await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
+                var firstSeries = tvMazeSeries[0];
+                var seasons =
+                    await ImportSeasons(firstSeries.Show.Name, Int32.Parse(firstSeries.Show.Id)); //ÖSSZES SZEZON
+                var cast = await GetCast(Int32.Parse(firstSeries.Show.Id));
+
+                //A végleges belső MongoSeries modelje
+                if (firstSeries != null && seasons != null)
                 {
-                    SeriesId = firstSeries.Show.Id,
-                    Runtime = new List<string>() { firstSeries.Show.Runtime },
-                    Title = firstSeries.Show.Name,
-                    Seasons = seasons,
-                    Categories = firstSeries.Show.Genres,
-                    Description = firstSeries.Show.Summary,
-                    Rating = firstSeries.Show.Rating.Average,
-                    LastUpdated = firstSeries.Show.Updated,
-                    Cast = cast
-                };
+                    return new InternalSeries()
+                    {
+                        TvMazeId = firstSeries.Show.Id,
+                        Runtime = new List<string>() {firstSeries.Show.Runtime},
+                        Title = firstSeries.Show.Name,
+                        Seasons = seasons,
+                        Categories = firstSeries.Show.Genres,
+                        Description = firstSeries.Show.Summary,
+                        Rating = firstSeries.Show.Rating.Average,
+                        LastUpdated = firstSeries.Show.Updated,
+                        Cast = cast
+                    };
+                }
             }
+            catch (Exception ex)
+            {
+                throw new InternalException(605, "Series not found on TVMAZE.");
+            }
+            
 
             return null;
         }
@@ -168,7 +178,7 @@ namespace Series.Parsers.TvMaze
             return sb.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        public async Task<bool> IsShowExist(string title)
+        public async Task<bool> IsShowExistInTvMaze(string title)
         {
             var boolean = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
             if (boolean.Count>0)

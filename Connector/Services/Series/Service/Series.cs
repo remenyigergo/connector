@@ -6,6 +6,7 @@ using Contracts.Models.Series;
 using Core.Dependency;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.Repositories;
 using Series.Parsers;
 using Series.Parsers.TMDB;
@@ -34,7 +35,7 @@ namespace Series.Service
 
             var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
             
-            await _repo.AddInternalSeries(tvMazeInternalSeries);
+            //await _repo.AddInternalSeries(tvMazeInternalSeries);
 
             if (tvMazeInternalSeries != null)
             {
@@ -114,10 +115,24 @@ namespace Series.Service
         {
             return await _repo.GetShow(episodeStarted, title);
         }
-
-        public async Task<bool> IsShowExist(string title)
+        public async Task<InternalSeries> GetSeries(string title)
         {
-            return await _repo.IsShowExist(title);
+            return await _repo.GetSeries(title);
+        }
+
+        public async Task<bool> IsShowExistInMongoDb(string title)
+        {
+            return await _repo.IsShowExistInMongoDb(title);
+        }
+
+        public async Task<bool> IsShowExistInTvMaze(string title)
+        {
+            return await new TvMazeParser().IsShowExistInTvMaze(title);
+        }
+
+        public async Task<bool> IsShowExistInTmdb(string title)
+        {
+            return await new TmdbParser().IsShowExistInTmdb(title);
         }
     }
 }

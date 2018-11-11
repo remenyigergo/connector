@@ -13,6 +13,8 @@ namespace Series.DataManagement.MongoDB.Models.Series
         [BsonIgnoreIfNull]
         [BsonRepresentation(BsonType.ObjectId)]        
         public string Id { get; set; }
+        public string TvMazeId { get; set; }
+        public string TmdbId { get; set; }
         public string SeriesId { get; set; }
         public string Title { get; set; }
         public List<MongoSeason> Seasons { get; set; }

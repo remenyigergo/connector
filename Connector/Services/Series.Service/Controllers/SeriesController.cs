@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Series.Service.Models;
 using Contracts.Models.Series;
 using Contracts.Requests;
+using Series.Service.Requests;
 using Series.Service.Response;
 
 namespace Series.Service.Controllers
@@ -26,11 +27,11 @@ namespace Series.Service.Controllers
             {
                 if (string.IsNullOrEmpty(request.Title))
                 {
-                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
@@ -39,9 +40,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int) CoreCodes.AlreadyImported)
+                if (ex.ErrorCode == (int)CoreCodes.AlreadyImported)
                 {
-                    Response.StatusCode = (int) HttpStatusCode.Conflict;
+                    Response.StatusCode = (int)HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -52,11 +53,11 @@ namespace Series.Service.Controllers
             }
             catch (Exception e)
             {
-                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -64,7 +65,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int) CoreCodes.NoError,
+                ResultCode = (int)CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -77,11 +78,11 @@ namespace Series.Service.Controllers
                 if (string.IsNullOrEmpty(request.SeasonNumber) || string.IsNullOrEmpty(request.EpisodeNumber) ||
                     string.IsNullOrEmpty(request.SeriesId) || string.IsNullOrEmpty(request.UserId))
                 {
-                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -104,7 +105,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int) CoreCodes.NoError,
+                ResultCode = (int)CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -116,11 +117,11 @@ namespace Series.Service.Controllers
             {
                 if (request.Seriesid == null || request.Userid == null)
                 {
-                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -211,10 +212,35 @@ namespace Series.Service.Controllers
             return await new Series().GetShow(request.Episode, request.Title);
         }
 
-        [HttpPost("exist")]
-        public async Task<bool> IsShowExist([FromBody] InternalImportRequest request)
+        [HttpPost("getseries")]
+        public async Task<InternalSeries> GetSeries([FromBody] GetSeriesRequest request)
         {
-            return await new Series().IsShowExist(request.Title);
+            return await new Series().GetSeries(request.Title);
+        }
+
+        [HttpPost("exist")]
+        public async Task<int> IsShowExist([FromBody] InternalImportRequest request)  //DB : 1, TVMAZE: 2, TMDB: 3, Egyik sem: -1, Request hiba: -2
+        {
+            if (request != null)
+            {
+                if (await new Series().IsShowExistInMongoDb(request.Title))
+                {
+                    return 1;
+                }
+
+                var tvmazexist = await new Series().IsShowExistInTvMaze(request.Title);
+                var tmdbexist = await new Series().IsShowExistInTvMaze(request.Title);
+                if (tvmazexist)
+                {
+                    if (tmdbexist)
+                    {
+                        return 3;
+                    }
+                    return 2;
+                }
+                return -1;
+            }
+            return -2;
         }
     }
 }

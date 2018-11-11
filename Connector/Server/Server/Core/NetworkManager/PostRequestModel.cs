@@ -10,7 +10,7 @@ namespace Core.NetworkManager
         [JsonProperty("Title")]
         public string ShowTitle;
         //public string UserId;
-        //public string SeriesId;
+        //public string TvMazeId;
         public int SeasonNumber;
         public int EpisodeNumber;
         //public string Date;
