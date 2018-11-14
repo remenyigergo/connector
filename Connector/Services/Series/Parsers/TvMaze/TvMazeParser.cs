@@ -4,11 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Contracts.Exceptions;
-using Contracts.Models.Series;
-using Contracts.Models.Series.ExtendClasses;
-using Contracts.Models.Series.ExtendClasses.Cast;
-using Core.NetworkManager;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Contracts.Models.Series.ExtendClasses.Cast;
+using Standard.Core.NetworkManager;
 using Series.Parsers.TMDB.Models.TmdbShowModels;
 using Series.Parsers.TvMaze.Models;
 
@@ -19,7 +19,7 @@ namespace Series.Parsers.TvMaze
         private const string _endpoint = "http://api.tvmaze.com";
 
         //LESZEDJÜK AZ APIN KERESZTÜL ÉS ÁTALAKÍTJUK SAJÁT SOROZAT FORMÁTUMRA
-        public async Task<Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title)
+        public async Task<Standard.Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace Series.Parsers.TvMaze
 
                 if (s.Count > 0)
                 {
-                    var removedAccent = RemoveDiacritics(s[0].Show.Name.ToLower());
+                    var removedAccent = RemoveAccent(s[0].Show.Name.ToLower());
                     if (title.ToLower().Equals(removedAccent))
                     {
                         return true;
@@ -161,22 +161,6 @@ namespace Series.Parsers.TvMaze
             return false;
         }
 
-        static string RemoveDiacritics(string text)
-        {
-            string formD = text.Normalize(NormalizationForm.FormD);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (char ch in formD)
-            {
-                UnicodeCategory uc = CharUnicodeInfo.GetUnicodeCategory(ch);
-                if (uc != UnicodeCategory.NonSpacingMark)
-                {
-                    sb.Append(ch);
-                }
-            }
-
-            return sb.ToString().Normalize(NormalizationForm.FormC);
-        }
 
         public async Task<bool> IsShowExistInTvMaze(string title)
         {
@@ -185,7 +169,9 @@ namespace Series.Parsers.TvMaze
             {
                 foreach (var series in boolean)
                 {
-                    if (series.Show.Name.ToLower() == title.ToLower())
+                    var seriesName = RemoveAccent(series.Show.Name.ToLower());
+
+                    if (seriesName == title.ToLower())
                     {
                         return true;
                     }
@@ -193,6 +179,16 @@ namespace Series.Parsers.TvMaze
             }
 
             return false;
+        }
+
+        public string RemoveAccent(string text)
+        {
+            var decomposed = text.Normalize(NormalizationForm.FormD);
+
+            char[] filtered = decomposed
+                .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+            return new String(filtered);
         }
 
 

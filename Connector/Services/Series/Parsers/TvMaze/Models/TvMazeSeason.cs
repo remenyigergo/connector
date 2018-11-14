@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Contracts.Models.Series;
+using Standard.Contracts.Models.Series;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 

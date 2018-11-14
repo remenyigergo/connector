@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
-using Contracts;
-using Contracts.Enum;
-using Contracts.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Series.Service.Models;
-using Contracts.Models.Series;
-using Contracts.Requests;
 using Series.Service.Requests;
 using Series.Service.Response;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Requests;
 
 namespace Series.Service.Controllers
 {
@@ -27,11 +29,11 @@ namespace Series.Service.Controllers
             {
                 if (string.IsNullOrEmpty(request.Title))
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
@@ -40,9 +42,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyImported)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyImported)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    Response.StatusCode = (int) HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -53,11 +55,11 @@ namespace Series.Service.Controllers
             }
             catch (Exception e)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -65,7 +67,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -78,11 +80,11 @@ namespace Series.Service.Controllers
                 if (string.IsNullOrEmpty(request.SeasonNumber) || string.IsNullOrEmpty(request.EpisodeNumber) ||
                     string.IsNullOrEmpty(request.SeriesId) || string.IsNullOrEmpty(request.UserId))
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -92,11 +94,11 @@ namespace Series.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -105,7 +107,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -117,11 +119,11 @@ namespace Series.Service.Controllers
             {
                 if (request.Seriesid == null || request.Userid == null)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -130,9 +132,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyAdded)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyAdded)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    Response.StatusCode = (int) HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -144,11 +146,11 @@ namespace Series.Service.Controllers
 
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -157,7 +159,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -181,11 +183,11 @@ namespace Series.Service.Controllers
 
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = true,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -194,10 +196,9 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully marked."
             };
-
         }
 
         [HttpPost("update")]
@@ -219,7 +220,9 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("exist")]
-        public async Task<int> IsShowExist([FromBody] InternalImportRequest request)  //DB : 1, TVMAZE: 2, TMDB: 3, Egyik sem: -1, Request hiba: -2
+        public async Task<int>
+            IsShowExist(
+                [FromBody] InternalImportRequest request) //DB : 1, TVMAZE: 2, TMDB: 3, Egyik sem: -1, Request hiba: -2
         {
             if (request != null)
             {
@@ -227,9 +230,9 @@ namespace Series.Service.Controllers
                 {
                     return 1;
                 }
-
+                request.Title = RemoveAccent(request.Title);
                 var tvmazexist = await new Series().IsShowExistInTvMaze(request.Title);
-                var tmdbexist = await new Series().IsShowExistInTvMaze(request.Title);
+                var tmdbexist = await new Series().IsShowExistInTmdb(request.Title);
                 if (tvmazexist)
                 {
                     if (tmdbexist)
@@ -241,6 +244,16 @@ namespace Series.Service.Controllers
                 return -1;
             }
             return -2;
+        }
+
+        public string RemoveAccent(string text)
+        {
+            var decomposed = text.Normalize(NormalizationForm.FormD);
+
+            char[] filtered = decomposed
+                .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+            return new String(filtered);
         }
     }
 }

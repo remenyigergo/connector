@@ -8,10 +8,11 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>KeyEventForm</RootNamespace>
     <AssemblyName>KeyEventForm</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.8.10.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\Server\Server\packages\HtmlAgilityPack.1.8.10\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,6 +56,14 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Helpers\Helper.cs" />
+    <Compile Include="Modules\MPCManager\IMPCManager.cs" />
+    <Compile Include="Modules\MPCManager\MPC.cs" />
+    <Compile Include="Modules\ProcessManager\ProcessManager.cs" />
+    <Compile Include="Modules\SubtitleManager\Downloader.cs" />
+    <Compile Include="Modules\SubtitleManager\FeliratokInfo\FeliratokInfoDownloader.cs" />
+    <Compile Include="Modules\SubtitleManager\FeliratokInfo\Models\SubtitleModel.cs" />
+    <Compile Include="Modules\SubtitleManager\SubtitleFetcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -62,7 +74,9 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -76,5 +90,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts.Standard\Standard.Contracts.csproj">
+      <Project>{1814874b-d3bf-4abb-9682-94d345ebb72a}</Project>
+      <Name>Standard.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Standard.Core\Standard.Core.csproj">
+      <Project>{8bf7417e-2073-4c69-aafa-92286b0a7e93}</Project>
+      <Name>Standard.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

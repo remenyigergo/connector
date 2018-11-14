@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Contracts.Requests;
-using Core.NetworkManager;
+using Standard.Contracts.Requests;
+using Standard.Core.NetworkManager;
 using Series.Parsers.TMDB.Models.TmdbShowModels;
 using Series.Parsers.TvMaze.Models;
 using Series.Service.Models;
@@ -26,8 +26,16 @@ namespace DesktopClient.Modules.Helpers
 
         public static string GetTitle(string text)
         {
+
             var regexResult = regexPattern.Matches(text);
-            return regexResult[0].Groups[2].Value.Replace('.', ' ');
+
+            if (regexResult.Count > 0)
+            {
+                return regexResult[0].Groups[2].Value.Replace('.', ' ');
+            }
+
+            return null;
+
         }
 
         public static int GetSeasonNumber(string text)

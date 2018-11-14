@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Contracts.Requests;
+using System.Timers;
+using Standard.Contracts.Requests;
 using DesktopClient.MPCManager;
 using DesktopClient.Modules.Helpers;
 
@@ -9,20 +9,16 @@ namespace DesktopClient.Modules.MPCManager
 {
     class MPC : IMPCManager
     {
-        public async Task<bool> IsMediaRunning()
+        public Process IsMediaRunning()
         {
-            //TODO Ne csak 64bites MPC-t találjunk meg 
-            var process = new ProcessManager().FindProcessByName("mpc-hc64");
-
-            if (process != null)
-            {
-                await RecognizeMedia(process);
-            }
-
-            return false;
+            return new ProcessManager().FindProcessByName("mpc-hc");
         }
 
-
+        public async Task Timering(string title)
+        {
+            Timer t = new Timer(1000);
+            
+        }
 
         public async Task<bool> RecognizeMedia(Process playerProcess)
         {

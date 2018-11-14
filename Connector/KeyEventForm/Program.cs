@@ -28,10 +28,10 @@ namespace KeyEventForm
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            _hookID = SetHook(_proc);
+            //_hookID = SetHook(_proc);
             Application.Run(new Form1());
             
-            UnhookWindowsHookEx(_hookID);
+            //UnhookWindowsHookEx(_hookID);
         }
 
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.DataManager.Mongo.DbModels;
-using Core.DataManager.Mongo.IRepository;
-using Core.DataManager.Mongo.Repository;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.DataManager.MongoDB.IRepository;
+using Standard.Core.DataManager.MongoDB.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;

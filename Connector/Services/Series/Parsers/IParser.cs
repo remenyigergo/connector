@@ -5,6 +5,6 @@ namespace Series.Parsers
 {
     public interface IParser
     {
-        Task<Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title);
+        Task<Standard.Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Contracts.Enum;
-using Contracts.Exceptions;
-using Contracts.Models.Series;
-using Core.Dependency;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Core.Dependency;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Series.DataManagement.MongoDB.Models.Series;

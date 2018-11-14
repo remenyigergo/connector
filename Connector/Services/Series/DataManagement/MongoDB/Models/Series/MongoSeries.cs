@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using Contracts.Models.Series.ExtendClasses;
+using Standard.Contracts.Models.Series.ExtendClasses;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Series.Parsers.Trakt.Models;
-using Series.Parsers.Trakt.Models.TraktShowModels;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {

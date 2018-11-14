@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using Contracts.Exceptions;
-using Contracts.Models.Series;
-using Contracts.Models.Series.ExtendClasses;
-using Contracts.Models.Series.ExtendClasses.Cast;
-using Core.NetworkManager;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Core.NetworkManager;
 using Series.Parsers.TMDB.Models;
-using Series.Parsers.TMDB.Models.TmdbShowModels;
 using Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper;
 using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
-using Series.Parsers.Trakt.Models;
-using Series.Parsers.Trakt.Models.TraktShowModels;
-using Series.Parsers.Trakt.Models.TraktShowModels.SeasonModel;
 
 namespace Series.Parsers.TMDB
 {
@@ -101,12 +95,24 @@ namespace Series.Parsers.TMDB
 
         public async Task<bool> IsShowExistInTmdb(string title)
         {
-            var show = await new WebClientManager().Get<TmdbShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
-            if (show != null)
+            var show = await new WebClientManager().Get<TmdbQueryShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+            Console.WriteLine($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+            if (show.Results.Count > 0)
             {
-                return show.Name == title;
+                var showName = RemoveAccent(show.Results[0].Name);
+                return showName == title;
             }
             return false;
+        }
+
+        public string RemoveAccent(string text)
+        {
+            var decomposed = text.Normalize(NormalizationForm.FormD);
+
+            char[] filtered = decomposed
+                .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+            return new String(filtered);
         }
 
     }

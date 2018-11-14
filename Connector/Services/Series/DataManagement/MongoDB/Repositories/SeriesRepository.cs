@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Contracts.Models.Series;
-using Core.DataManager.Mongo;
-using Core.DataManager.Mongo.DbModels;
-using Core.DataManager.Mongo.Extensions;
+using Standard.Contracts.Models.Series;
+using Standard.Core.DataManager.MongoDB;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.DataManager.MongoDB.Extensions;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;

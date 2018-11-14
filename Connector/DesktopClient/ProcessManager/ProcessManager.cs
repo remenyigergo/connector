@@ -17,9 +17,11 @@ namespace DesktopClient
 
         public Process FindProcessByName(string processName)
         {
-            var p = Process.GetProcessesByName(processName).FirstOrDefault(process => process.ProcessName.StartsWith(processName));
-            Console.WriteLine(p);
-            return p;
+            //var p = Process.GetProcessesByName(processName).First(process => process.MainModule.FileName.Contains(processName));
+
+            var s = Process.GetProcesses().FirstOrDefault(process => process.ProcessName.Contains(processName));
+            return s;
+
         }
 
     }

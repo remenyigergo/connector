@@ -5,7 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Server\Server\Core\Core.csproj" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="NetFusion.Common" Version="3.2.96" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Contracts.Standard\Standard.Contracts.csproj" />
+    <ProjectReference Include="..\..\Standard.Core\Standard.Core.csproj" />
   </ItemGroup>
 
 </Project>

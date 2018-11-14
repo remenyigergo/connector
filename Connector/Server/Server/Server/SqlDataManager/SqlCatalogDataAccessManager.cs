@@ -1,4 +1,4 @@
-﻿using Core.DataManager.SQL;
+﻿using Standard.Core.DataManager.SQL;
 
 namespace Server.SqlDataManager
 {

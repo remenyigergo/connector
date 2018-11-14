@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DataManager.Mongo;
-using Core.DataManager.SQL;
+using Standard.Core.DataManager.MongoDB;
+using Standard.Core.DataManager.SQL;
 using Server.Models;
 using Server.SqlDataManager;
 

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using Contracts.Models.Series;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
 using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
-using Series.Parsers.Trakt.Models;
-using Series.Parsers.Trakt.Models.TraktShowModels;
-using Series.Parsers.Trakt.Models.TraktShowModels.SeasonModel;
 
 namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Contracts.Models.Series;
+using Standard.Contracts.Models.Series;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.Service.Models;
 
