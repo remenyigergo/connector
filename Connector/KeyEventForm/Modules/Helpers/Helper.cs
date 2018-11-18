@@ -38,39 +38,98 @@ namespace KeyEventForm.Modules.Helpers
 
         }
 
+        public static bool DoesItContainHun(string text)
+        {
+            var regexResult = new Regex(@"[._-](hun|HUN)[._-]").Matches(text);
+            if (regexResult.Count != 0)
+            {
+                return true;
+            }
+            return false;
+        }
 
-        public static string GetEpisodeFromFeliratokInfo(string text)
+        public static string GetEpisodeFromFeliratokInfo1x2(string text)
         {
             var regexResult = SeasonXEpisodePattern.Matches(text);
-            return regexResult[0].Groups[4].Value;
+            if (regexResult.Count != 0)
+            {
+                return regexResult[0].Groups[4].Value;
+            }
+            return "";
         }
-        public static string GetSeasonFromFeliratokInfo(string text)
+
+        public static string GetSeasonFromFeliratokInfo1x2(string text)
         {
             var regexResult = SeasonXEpisodePattern.Matches(text);
-            return regexResult[0].Groups[3].Value;
+            if (regexResult.Count != 0)
+            {
+                return regexResult[0].Groups[3].Value;
+            }
+            return "";
         }
+
+        public static int GetSeasonFromFeliratokInfoEvad(string text)
+        {
+            MatchCollection regexResult = null;
+            regexResult = new Regex(@"\(([0-9]{1,2})(\. Ă©vad\))").Matches(text);
+            if (regexResult.Count != 0)
+            {
+                return Int32.Parse(regexResult[0].Groups[1].Value);
+            }
+            return -1;
+        }
+
+        public static int GetSeasonFromFeliratokInfoThird(string text)
+        {
+            MatchCollection regexResult = null;
+            regexResult = new Regex(@"\((Season )([0-9]{1,2})\)").Matches(text);
+            if (regexResult.Count != 0)
+            {
+                return Int32.Parse(regexResult[0].Groups[2].Value);
+            }
+            return -1;
+        }
+
 
         public static string GetQuality(string text)
         {
             var regexResult = QualityPattern.Matches(text);
-            return regexResult[0].Groups[0].Value;
+            if (regexResult.Count != 0)
+            {
+                return regexResult[0].Groups[0].Value;
+            }
+            return "";
         }
 
         public static string GetReleaser(string text)
         {
             var regexResult = regexPattern.Matches(text);
-            return regexResult[0].Groups[11].Value;
+            if (regexResult.Count != 0)
+            {
+                return regexResult[0].Groups[11].Value;
+            }
+            return "";
+
         }
 
         public static int GetSeasonNumber(string text)
         {
             var regexResult = regexPattern.Matches(text);
-            return Int32.Parse(regexResult[0].Groups[3].Value);
+            if (regexResult.Count != 0)
+            {
+                return Int32.Parse(regexResult[0].Groups[3].Value);
+            }
+            return -1;
+
         }
         public static int GetEpisodeNumber(string text)
         {
             var regexResult = regexPattern.Matches(text);
-            return Int32.Parse(regexResult[0].Groups[4].Value);
+            if (regexResult.Count != 0)
+            {
+                return Int32.Parse(regexResult[0].Groups[4].Value);
+            }
+            return -1;
         }
 
         public static async Task<int> GetShow(string title)

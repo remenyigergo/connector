@@ -78,7 +78,11 @@ namespace KeyEventForm.Modules.SubtitleManager
 
         public static bool DownloadSubtitle(SubtitleModel subtitleModel, string path, string filename)
         {
-            return FeliratokInfoDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path, filename) != false;
+            if (!Helper.DoesItContainHun(filename))
+            {
+                return FeliratokInfoDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path, filename) != false;
+            }
+            return false;
         }
 
         public static string TrimFileName(string path)

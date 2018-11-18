@@ -13,18 +13,19 @@ namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo
     {
         public static string lang = "Magyar";
 
-        public static bool GetFeliratokInfoHtml(SubtitleModel subtitleModel, string url, string folderPath, string filename)
+        public static bool GetFeliratokInfoHtml(SubtitleModel subtitleModel, string url, string folderPath,
+            string filename)
         {
             using (WebClient client = new WebClient())
             {
-                string route = $"/?search={subtitleModel.ShowName}&soriSorszam=&nyelv={lang}&sorozatnev=&sid=&complexsearch=true&knyelv=0&evad={subtitleModel.SeasonNumber}&epizod{subtitleModel.EpisodeNumber}=2&cimke=0&minoseg=0&rlsr=0&tab=all";
-                var data = client.DownloadString(new Uri(url+route));
+                string route =
+                    $"/?search={subtitleModel.ShowName}&soriSorszam=&nyelv={lang}&sorozatnev=&sid=&complexsearch=true&knyelv=0&evad={subtitleModel.SeasonNumber}&epizod{subtitleModel.EpisodeNumber}=2&cimke=0&minoseg=0&rlsr=0&tab=all";
+                var data = client.DownloadString(new Uri(url + route));
 
                 var subtitleList = GetSubtitles(data);
 
                 bool subtitleFound =
                     FindAdherentSubtitleAndDownload(subtitleList, subtitleModel, url, folderPath, filename);
-
 
                 return subtitleFound;
             }
@@ -47,17 +48,28 @@ namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo
             return listOfSubtitles;
         }
 
-        public static bool FindAdherentSubtitleAndDownload(List<HtmlNode> subtitlesHtmlList, SubtitleModel subtitleModel, string url, string folderPath, string filename)
+        public static bool FindAdherentSubtitleAndDownload(List<HtmlNode> subtitlesHtmlList,
+            SubtitleModel subtitleModel, string url, string folderPath, string filename)
         {
-            
-            return FindForExactMatch(subtitlesHtmlList, subtitleModel, url, folderPath, filename);
+            var subtitleFound = FindForExactMatch(subtitlesHtmlList, subtitleModel, url, folderPath, filename);
 
+            if (subtitleFound)
+            {
+                return subtitleFound;
+            }
+            else
+            {
+                subtitleFound = FindSeasonPack(subtitlesHtmlList, subtitleModel, url, folderPath, filename);
+            }
+
+            return false;
         }
 
-        public static bool FindForExactMatch(List<HtmlNode> subtitlesHtmlList, SubtitleModel subtitleModel, string url, string folderPath, string filename)
+        public static bool FindForExactMatch(List<HtmlNode> subtitlesHtmlList, SubtitleModel subtitleModel, string url,
+            string folderPath, string filename)
         {
             //Ebben évadpakk nélkül, és S01-02 nélkül keresünk, pontos egyezésre azaz Megtaláljuk (1x1,1080p-RLSR)
-            
+
 
             string magyarXPath = "//div[@class=\'magyar\']";
             string originalXPath = "//div[@class=\'eredeti\']";
@@ -70,44 +82,111 @@ namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo
 
                 var magyarNode = htmlDocument.DocumentNode.SelectSingleNode(magyarXPath);
                 var originalNode = htmlDocument.DocumentNode.SelectSingleNode(originalXPath);
-                var EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo(magyarNode.InnerText);
-                var SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo(magyarNode.InnerText);
 
-                if (EpisodeFromFeliratokInfo.Length == 0 || SeasonFromFeliratokInfo.Length == 0)
+                string EpisodeFromFeliratokInfo = string.Empty;
+                string SeasonFromFeliratokInfo = string.Empty;
+
+                //A felsőben csak egy kötőjel, megnézi a SOROZATxEPIZÓD stílust, és a leírásos (Season X) stílust is
+                if (magyarNode.InnerText == "-")
                 {
-                    EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo(originalNode.InnerText);
-                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo(originalNode.InnerText);
-                }
+                    EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
+                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
 
-                if (subtitleModel.SeasonNumber == Int32.Parse(SeasonFromFeliratokInfo) && subtitleModel.EpisodeNumber == Int32.Parse(EpisodeFromFeliratokInfo)
-                    && originalNode.InnerText.Contains(subtitleModel.Releaser) && originalNode.InnerText.Contains(subtitleModel.Quality))
-                {
-
-                    //var subtitleDescriptionSplittedByComma = Regex.Split(originalNode.InnerText, ",");
-
-                    using (var client = new WebClient())
+                    if (CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
                     {
-
-
-                        var downloadNode = htmlDocument.DocumentNode.SelectSingleNode(downloadXPath).Attributes["href"].Value;
-                        client.DownloadFile(url + downloadNode, $"{folderPath}\\{filename.Remove(filename.Length-4,4)}.srt");
-                        return true;
+                        return Download(htmlDocument, downloadXPath, url, folderPath, filename);
+                    }
+                    else if (SeasonFromFeliratokInfo.Length == 0)
+                    {
+                        SeasonFromFeliratokInfo =
+                            Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
+                        if (CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
+                        {
+                            return Download(htmlDocument, downloadXPath, url, folderPath, filename);
+                        }
                     }
                 }
 
+                //Évadpakk
+                //Ekkor van sima neve(felsőben), ezért ráapplikálom a (8. évad) stílust a felsőre,
+                //az alsóra meg a (Season 8) félét ha nincs a felsőben találat
+                //ELSŐ KÖRBEN AZ X-est
+                SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfoEvad(magyarNode.InnerText).ToString();
+
+                if (SeasonFromFeliratokInfo.Length == 0)
+                {
+                    EpisodeFromFeliratokInfo = subtitleModel.EpisodeNumber.ToString();  //beállítom, hogy a check ne dobjon hibát
+                    var seasonOnSite = Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText);
+                    if (seasonOnSite == subtitleModel.SeasonNumber && CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
+                    {
+                        return Download(htmlDocument, downloadXPath, url, folderPath, filename);
+                    }
+                }
+
+                //PONTOS EGYEZÉS
+                if (EpisodeFromFeliratokInfo.Length == 0 || SeasonFromFeliratokInfo.Length == 0)
+                {
+                    EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
+                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
+
+                    if (SeasonFromFeliratokInfo.Length == 0)
+                    {
+                        EpisodeFromFeliratokInfo = subtitleModel.EpisodeNumber.ToString();
+                        SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
+                    }
+
+                    if (CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
+                    {
+                        return Download(htmlDocument, downloadXPath, url, folderPath, filename);
+                    }
+                }
             }
+
+            return false;
+        }
+
+        public static bool Download(HtmlDocument htmlDocument, string downloadXPath, string url, string folderPath, string filename)
+        {
+
+
+            using (var client = new WebClient())
+            {
+                var downloadNode = htmlDocument.DocumentNode.SelectSingleNode(downloadXPath).Attributes["href"]
+                    .Value;
+                client.DownloadFile(url + downloadNode,
+                    $"{folderPath}\\{filename.Remove(filename.Length - 4, 4)}.srt");
+                return true;
+            }
+
+        }
+
+        public static bool CheckMatching(SubtitleModel subtitleModel, string SeasonFromFeliratokInfo, string EpisodeFromFeliratokInfo, HtmlNode originalNode)
+        {
+            if (subtitleModel.SeasonNumber == Int32.Parse(SeasonFromFeliratokInfo) && subtitleModel.EpisodeNumber ==
+                Int32.Parse(EpisodeFromFeliratokInfo)
+                && originalNode.InnerText.Contains(subtitleModel.Releaser) &&
+                originalNode.InnerText.Contains(subtitleModel.Quality))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool FindSeasonPack(List<HtmlNode> subtitlesHtmlList, SubtitleModel subtitleModel, string url,
+            string folderPath, string filename)
+        {
+
 
             return false;
         }
 
         public static string Trim(this string s, string trimmer)
         {
-
-            if (String.IsNullOrEmpty(s) || String.IsNullOrEmpty(trimmer) || !s.EndsWith(trimmer, StringComparison.OrdinalIgnoreCase))
+            if (String.IsNullOrEmpty(s) || String.IsNullOrEmpty(trimmer) ||
+                !s.EndsWith(trimmer, StringComparison.OrdinalIgnoreCase))
                 return s;
             else
                 return s.Substring(0, s.Length - trimmer.Length);
         }
-
     }
 }
