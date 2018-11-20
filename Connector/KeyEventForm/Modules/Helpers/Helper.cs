@@ -11,7 +11,8 @@ namespace KeyEventForm.Modules.Helpers
 {
     public static class Helper
     {
-        public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)?$";
+        //public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)?$";
+        public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)\.(mkv|avi|mp4|srt)?$";
         public static string Quality = "(1080|720)[pi]";
         public static string FeliratokInfoSeasonXEpisode = "-(\\s?)(([0-9]{1,2})x([0-9]{1,2}))";
 
@@ -35,7 +36,6 @@ namespace KeyEventForm.Modules.Helpers
             }
 
             return null;
-
         }
 
         public static bool DoesItContainHun(string text)
@@ -106,7 +106,7 @@ namespace KeyEventForm.Modules.Helpers
             var regexResult = regexPattern.Matches(text);
             if (regexResult.Count != 0)
             {
-                return regexResult[0].Groups[11].Value;
+                return regexResult[0].Groups[12].Value;
             }
             return "";
 

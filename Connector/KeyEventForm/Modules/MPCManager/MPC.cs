@@ -37,7 +37,8 @@ namespace KeyEventForm.Modules.MPCManager
                             var showName = Helper.GetTitle(fileName);
                             var episodeNumber = Helper.GetEpisodeNumber(fileName);
                             var seasonNumber = Helper.GetSeasonNumber(fileName);
-                            var releaser = Helper.GetQuality(fileName);
+                            var releaser = Helper.GetReleaser(fileName);
+                            var quality = Helper.GetQuality(fileName);
 
 
                             if (!SubtitleFetcher.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
@@ -48,7 +49,7 @@ namespace KeyEventForm.Modules.MPCManager
                                     SeasonNumber = seasonNumber,
                                     EpisodeNumber = episodeNumber,
                                     Releaser = releaser,
-                                    Quality = ""
+                                    Quality = quality
                                 };
 
                                 if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))

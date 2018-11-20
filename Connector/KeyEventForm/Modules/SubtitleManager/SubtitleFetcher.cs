@@ -56,20 +56,40 @@ namespace KeyEventForm.Modules.SubtitleManager
 
         }
 
+        //public static bool IsThereSubtitles(string folderPath, string showName, int episodeNum, int seasonNum)
+        //{
+        //    showName = TrimFileName(showName).ToLower();
+        //    string[] fileArray = Directory.GetFiles(folderPath);
+        //    foreach (var file1 in fileArray)
+        //    {
+        //        var file = TrimFileName(file1).ToLower();
+        //        if (file.EndsWith(".srt"))
+        //        {
+        //            if (file.Contains(showName) && (file.Contains("S" + seasonNum) || file.Contains("s" + seasonNum) || file.Contains("S0" + seasonNum) || file.Contains("s0" + seasonNum)) &&
+        //                (file.Contains("E" + episodeNum) || file.Contains("e" + episodeNum) || file.Contains("E0" + episodeNum) || file.Contains("e0" + episodeNum))) //TODO ÉS SZEZONT ÉS EPIZÓDOT
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+
+        //    return false;
+        //}
+
+
         public static bool IsThereSubtitles(string folderPath, string showName, int episodeNum, int seasonNum)
         {
             showName = TrimFileName(showName).ToLower();
-            string[] fileArray = Directory.GetFiles(folderPath);
+            var fileArray = Directory.GetFiles(folderPath,"*.srt");
             foreach (var file1 in fileArray)
             {
                 var file = TrimFileName(file1).ToLower();
-                if (file.EndsWith(".srt"))
+                var downloadedSubSeason = Helper.GetSeasonNumber(file);
+                var downloadedSubEpisode= Helper.GetEpisodeNumber(file);
+                var downloadedSubName = Helper.GetTitle(file);
+                if (downloadedSubSeason == seasonNum && downloadedSubEpisode == episodeNum && downloadedSubName == showName)
                 {
-                    if (file.Contains(showName) && (file.Contains("S" + seasonNum) || file.Contains("s" + seasonNum) || file.Contains("S0" + seasonNum) || file.Contains("s0" + seasonNum)) &&
-                        (file.Contains("E" + episodeNum) || file.Contains("e" + episodeNum) || file.Contains("E0" + episodeNum) || file.Contains("e0" + episodeNum))) //TODO ÉS SZEZONT ÉS EPIZÓDOT
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
