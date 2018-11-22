@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
 using KeyEventForm.Modules.Helpers;
 using KeyEventForm.Modules.SubtitleManager;
 using KeyEventForm.Modules.SubtitleManager.FeliratokInfo.Models;
 using Standard.Contracts.Requests;
+using HtmlAgilityPack;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Timer = System.Timers.Timer;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using Standard.Contracts.Models.Series;
+using Series.Service.Models;
+using Standard.Core.NetworkManager;
 
 namespace KeyEventForm.Modules.MPCManager
 {
@@ -16,65 +26,149 @@ namespace KeyEventForm.Modules.MPCManager
 
         public static Stopwatch stopWatch = new Stopwatch();
         public static bool mediaJustStarted = false;
+        private const string mpcVariablesSiteUrl = @"http://localhost:13579/variables.html";
+        private const string mpcPlayerSiteUrL = @"http://localhost:13579/controls.html";
+        private const string apiEndpoint = "localhost:5001";
 
-
-        public void MPCManager()
+        public async Task MPCManager()
         {
             Thread.Sleep(1000);
             try
             {
-                Task.Run(() =>
-                {
-                    while (true)
-                    {
-                        var runningMedia = IsMediaRunning();
-                        Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
+                await Task.Run(async () =>
+                 {
+                     while (true)
+                     {
+                         var runningMedia = IsMediaRunning();
+                         Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
                         if (!mediaJustStarted && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
-                        {
-                            var path = SubtitleFetcher.GetFolderPathFromMPCweb();
-                            var fileName = runningMedia.MainWindowTitle;
+                         {
+                             var path = SubtitleFetcher.GetFolderPathFromMPCweb();
+                             var fileName = runningMedia.MainWindowTitle;
 
-                            var showName = Helper.GetTitle(fileName);
-                            var episodeNumber = Helper.GetEpisodeNumber(fileName);
-                            var seasonNumber = Helper.GetSeasonNumber(fileName);
-                            var releaser = Helper.GetReleaser(fileName);
-                            var quality = Helper.GetQuality(fileName);
+                             var showName = Helper.GetTitle(fileName);
+                             var episodeNumber = Helper.GetEpisodeNumber(fileName);
+                             var seasonNumber = Helper.GetSeasonNumber(fileName);
+                             var releaser = Helper.GetReleaser(fileName);
+                             var quality = Helper.GetQuality(fileName);
 
 
-                            if (!SubtitleFetcher.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
-                            {
-                                var feliratModel = new SubtitleModel()
-                                {
-                                    ShowName = SubtitleFetcher.TrimFileName(showName),
-                                    SeasonNumber = seasonNumber,
-                                    EpisodeNumber = episodeNumber,
-                                    Releaser = releaser,
-                                    Quality = quality
-                                };
+                             if (!SubtitleFetcher.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
+                             {
+                                 var feliratModel = new SubtitleModel()
+                                 {
+                                     ShowName = SubtitleFetcher.TrimFileName(showName),
+                                     SeasonNumber = seasonNumber,
+                                     EpisodeNumber = episodeNumber,
+                                     Releaser = releaser,
+                                     Quality = quality
+                                 };
 
-                                if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
-                                {
-                                    runningMedia.Kill();
-                                    System.Diagnostics.Process.Start(path + "\\" + fileName);
-                                }
-                            }
-                            stopWatch.Start(); //timer indul
+                                 if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
+                                 {
+                                     runningMedia.Kill();
+                                     System.Diagnostics.Process.Start(path + "\\" + fileName);
+                                 }
+                             }
+
+                             await SavePosition(showName, seasonNumber, episodeNumber);
+
+                             stopWatch.Start(); //timer indul
                             mediaJustStarted = true;
-                        }
-                        else if (mediaJustStarted && new MPC().IsMediaRunning() == null)
-                        {
-                            stopWatch.Start();  //timer stop
+                         }
+                         else if (mediaJustStarted && new MPC().IsMediaRunning() == null)
+                         {
+                             stopWatch.Start();  //timer stop
                             var duration = stopWatch.ElapsedMilliseconds / 1000;
-                            mediaJustStarted = false;
-                        }
-                        Thread.Sleep(1000);
-                    }
-                });
+                             mediaJustStarted = false;
+                         }
+                         Thread.Sleep(1000);
+                     }
+                 });
             }
             catch (Exception ex)
             {
 
             }
+        }
+
+        public async Task SavePosition(string showName, int seasonNum, int episodeNum)
+        {
+            //string positionFramePath = "(/html/body/p)[8]";
+            //string durationFramePath = "(/html/body/p)[10]";
+
+            string positionPath = "(/html/body/p)[9]";
+            string durationPath = "(/html/body/p)[11]";
+
+            using (WebClient client = new WebClient())
+            {
+                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                HtmlDocument htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(htmlString);
+
+                //HtmlNode positionFrame = htmlDocument.DocumentNode.SelectSingleNode(positionFramePath);
+                //HtmlNode durationFrame = htmlDocument.DocumentNode.SelectSingleNode(durationFramePath);
+
+                HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
+                HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationPath);
+
+                var pos = Regex.Split(position.InnerText, ":");
+                var dur = Regex.Split(duration.InnerText, ":");
+
+                double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
+                double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
+                double percentage = (100/totalSeconds)*seenSeconds;
+
+                InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
+                {
+                    Date = DateTime.Now,
+                    EpisodeNumber = episodeNum,
+                    SeasonNumber = seasonNum,
+                    HoursElapsed = Int32.Parse(pos[0]),
+                    MinutesElapsed = Int32.Parse(pos[1]),
+                    SecondsElapsed = Int32.Parse(pos[2]),
+                    WatchedPercentage = percentage
+                    //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
+                };
+
+                await Helper.UpdateStartedSeries(episode,showName);
+
+            }
+
+            
+        }
+
+        public void ResumeEpisode(string position)
+        { //ezzel a cél azvolt hogy a web interfaceröl irányitsam a lejátszót, hogy a megjegyzést megcsinálja, ha esetleg az mpc már nem tudja
+            string positionFramePath = @"(/html/body/div/form/table/tr/td[3]/input[@id='pos']/@value)";  //működik
+            //using (WebClient client = new WebClient())
+            //{
+            //    string htmlString = client.DownloadString(mpcPlayerSiteUrL);
+            //    HtmlDocument htmlDocument = new HtmlDocument();
+            //    htmlDocument.LoadHtml(htmlString);
+
+            //    HtmlNode positionFrame = htmlDocument.DocumentNode.SelectSingleNode(positionFramePath);
+            // }
+
+            IWebDriver chromeDriver = new ChromeDriver(@"C:\Users\Greg\Downloads\chromedriver_win32");
+            chromeDriver.Navigate().GoToUrl(mpcPlayerSiteUrL);
+
+            //IWebElement element = chromeDriver.FindElement(By.XPath(@"(/html/body/div/form/table/tbody/tr/td[3]/input[@id='pos']"));
+            //element.SendKeys("00:33:00");
+
+            IJavaScriptExecutor js = (IJavaScriptExecutor)chromeDriver;
+            string title = (string)js.ExecuteScript("return document.title");
+
+            //var s = (string)js.ExecuteScript("document.getElementById('//id of element').setAttribute('attr', '10')");
+            var s1 = (string)js.ExecuteScript($"document.getElementById('pos').setAttribute('value', '{position}')");
+
+
+            //var button = (string)js.ExecuteScript($"document.querySelector('[value='Go!']').click()");
+            var button = (string)js.ExecuteScript($"document.getElementById('pos')");
+
+            //IWebElement button = chromeDriver.FindElement(By.XPath(@"(/html/body/div/form/table/tbody/tr/td[4]/input)"));
+            //button.Click();
+
         }
 
         public Process IsMediaRunning()
@@ -85,7 +179,6 @@ namespace KeyEventForm.Modules.MPCManager
         public async Task Timering(string title)
         {
             Timer t = new Timer(1000);
-
         }
 
         public async Task<bool> RecognizeMedia(Process playerProcess)

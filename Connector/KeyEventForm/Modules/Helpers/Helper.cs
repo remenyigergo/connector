@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Series.Service.Models;
 using Standard.Contracts.Requests;
 using Standard.Core.NetworkManager;
 
@@ -153,6 +154,12 @@ namespace KeyEventForm.Modules.Helpers
             return showExist;
         }
 
+
+        public static async Task<bool> UpdateStartedSeries(InternalEpisodeStartedModel internalEpisode,string title)
+        {
+            var isUpdated = await new WebClientManager().Post<bool>($"http://localhost:5001/series/updateStartedEpisode/{title}", internalEpisode);
+            return isUpdated;
+        }
         public static async Task<int> MarkRequest(InternalMarkRequest imr)
         {
             //var requestbody = new InternalMarkRequest() { TvMazeId = title };

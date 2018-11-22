@@ -34,10 +34,10 @@ namespace Series.DataManagement.MongoDB.Repositories
         }
 
         public async Task AddSeason(MongoSeason mongoSeason, int seriesId)
-            //OLYAT TUDUNK CSINÁLNI, HOGY HA EZ NEM MEGY, HOGY KIKÉREM A SOROZATOT,
-            // KIVESZEM AZ ÉVADOKAT EGY LISTÁBA, A LISTÁT MEGPÓTOLOM AZZAL AMIT BE AKARUNK ADNI, ÉS INSERTÁLOM ÚJ SOROZATKÉNT
-            // viszont így felmerül az a hibalehetőség, hogy majd a megtekintett epizódok nem töltődnek be, amíg 
-            // kitörlődve van az adott sorozat a csere miatt, szóval nem a legjobb eddig ez így.
+        //OLYAT TUDUNK CSINÁLNI, HOGY HA EZ NEM MEGY, HOGY KIKÉREM A SOROZATOT,
+        // KIVESZEM AZ ÉVADOKAT EGY LISTÁBA, A LISTÁT MEGPÓTOLOM AZZAL AMIT BE AKARUNK ADNI, ÉS INSERTÁLOM ÚJ SOROZATKÉNT
+        // viszont így felmerül az a hibalehetőség, hogy majd a megtekintett epizódok nem töltődnek be, amíg 
+        // kitörlődve van az adott sorozat a csere miatt, szóval nem a legjobb eddig ez így.
         {
             //            var series = GetSeriesById(seriesId).Result;
             //            var filter = Builders<MongoSeries>.Filter.Eq(series[0].TvMazeId, seriesId);
@@ -78,7 +78,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task DeleteSeriesById(int id)
         {
             //List<Series> seriesList = GetAllSeries().Result;
-            var seriesExistCheck = Series.Find(x => x.SeriesId == id.ToString());
+            var seriesExistCheck = Series.Find(x => x.TvMazeId == id.ToString() || x.TmdbId == id.ToString());
             if (seriesExistCheck != null)
             {
                 await Series.DeleteOneAsync(Builders<MongoSeries>.Filter.Eq("TvMazeId", id));
@@ -185,7 +185,7 @@ namespace Series.DataManagement.MongoDB.Repositories
                 TvMazeId = internalSeries.TvMazeId,
                 TmdbId = internalSeries.TmdbId,
                 Title = internalSeries.Title,
-                SeriesId = internalSeries.Id,
+                //SeriesId = internalSeries.Id,
                 Runtime = internalSeries.Runtime,
                 TotalSeasons = internalSeries.TotalSeasons,
                 Categories = internalSeries.Categories,
@@ -309,27 +309,34 @@ namespace Series.DataManagement.MongoDB.Repositories
             return s > 0;
         }
 
-        public Task MarkEpisodeStarted(EpisodeStartedModel episodeStartedModel)
+        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
         {
-            //TODO: ÁTALAKTÍANI EPISODESTARTED-re
+            //bool isNull = episodeStartedModel.GetType().GetProperties()
+            //    .All(p => p.GetValue(episodeStartedModel) != null);
 
-            bool isNull = episodeStartedModel.GetType().GetProperties()
-                .All(p => p.GetValue(episodeStartedModel) != null);
+            await EpisodeStarted.InsertOneAsync(new EpisodeStarted()
+            {
+                Date = episodeStartedModel.Date,
+                EpisodeNumber = episodeStartedModel.EpisodeNumber,
+                SeasonNumber = episodeStartedModel.SeasonNumber,
+                HoursElapsed = episodeStartedModel.HoursElapsed,
+                MinutesElapsed = episodeStartedModel.MinutesElapsed,
+                SecondsElapsed = episodeStartedModel.SecondsElapsed,
+                TmdbId = episodeStartedModel.TmdbId,
+                TvMazeId = episodeStartedModel.TvMazeId,
+                Userid = episodeStartedModel.Userid,
+                WatchedPercentage = episodeStartedModel.WatchedPercentage
+            });
 
             //            if (!isNull) { return EpisodeStarted.InsertOneAsync(episodeStartedModel); } return null;
-            return null;
         }
 
-        public Task<bool> IsEpisodeStarted(EpisodeStartedModel episodeStartedModel)
+        public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
         {
-            throw new System.NotImplementedException();
+            var s = await EpisodeStarted.CountDocumentsAsync(ep => ep.TvMazeId == episodeStartedModel.TvMazeId || ep.TmdbId == episodeStartedModel.TmdbId);
+            return s > 0;
         }
 
-
-        public Task<bool> IsEpisodeStarted(EpisodeStarted episodeStartedModel)
-        {
-            return null;
-        }
 
         public async Task<bool> GetShow(EpisodeStarted episodeStarted, string showTitle)
         {
@@ -344,7 +351,7 @@ namespace Series.DataManagement.MongoDB.Repositories
                 List<EpisodeStarted> series = new List<EpisodeStarted>();
                 if (!coll.Empty())
                 {
-                    series = coll.Where(b => b.Seriesid.ToString() == show[0].SeriesId.ToString()).ToList();
+                    series = coll.Where(b => b.TvMazeId.ToString() == show[0].TvMazeId.ToString() || b.TmdbId.ToString() == show[0].TmdbId.ToString()).ToList();
                 }
 
                 if (series.Count > 0)
@@ -352,15 +359,18 @@ namespace Series.DataManagement.MongoDB.Repositories
                     EpisodeStarted ep = new EpisodeStarted()
                     {
                         Userid = episodeStarted.Userid,
-                        Seriesid = episodeStarted.Seriesid,
+                        TvMazeId = episodeStarted.TvMazeId,
+                        TmdbId = episodeStarted.TmdbId,
                         SeasonNumber = episodeStarted.SeasonNumber,
                         EpisodeNumber = episodeStarted.EpisodeNumber,
                         Date = episodeStarted.Date,
-                        TimeElapsed = episodeStarted.TimeElapsed,
+                        HoursElapsed = episodeStarted.HoursElapsed,
+                        MinutesElapsed = episodeStarted.MinutesElapsed,
+                        SecondsElapsed = episodeStarted.SecondsElapsed,
                         WatchedPercentage = episodeStarted.WatchedPercentage
                     };
                     await EpisodeStarted.ReplaceOneAsync(
-                        s => s.Seriesid == ep.Seriesid && s.SeasonNumber == ep.SeasonNumber &&
+                        s => (s.TvMazeId == ep.TvMazeId || s.TmdbId == ep.TmdbId) && s.SeasonNumber == ep.SeasonNumber &&
                              s.EpisodeNumber == ep.EpisodeNumber, ep);
                 }
                 else
@@ -405,5 +415,14 @@ namespace Series.DataManagement.MongoDB.Repositories
 
             return null;
         }
+
+        public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
+        {
+            var updateDef = Builders<EpisodeStarted>.Update.Set(o => o.HoursElapsed, internalEpisode.HoursElapsed).Set(o => o.MinutesElapsed, internalEpisode.MinutesElapsed).Set(o => o.SecondsElapsed, internalEpisode.SecondsElapsed).Set(o => o.WatchedPercentage, internalEpisode.WatchedPercentage);
+            var s = await EpisodeStarted.UpdateOneAsync(episodeStarted => (episodeStarted.TvMazeId == internalEpisode.TvMazeId) || (episodeStarted.TmdbId == internalEpisode.TmdbId), updateDef);
+
+            return s.ModifiedCount > 0;
+        }
+
     }
 }

@@ -22,12 +22,13 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task MarkAsSeen(int userid, int seriesid, int seasonNumber, int episodeNumber);
         Task AddSeriesToUser(int userid, int seriesid);
         Task<bool> IsSeriesAddedToUser(int userid, int seriesid);
-        Task MarkEpisodeStarted(EpisodeStartedModel episodeStartedModel);
-        Task<bool> IsEpisodeStarted(EpisodeStartedModel episodeStartedModel);
+        Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
+        Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
 
         Task<bool> GetShow(EpisodeStarted episodeStarted,string title);
         Task<bool> IsShowExistInMongoDb(string title);
         Task<InternalSeries> GetSeries(string title);
+        Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName);
     }
 }
 

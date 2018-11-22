@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Standard.Contracts.Requests;
 using Newtonsoft.Json;
+using Series.Service.Models;
 
 namespace Standard.Core.NetworkManager
 {
@@ -70,6 +71,20 @@ namespace Standard.Core.NetworkManager
             var response = await request.Content.ReadAsStringAsync();
 
             return Int32.Parse(response);
+            //return bool.TryParse(response, out var result);
+        }
+
+        public async Task<bool> Post<T>(string url, InternalEpisodeStartedModel body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+
+            return bool.Parse(response);
             //return bool.TryParse(response, out var result);
         }
 

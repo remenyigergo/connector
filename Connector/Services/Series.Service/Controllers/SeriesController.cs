@@ -165,7 +165,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("started")]
-        public async Task<Result<bool>> MarkEpisodeStarted([FromBody] EpisodeStartedModel request)
+        public async Task<Result<bool>> MarkEpisodeStarted([FromBody] InternalEpisodeStartedModel request)
         {
             try
             {
@@ -244,6 +244,12 @@ namespace Series.Service.Controllers
                 return -1;
             }
             return -2;
+        }
+
+        [HttpPost("updateStartedEpisode/{showName}")]
+        public async Task<bool> UpdateStartedEpisode([FromBody]InternalEpisodeStartedModel internalEpisode, string showName)
+        {
+           return await new Series().UpdateStartedEpisode(internalEpisode, showName);
         }
 
         public string RemoveAccent(string text)

@@ -5,6 +5,7 @@ using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
 using Standard.Core.Dependency;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.Repositories;
@@ -12,6 +13,7 @@ using Series.Parsers;
 using Series.Parsers.TMDB;
 using Series.Parsers.TvMaze;
 using Series.Service.Models;
+using System.Collections.Generic;
 
 namespace Series.Service
 {
@@ -70,18 +72,20 @@ namespace Series.Service
             
         }
 
-        public async Task MarkEpisodeStarted(EpisodeStartedModel episodeStartedModel)
+        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
         {
             //var isStarted = await _repo.IsSeriesStarted(episodeStartedModel);
-            var isStarted = false;
-            if (!isStarted)
-            {
-                await _repo.MarkEpisodeStarted(episodeStartedModel);
-            }
-            else
-            {
-                throw new InternalException(604, "Series is already started by the user.");
-            }
+            //var isStarted = false;
+            //if (!isStarted)
+            //{
+            //    await _repo.MarkEpisodeStarted(episodeStartedModel);
+            //}
+            //else
+            //{
+            //    throw new InternalException(604, "Series is already started by the user.");
+            //}
+
+            await _repo.MarkEpisodeStarted(episodeStartedModel);
 
         }
 
@@ -133,6 +137,45 @@ namespace Series.Service
         public async Task<bool> IsShowExistInTmdb(string title)
         {
             return await new TmdbParser().IsShowExistInTmdb(title);
+        }
+
+        public async Task<List<MongoSeries>> GetSeriesByTitle(string title)
+        {
+            return await _repo.GetSeriesByTitle(title);
+        }
+
+        public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel internalEpisode)
+        {
+            var isItStarted = await _repo.IsEpisodeStarted(internalEpisode);
+            return isItStarted;
+        }
+
+        public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
+        {
+            var showExist = await IsShowExistInMongoDb(showName);
+
+            if (showExist)
+            {
+                //check if episode is started 
+                var isEpisodeStarted = await IsEpisodeStarted(internalEpisode);
+
+                if (isEpisodeStarted)
+                {
+                    return await _repo.UpdateStartedEpisode(internalEpisode, showName);
+                }
+                
+                //hozzáadjuk mint markepisode started
+                await MarkEpisodeStarted(internalEpisode);
+                return true;
+            }
+            else
+            {
+                //import sorozat
+                await ImportSeries(showName);
+                await MarkEpisodeStarted(internalEpisode);
+                return true;
+            }
+
         }
     }
 }

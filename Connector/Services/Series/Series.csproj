@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\Standard.Core\Standard.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Service\Models\" />
+  </ItemGroup>
+
 </Project>

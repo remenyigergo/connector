@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Series.Service.Models
 {
-    public class EpisodeStarted
+    public class InternalEpisodeStartedModel
     {
         public int Userid;
         public int TvMazeId;
