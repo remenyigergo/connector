@@ -5,10 +5,10 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 using HtmlAgilityPack;
-using KeyEventForm.Modules.SubtitleManager.FeliratokInfo.Models;
 
-namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo
+namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
 {
     public static class FeliratokInfoDownloader
     {
@@ -291,10 +291,17 @@ namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo
 
         public static bool CheckMatching(SubtitleModel subtitleModel, string SeasonFromFeliratokInfo, string EpisodeFromFeliratokInfo, HtmlNode originalNode)
         {
+            var name = subtitleModel.ShowName.ToLower();
+            Regex trimEnd = new Regex($"({name})(.*?)(\\(.*\\))\\s*(-)\\s.*");
+            
+            var nameRegexed = trimEnd.Matches(originalNode.InnerText.ToLower());
+            var dash = nameRegexed[0].Groups[4].Value;
+            var namefromgroup = nameRegexed[0].Groups[1].Value;
+
             if (subtitleModel.SeasonNumber == Int32.Parse(SeasonFromFeliratokInfo) && subtitleModel.EpisodeNumber ==
                 Int32.Parse(EpisodeFromFeliratokInfo)
                 && originalNode.InnerText.ToLower().Contains(subtitleModel.Releaser.ToLower()) &&
-                originalNode.InnerText.ToLower().Contains(subtitleModel.Quality.ToLower()) && originalNode.InnerText.ToLower().StartsWith(subtitleModel.ShowName.ToLower()))
+                originalNode.InnerText.ToLower().Contains(subtitleModel.Quality.ToLower()) && namefromgroup == name && dash == "-")
             {
                 return true;
             }

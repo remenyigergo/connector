@@ -1,14 +1,14 @@
 ﻿using System.IO;
 using System.Net;
 using HtmlAgilityPack;
-using KeyEventForm.Modules.Helpers;
-using KeyEventForm.Modules.MPCManager;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using KeyEventForm.Modules.SubtitleManager.FeliratokInfo;
 using System.Threading.Tasks;
-using KeyEventForm.Modules.SubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.Helpers;
+using DesktopClient.Modules.MPCManager;
+using DesktopClient.Modules.SubtitleManager.FeliratokInfo;
+using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 
-namespace KeyEventForm.Modules.SubtitleManager
+namespace DesktopClient.Modules.SubtitleManager
 {
     public static class SubtitleFetcher
     {
@@ -41,16 +41,23 @@ namespace KeyEventForm.Modules.SubtitleManager
         {
             string path = string.Empty;
 
-
-            using (WebClient client = new WebClient())
+            try
             {
-                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                HtmlDocument htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(htmlString);
-                string xPath = "(/html/body/p)[5]";
-                HtmlNode node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
-                path = node.InnerHtml.Replace(@"\\", @"\");
+                using (WebClient client = new WebClient())
+                {
+                    string htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    HtmlDocument htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(htmlString);
+                    string xPath = "(/html/body/p)[5]";
+                    HtmlNode node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    path = node.InnerHtml.Replace(@"\\", @"\");
+                }
             }
+            catch (WebException WebEx)
+            {
+                
+            }
+            
 
             return path;
 

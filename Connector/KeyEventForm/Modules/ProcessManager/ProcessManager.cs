@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace KeyEventForm.Modules.ProcessManager
+namespace DesktopClient.Modules.ProcessManager
 {
     public class ProcessManager
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KeyEventForm.Modules.SubtitleManager.FeliratokInfo.Models
+namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models
 {
     public class SubtitleModel
     {

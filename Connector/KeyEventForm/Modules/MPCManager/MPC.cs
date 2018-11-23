@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using KeyEventForm.Modules.Helpers;
-using KeyEventForm.Modules.SubtitleManager;
-using KeyEventForm.Modules.SubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.Helpers;
+using DesktopClient.Modules.SubtitleManager;
+using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 using Standard.Contracts.Requests;
 using HtmlAgilityPack;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
@@ -19,7 +19,7 @@ using Standard.Contracts.Models.Series;
 using Series.Service.Models;
 using Standard.Core.NetworkManager;
 
-namespace KeyEventForm.Modules.MPCManager
+namespace DesktopClient.Modules.MPCManager
 {
     class MPC : IMPCManager
     {
@@ -40,19 +40,19 @@ namespace KeyEventForm.Modules.MPCManager
                      while (true)
                      {
                          var runningMedia = IsMediaRunning();
+
+                         var path = SubtitleFetcher.GetFolderPathFromMPCweb();
+                         var fileName = runningMedia.MainWindowTitle;
+
+                         var showName = Helper.GetTitle(fileName);
+                         var episodeNumber = Helper.GetEpisodeNumber(fileName);
+                         var seasonNumber = Helper.GetSeasonNumber(fileName);
+                         var releaser = Helper.GetReleaser(fileName);
+                         var quality = Helper.GetQuality(fileName);
+
                          Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
-                        if (!mediaJustStarted && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                         if (!mediaJustStarted && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                          {
-                             var path = SubtitleFetcher.GetFolderPathFromMPCweb();
-                             var fileName = runningMedia.MainWindowTitle;
-
-                             var showName = Helper.GetTitle(fileName);
-                             var episodeNumber = Helper.GetEpisodeNumber(fileName);
-                             var seasonNumber = Helper.GetSeasonNumber(fileName);
-                             var releaser = Helper.GetReleaser(fileName);
-                             var quality = Helper.GetQuality(fileName);
-
-
                              if (!SubtitleFetcher.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
                              {
                                  var feliratModel = new SubtitleModel()
@@ -68,19 +68,26 @@ namespace KeyEventForm.Modules.MPCManager
                                  {
                                      runningMedia.Kill();
                                      System.Diagnostics.Process.Start(path + "\\" + fileName);
+                                     Thread.Sleep(500);
                                  }
                              }
 
-                             await SavePosition(showName, seasonNumber, episodeNumber);
-
                              stopWatch.Start(); //timer indul
-                            mediaJustStarted = true;
+                             mediaJustStarted = true;
                          }
                          else if (mediaJustStarted && new MPC().IsMediaRunning() == null)
                          {
+                             
+
                              stopWatch.Start();  //timer stop
-                            var duration = stopWatch.ElapsedMilliseconds / 1000;
+                             var duration = stopWatch.ElapsedMilliseconds / 1000;
                              mediaJustStarted = false;
+                         } else if (IsMediaRunning() != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                         {
+                             await Task.Run(async () =>
+                             {
+                                 await SavePosition(showName, seasonNumber, episodeNumber);
+                             });
                          }
                          Thread.Sleep(1000);
                      }
@@ -117,7 +124,7 @@ namespace KeyEventForm.Modules.MPCManager
 
                 double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
                 double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
-                double percentage = (100/totalSeconds)*seenSeconds;
+                double percentage = (100 / totalSeconds) * seenSeconds;
 
                 InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
                 {
@@ -131,11 +138,11 @@ namespace KeyEventForm.Modules.MPCManager
                     //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
                 };
 
-                await Helper.UpdateStartedSeries(episode,showName);
+                await Helper.UpdateStartedSeries(episode, showName);
 
             }
 
-            
+
         }
 
         public void ResumeEpisode(string position)

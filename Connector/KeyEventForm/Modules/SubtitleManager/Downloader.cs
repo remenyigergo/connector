@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KeyEventForm.Modules.SubtitleManager
+namespace DesktopClient.Modules.SubtitleManager
 {
     class Downloader
     {

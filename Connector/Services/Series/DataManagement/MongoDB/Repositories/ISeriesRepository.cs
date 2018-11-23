@@ -12,8 +12,6 @@ namespace Series.DataManagement.MongoDB.Repositories
 //        Task<List<MongoSeries>> GetSeriesById(int id);
         Task<List<MongoSeries>> GetSeriesByTitle(string name);
         Task AddInternalSeries(InternalSeries series);
-        Task AddEpisodes(List<InternalEpisode> episodes);
-        Task AddSeason(MongoSeason mongoSeason, int seriesId);
         Task DeleteSeriesById(int id);
         Task<bool> IsSeriesImported(string title);
         Task<bool> IsUpToDate(string title, string updateCode);

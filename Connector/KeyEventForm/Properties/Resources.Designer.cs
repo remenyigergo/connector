@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KeyEventForm.Properties {
+namespace DesktopClient.Properties {
     using System;
     
     

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KeyEventForm.Modules.MPCManager
+namespace DesktopClient.Modules.MPCManager
 {
     public interface IMPCManager
     {

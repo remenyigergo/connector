@@ -8,7 +8,7 @@ using Series.Service.Models;
 using Standard.Contracts.Requests;
 using Standard.Core.NetworkManager;
 
-namespace KeyEventForm.Modules.Helpers
+namespace DesktopClient.Modules.Helpers
 {
     public static class Helper
     {

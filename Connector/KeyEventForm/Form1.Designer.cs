@@ -1,4 +1,4 @@
-﻿namespace KeyEventForm
+﻿namespace DesktopClient
 {
     partial class Form1
     {

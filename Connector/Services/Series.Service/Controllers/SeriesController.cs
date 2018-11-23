@@ -164,42 +164,42 @@ namespace Series.Service.Controllers
             };
         }
 
-        [HttpPost("started")]
-        public async Task<Result<bool>> MarkEpisodeStarted([FromBody] InternalEpisodeStartedModel request)
-        {
-            try
-            {
-                await new Series().MarkEpisodeStarted(request);
-            }
-            catch (InternalException ex)
-            {
-                return new Result<bool>()
-                {
-                    Data = false,
-                    ResultCode = ex.ErrorCode,
-                    ResultMessage = ex.ErrorMessage
-                };
-            }
+        //[HttpPost("started")]
+        //public async Task<Result<bool>> MarkEpisodeStarted([FromBody] InternalEpisodeStartedModel request)
+        //{
+        //    try
+        //    {
+        //        await new Series().MarkEpisodeStarted(request);
+        //    }
+        //    catch (InternalException ex)
+        //    {
+        //        return new Result<bool>()
+        //        {
+        //            Data = false,
+        //            ResultCode = ex.ErrorCode,
+        //            ResultMessage = ex.ErrorMessage
+        //        };
+        //    }
 
-            catch (Exception ex)
-            {
-                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<bool>()
-                {
-                    Data = true,
-                    ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
-                };
-            }
+        //    catch (Exception ex)
+        //    {
+        //        Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+        //        return new Result<bool>()
+        //        {
+        //            Data = true,
+        //            ResultCode = (int) CoreCodes.CommonGenericError,
+        //            ResultMessage = "Common Generic Error"
+        //        };
+        //    }
 
 
-            return new Result<bool>()
-            {
-                Data = true,
-                ResultCode = (int) CoreCodes.NoError,
-                ResultMessage = "Successfully marked."
-            };
-        }
+        //    return new Result<bool>()
+        //    {
+        //        Data = true,
+        //        ResultCode = (int) CoreCodes.NoError,
+        //        ResultMessage = "Successfully marked."
+        //    };
+        //}
 
         [HttpPost("update")]
         public async Task UpdateSeries([FromBody] ImportRequest request)

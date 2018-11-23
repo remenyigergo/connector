@@ -14,6 +14,7 @@ using Series.Parsers.TMDB;
 using Series.Parsers.TvMaze;
 using Series.Service.Models;
 using System.Collections.Generic;
+using System;
 
 namespace Series.Service
 {
@@ -72,7 +73,7 @@ namespace Series.Service
             
         }
 
-        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
+        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel, string showName)
         {
             //var isStarted = await _repo.IsSeriesStarted(episodeStartedModel);
             //var isStarted = false;
@@ -84,6 +85,13 @@ namespace Series.Service
             //{
             //    throw new InternalException(604, "Series is already started by the user.");
             //}
+            var series = GetSeriesByTitle(showName);
+            if (series.Result.Count != 0)
+            {
+                episodeStartedModel.TvMazeId = Int32.Parse(series.Result[0].TvMazeId);
+                episodeStartedModel.TmdbId = Int32.Parse(series.Result[0].TmdbId);
+            }
+            
 
             await _repo.MarkEpisodeStarted(episodeStartedModel);
 
@@ -157,6 +165,9 @@ namespace Series.Service
             if (showExist)
             {
                 //check if episode is started 
+                var show = GetSeriesByTitle(showName);
+                internalEpisode.TmdbId = Int32.Parse(show.Result[0].TmdbId);
+                internalEpisode.TvMazeId = Int32.Parse(show.Result[0].TvMazeId);
                 var isEpisodeStarted = await IsEpisodeStarted(internalEpisode);
 
                 if (isEpisodeStarted)
@@ -165,14 +176,14 @@ namespace Series.Service
                 }
                 
                 //hozzáadjuk mint markepisode started
-                await MarkEpisodeStarted(internalEpisode);
+                await MarkEpisodeStarted(internalEpisode, showName);
                 return true;
             }
             else
             {
                 //import sorozat
                 await ImportSeries(showName);
-                await MarkEpisodeStarted(internalEpisode);
+                await MarkEpisodeStarted(internalEpisode, showName);
                 return true;
             }
 
