@@ -74,6 +74,20 @@ namespace Standard.Core.NetworkManager
             //return bool.TryParse(response, out var result);
         }
 
+        public async Task<string> PostMarkAsSeen<T>(string url, InternalMarkRequest body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+
+            return response;
+            //return bool.TryParse(response, out var result);
+        }
+
         public async Task<bool> Post<T>(string url, InternalEpisodeStartedModel body)
         {
 

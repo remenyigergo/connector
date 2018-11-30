@@ -78,10 +78,10 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\Helpers\Helper.cs" />
+    <Compile Include="Modules\MonitorModule\MPC.cs" />
     <Compile Include="Modules\MPCManager\IMPCManager.cs" />
     <Compile Include="Modules\MPCManager\MPC.cs" />
     <Compile Include="Modules\ProcessManager\ProcessManager.cs" />
-    <Compile Include="Modules\SubtitleManager\Downloader.cs" />
     <Compile Include="Modules\SubtitleManager\FeliratokInfo\FeliratokInfoDownloader.cs" />
     <Compile Include="Modules\SubtitleManager\FeliratokInfo\Models\SubtitleModel.cs" />
     <Compile Include="Modules\SubtitleManager\SubtitleFetcher.cs" />

@@ -14,6 +14,7 @@ using Standard.Contracts;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Contracts.Requests;
 
 namespace Series.Service.Controllers
@@ -77,8 +78,8 @@ namespace Series.Service.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(request.SeasonNumber) || string.IsNullOrEmpty(request.EpisodeNumber) ||
-                    string.IsNullOrEmpty(request.SeriesId) || string.IsNullOrEmpty(request.UserId))
+                //ebben a vizsgálatban még a többi paramétert is le kell checkolni, userid, stb
+                if (string.IsNullOrEmpty(request.SeasonNumber) || string.IsNullOrEmpty(request.EpisodeNumber))
                 {
                     Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
@@ -89,8 +90,17 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                await new Series().MarkAsSeen(Int32.Parse(request.UserId), Int32.Parse(request.SeriesId),
-                    Int32.Parse(request.SeasonNumber), Int32.Parse(request.EpisodeNumber));
+                var markseen = await new Series().MarkAsSeen(Int32.Parse(request.UserId), request.TvMazeId, request.TmdbId,
+                    Int32.Parse(request.SeasonNumber), Int32.Parse(request.EpisodeNumber), request.ShowName);
+                if (!markseen)
+                {
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int)CoreCodes.AlreadySeen,
+                        ResultMessage = "The series is already seen."
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -250,6 +260,18 @@ namespace Series.Service.Controllers
         public async Task<bool> UpdateStartedEpisode([FromBody]InternalEpisodeStartedModel internalEpisode, string showName)
         {
            return await new Series().UpdateStartedEpisode(internalEpisode, showName);
+        }
+
+        [HttpPost("rate/episode")]
+        public async Task RateEpisode([FromBody] EpisodeRateRequest episodeRate)
+        {
+            await new Series().RateEpisode(episodeRate.UserId, episodeRate.TvMazeId, episodeRate.TmdbId, episodeRate.EpisodeNumber, episodeRate.SeasonNumber, episodeRate.Rate);
+        }
+
+        [HttpGet("getdays/{days}")]
+        public async Task<List<InternalStartedAndSeenEpisodes>> GetLastDaysEpisodes(int days)
+        {
+            return await new Series().GetLastDays(days);
         }
 
         public string RemoveAccent(string text)

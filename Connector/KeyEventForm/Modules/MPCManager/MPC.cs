@@ -42,7 +42,7 @@ namespace DesktopClient.Modules.MPCManager
                          var runningMedia = IsMediaRunning();
 
                          var path = SubtitleFetcher.GetFolderPathFromMPCweb();
-                         var fileName = runningMedia.MainWindowTitle;
+                         var fileName = SubtitleFetcher.GetFilenameFromMPCweb();
 
                          var showName = Helper.GetTitle(fileName);
                          var episodeNumber = Helper.GetEpisodeNumber(fileName);
@@ -89,6 +89,7 @@ namespace DesktopClient.Modules.MPCManager
                                  await SavePosition(showName, seasonNumber, episodeNumber);
                              });
                          }
+
                          Thread.Sleep(1000);
                      }
                  });
@@ -138,7 +139,25 @@ namespace DesktopClient.Modules.MPCManager
                     //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
                 };
 
-                await Helper.UpdateStartedSeries(episode, showName);
+                if (percentage <= 98)
+                {
+                    await Helper.UpdateStartedSeries(episode, showName);
+                }
+                else
+                {
+                    await Helper.MarkRequest(new InternalMarkRequest()
+                    {
+                        //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
+                        //átküldés után lekell kérni a showt névszerint
+                        UserId = 1,
+                        TvMazeId = "",
+                        TmdbId = "",
+                        ShowName = showName,
+                        EpisodeNumber = episodeNum,
+                        SeasonNumber = seasonNum
+                    });
+                }
+                
 
             }
 
@@ -200,9 +219,11 @@ namespace DesktopClient.Modules.MPCManager
                     return false; //EKKOR NINCS ILYEN SOROZAT
 
                 case 1:
+                    var s = await Helper.GetShow(name);
+                    
                     var imr = new InternalMarkRequest()
                     {
-                        SeriesId = await Helper.GetShow(name),
+                        ShowName = name,
                         SeasonNumber = Helper.GetSeasonNumber(playerProcess.MainWindowTitle),
                         EpisodeNumber = Helper.GetEpisodeNumber(playerProcess.MainWindowTitle)
                     };

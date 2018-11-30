@@ -57,10 +57,30 @@ namespace DesktopClient.Modules.SubtitleManager
             {
                 
             }
-            
-
             return path;
+        }
 
+        public static string GetFilenameFromMPCweb()
+        {
+            string filename = string.Empty;
+
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    string htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    HtmlDocument htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(htmlString);
+                    string xPath = "(/html/body/p)[1]";
+                    HtmlNode node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    filename = node.InnerHtml.Replace(@"\\", @"\");
+                }
+            }
+            catch (WebException WebEx)
+            {
+
+            }
+            return filename;
         }
 
         //public static bool IsThereSubtitles(string folderPath, string showName, int episodeNum, int seasonNum)

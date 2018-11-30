@@ -1,11 +1,14 @@
-﻿namespace Standard.Contracts.Requests
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class InternalMarkRequest
+    public class FavoriteEpisode
     {
         public int UserId;
         public string TvMazeId;
         public string TmdbId;
-        public string ShowName;
         public int SeasonNumber;
         public int EpisodeNumber;
     }

@@ -15,6 +15,7 @@ using Series.Parsers.TvMaze;
 using Series.Service.Models;
 using System.Collections.Generic;
 using System;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.Service
 {
@@ -37,7 +38,7 @@ namespace Series.Service
             await IsSeriesImported(title);
 
             var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
-            
+
             //await _repo.AddInternalSeries(tvMazeInternalSeries);
 
             if (tvMazeInternalSeries != null)
@@ -54,10 +55,20 @@ namespace Series.Service
             }
         }
 
-        public async Task MarkAsSeen(int userid, int seriesid, int season, int episode)
+        public async Task<bool> MarkAsSeen(int userid, string tvmazeid, string tmdbid, int season, int episode, string showname)
         {
-            await _repo.MarkAsSeen(userid, seriesid, season, episode);
+            var series = await GetSeriesByTitle(showname);
+            var isitSeen = await _repo.IsItSeen(userid, series[0].TvMazeId, series[0].TmdbId, season, episode);
+            if (!isitSeen)
+            {
+                await _repo.MarkAsSeen(userid, series[0].TvMazeId, series[0].TmdbId, season, episode);
+                await _repo.DeleteStartedEpisode(series[0].TvMazeId, series[0].TmdbId, season, episode);
+                return true;
+            }
+            return false;
         }
+
+
 
         public async Task AddSeriesToUser(int userid, int seriesid)
         {
@@ -70,7 +81,7 @@ namespace Series.Service
             {
                 throw new InternalException(602, "Series already added to the users list.");
             }
-            
+
         }
 
         public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel, string showName)
@@ -91,7 +102,7 @@ namespace Series.Service
                 episodeStartedModel.TvMazeId = Int32.Parse(series.Result[0].TvMazeId);
                 episodeStartedModel.TmdbId = Int32.Parse(series.Result[0].TmdbId);
             }
-            
+
 
             await _repo.MarkEpisodeStarted(episodeStartedModel);
 
@@ -160,33 +171,56 @@ namespace Series.Service
 
         public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
         {
-            var showExist = await IsShowExistInMongoDb(showName);
-
-            if (showExist)
+            if (internalEpisode.WatchedPercentage < 98)
             {
-                //check if episode is started 
-                var show = GetSeriesByTitle(showName);
-                internalEpisode.TmdbId = Int32.Parse(show.Result[0].TmdbId);
-                internalEpisode.TvMazeId = Int32.Parse(show.Result[0].TvMazeId);
-                var isEpisodeStarted = await IsEpisodeStarted(internalEpisode);
+                var showExist = await IsShowExistInMongoDb(showName);
 
-                if (isEpisodeStarted)
+                if (showExist)
                 {
-                    return await _repo.UpdateStartedEpisode(internalEpisode, showName);
+                    //check if episode is started 
+                    var show = GetSeriesByTitle(showName);
+                    internalEpisode.TmdbId = Int32.Parse(show.Result[0].TmdbId);
+                    internalEpisode.TvMazeId = Int32.Parse(show.Result[0].TvMazeId);
+                    var isEpisodeStarted = await IsEpisodeStarted(internalEpisode);
+
+                    if (isEpisodeStarted)
+                    {
+                        return await _repo.UpdateStartedEpisode(internalEpisode, showName);
+                    }
+
+                    //hozzáadjuk mint markepisode started
+                    await MarkEpisodeStarted(internalEpisode, showName);
+                    return true;
                 }
-                
-                //hozzáadjuk mint markepisode started
-                await MarkEpisodeStarted(internalEpisode, showName);
-                return true;
+                else
+                {
+                    //import sorozat
+                    await ImportSeries(showName);
+                    await MarkEpisodeStarted(internalEpisode, showName);
+                    return true;
+                }
             }
             else
             {
-                //import sorozat
-                await ImportSeries(showName);
-                await MarkEpisodeStarted(internalEpisode, showName);
-                return true;
+                if (internalEpisode.TvMazeId != 0 && internalEpisode.TmdbId != 0)
+                {
+                    await MarkAsSeen(1, internalEpisode.TvMazeId.ToString(), internalEpisode.TmdbId.ToString(), internalEpisode.SeasonNumber, internalEpisode.EpisodeNumber, showName);
+                }
+                return false;
             }
 
+        }
+
+
+        public async Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate)
+        {
+            await _repo.RateEpisode(userid, tvmazeid, tmdbid, episode, season, rate);
+        }
+
+        public async Task<List<InternalStartedAndSeenEpisodes>> GetLastDays(int days)
+        {
+            await _repo.GetLastDaysEpisodes(days);
+            return null;
         }
     }
 }

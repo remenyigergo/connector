@@ -157,15 +157,14 @@ namespace DesktopClient.Modules.Helpers
 
         public static async Task<bool> UpdateStartedSeries(InternalEpisodeStartedModel internalEpisode,string title)
         {
+
             var isUpdated = await new WebClientManager().Post<bool>($"http://localhost:5001/series/updateStartedEpisode/{title}", internalEpisode);
             return isUpdated;
         }
-        public static async Task<int> MarkRequest(InternalMarkRequest imr)
+        public static async Task<string> MarkRequest(InternalMarkRequest imr)
         {
-            //var requestbody = new InternalMarkRequest() { TvMazeId = title };
-            //var showExist = await new WebClientManager().Post<bool>($"http://localhost:5001/series/import", requestbody);
-            //return showExist;
-            return 0;
+            var marked = await new WebClientManager().PostMarkAsSeen<bool>($"http://localhost:5001/series/mark", imr);
+            return marked;
         }
     }
 }

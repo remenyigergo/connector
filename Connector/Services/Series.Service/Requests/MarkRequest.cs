@@ -7,9 +7,12 @@ namespace Series.Service.Models
 {
     public class MarkRequest
     {
+        public string ShowName;
         public string UserId;
-        public string SeriesId;
+        public string TvMazeId;
+        public string TmdbId;
         public string SeasonNumber;
         public string EpisodeNumber;
     }
 }
+
