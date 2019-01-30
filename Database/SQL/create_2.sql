@@ -181,3 +181,35 @@ CREATE TABLE SeenEpisodes(
 	FOREIGN KEY (userId) REFERENCES Users(Id)
 )
 
+CREATE TABLE Programs(
+	programId IDENTITY(1,1),
+	programName VARCHAR(128) NOT NULL,
+	PRIMARY KEY(programId)
+)
+
+CREATE TABLE ProgramsFollowed(
+	userId INT NOT NULL,
+	programId INT NOT NULL,
+	duration INT NOT NULL,
+	since DATE NOT NULL,
+	visible int not null,
+	category INT NOT NULL,
+	PRIMARY KEY(userId,programId),
+	FOREIGN KEY(userId) REFERENCES Users(Id),
+	FOREIGN KEY(programId) REFERENCES Programs(programId),
+	FOREIGN KEY(category) REFERENCES ProgramBaseCategories(categoryId)
+)
+
+CREATE TABLE ProgramsFollowedUpdates(
+	userId INT NOT NULL,
+	programId INT NOT NULL,
+	lastUpdated DATE NOT NULL,
+	durationAdded INT NOT NULL,
+	FOREIGN KEY(userId) REFERENCES Users(Id),
+	FOREIGN KEY(programId) REFERENCES Programs(programId)
+)
+
+CREATE TABLE ProgramBaseCategories(
+	categoryId INT IDENTITY(1,1),
+	name NVARCHAR(32) NOT NULL,
+)

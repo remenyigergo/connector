@@ -1,0 +1,38 @@
+---------------- Book ---------------------
+   
+{
+	"BookId":1,
+	"Title":"Star Wars - Kirajzás",
+	"Writer":"Timothy Zahn",
+	"Pages":472,
+	"PublicationYear":2018,
+	"OverallRating":0,
+	"Sample":"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…"
+}
+
+
+---------------- BookManagerModel // InternalBookManagerModel ---------------------
+
+{
+	"UserId":1,
+	"Book": {
+		"BookId":1,
+		"Title":"Star Wars - Kirajzás",
+		"Writer":"Timothy Zahn",
+		"Pages":472,
+		"PublicationYear":2018,
+		"OverallRating":0,
+		"Sample":"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…"
+	}
+}
+
+---------------- OnGoingBook ---------------------
+
+{
+	"UserId":1,
+	"BookId":1,
+	"PageNumber":"0",
+	"HoursRead":"null",
+	"MinutesRead":"null",
+	"UpDateTime":"2000-01-01 19:00:00"
+}
