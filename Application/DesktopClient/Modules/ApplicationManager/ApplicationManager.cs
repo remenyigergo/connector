@@ -4,9 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Xml;
-
 
 
 namespace DesktopClient.Modules.ApplicationManager
@@ -80,49 +77,7 @@ namespace DesktopClient.Modules.ApplicationManager
                 new RequestManager().InsertProgramRequest(differences);
             
 
-        }
-
-        private static void SendToast()
-        {
-            ToastContent toast = new ToastContent();
-
-            TileContent content = new TileContent()
-            {
-
-                Visual = new TileVisual()
-                {
-                    TileWide = new TileBinding()
-                    {
-                        Content = new TileBindingContentAdaptive()
-                        {
-                            Children =
-                            {
-                                new AdaptiveText()
-                                {
-                                    Text = "Jennifer Parker",
-                                    HintStyle = AdaptiveTextStyle.Subtitle
-                                },
-
-                                new AdaptiveText()
-                                {
-                                    Text = "Photos from our trip",
-                                    HintStyle = AdaptiveTextStyle.CaptionSubtle
-                                },
-
-                                new AdaptiveText()
-                                {
-                                    Text = "Check out these awesome photos I took while in New Zealand!",
-                                    HintStyle = AdaptiveTextStyle.CaptionSubtle
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-
-            
-        }
+        }        
 
         //private void ShowToast(string msg)
         //{
