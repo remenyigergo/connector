@@ -33,7 +33,9 @@ namespace Book.DataManagement.MongoDB.Repositories
 
         Task DeleteOnGoingBook(OnGoingBook onGoingBook);
 
-        Task<List<InternalBook>> GetRecommendations(int userid);
+        Task<List<InternalBook>> GetRecommendationsByUserId(int userid);
+
+        Task<List<Models.Book>> GetRecommendationsByString(string supposedTitle);
         Task<bool> IsBookExist(int bookid);
     }
 }

@@ -7,8 +7,10 @@ using Standard.Contracts.Models.Books;
 using Book.Service;
 using Book.DataManagement.MongoDB.Models;
 using Book.Service.Models.Request;
+using MongoDB.Bson;
 using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Book;
+using Book.DataManagement.Helpers;
 
 namespace Book.Service.Controllers
 {
@@ -27,19 +29,19 @@ namespace Book.Service.Controllers
         [HttpPost("insert")]
         public async Task InsertBook([FromBody]InternalBook book)
         {
-            var bookOverride = new InternalBook()
-            {
-                BookId = 4,
-                Title="ninscneve",
-                Writer="en",
-                Genre= Book.DataManagement.OverallModels.Genres.StarWars,
-                Pages=343,
-                PublicationYear=2015,
-                OverallRating=0,
-                Sample="Ez a tortenete:semmi"
-            };
+            //var bookOverride = new InternalBook()
+            //{
+            //    BookId = 4,
+            //    Title="ninscneve",
+            //    Writer="en",
+            //    Genre= Book.DataManagement.OverallModels.Genres.StarWars,
+            //    Pages=343,
+            //    PublicationYear=2015,
+            //    OverallRating=0,
+            //    Sample="Ez a tortenete:semmi"
+            //};
 
-            await new BookService().InsertBook(bookOverride);
+            await new BookService().InsertBook(book);
         }
 
         [HttpPost("insert/ongoing")]
@@ -122,10 +124,16 @@ namespace Book.Service.Controllers
         }
 
 
-        [HttpPost("get/recommendations")]
-        public async Task<List<InternalBook>> GetRecommendations([FromBody] int userid)
+        [HttpPost("get/recommendations/id")]
+        public async Task<List<InternalBook>> GetRecommendationsByUserId([FromBody] int userid)
         {
-            return await new BookService().GetRecommendations(userid);
+            return await new BookService().GetRecommendationsByUserId(userid);
+        }
+
+        [HttpPost("get/recommendations/string")]
+        public async Task<List<InternalBook>> GetRecommendationsByString([FromBody] string supposedTitle)
+        {
+            return await new BookService().GetRecommendationsByString(supposedTitle);
         }
 
         [HttpPost("get/exist/book")]

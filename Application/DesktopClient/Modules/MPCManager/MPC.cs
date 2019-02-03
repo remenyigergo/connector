@@ -11,11 +11,13 @@ using DesktopClient.Modules.SubtitleManager;
 using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 using Standard.Contracts.Requests;
 using HtmlAgilityPack;
+using KeyEventForm.Modules.ApplicationManager.MPC;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Timer = System.Timers.Timer;
 using Standard.Contracts.Models.Series;
 using Series.Service.Models;
 using Standard.Core.NetworkManager;
+using DesktopClient.Modules.Helpers.Series;
 
 namespace DesktopClient.Modules.MPCManager
 {
@@ -41,11 +43,11 @@ namespace DesktopClient.Modules.MPCManager
                          var path = SubtitleFetcher.GetFolderPathFromMPCweb();
                          var fileName = SubtitleFetcher.GetFilenameFromMPCweb();
 
-                         var showName = Helper.GetTitle(fileName);
-                         var episodeNumber = Helper.GetEpisodeNumber(fileName);
-                         var seasonNumber = Helper.GetSeasonNumber(fileName);
-                         var releaser = Helper.GetReleaser(fileName);
-                         var quality = Helper.GetQuality(fileName);
+                         var showName = SeriesHelper.GetTitle(fileName);
+                         var episodeNumber = SeriesHelper.GetEpisodeNumber(fileName);
+                         var seasonNumber = SeriesHelper.GetSeasonNumber(fileName);
+                         var releaser = SeriesHelper.GetReleaser(fileName);
+                         var quality = SeriesHelper.GetQuality(fileName);
 
                          Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
 
@@ -78,6 +80,8 @@ namespace DesktopClient.Modules.MPCManager
                              stopWatch.Start();  //timer stop
                              var duration = stopWatch.ElapsedMilliseconds / 1000;
                              mediaJustStarted = false;
+
+                             await new MPCTracker().Run(runningMedia.MainModule.ModuleName);
                          }
                          else if (IsMediaRunning() != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                          {
@@ -133,11 +137,11 @@ namespace DesktopClient.Modules.MPCManager
 
                 if (percentage <= 98)
                 {
-                    await Helper.UpdateStartedSeries(episode, showName);
+                    await SeriesHelper.UpdateStartedSeries(episode, showName);
                 }
                 else
                 {
-                    await Helper.MarkRequest(new InternalMarkRequest()
+                    await SeriesHelper.MarkRequest(new InternalMarkRequest()
                     {
                         //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
                         //átküldés után lekell kérni a showt névszerint
@@ -160,8 +164,8 @@ namespace DesktopClient.Modules.MPCManager
 
         public async Task<bool> RecognizeMedia(Process playerProcess)
         {
-            var name = Helper.GetTitle(playerProcess.MainWindowTitle);
-            var showExistInMongo = await Helper.Parse(name);
+            var name = SeriesHelper.GetTitle(playerProcess.MainWindowTitle);
+            var showExistInMongo = await SeriesHelper.Parse(name);
 
             switch (showExistInMongo)
             {
@@ -169,20 +173,20 @@ namespace DesktopClient.Modules.MPCManager
                     return false; //EKKOR NINCS ILYEN SOROZAT
 
                 case 1:
-                    var s = await Helper.GetShow(name);
+                    var s = await SeriesHelper.GetShow(name);
 
                     var imr = new InternalMarkRequest()
                     {
                         ShowName = name,
-                        SeasonNumber = Helper.GetSeasonNumber(playerProcess.MainWindowTitle),
-                        EpisodeNumber = Helper.GetEpisodeNumber(playerProcess.MainWindowTitle)
+                        SeasonNumber = SeriesHelper.GetSeasonNumber(playerProcess.MainWindowTitle),
+                        EpisodeNumber = SeriesHelper.GetEpisodeNumber(playerProcess.MainWindowTitle)
                     };
-                    await Helper.MarkRequest(imr);
+                    await SeriesHelper.MarkRequest(imr);
                     break;
 
                 case 2:
                 case 3:
-                    await Helper.ImportRequest(name);
+                    await SeriesHelper.ImportRequest(name);
                     break;
 
                 case -2:

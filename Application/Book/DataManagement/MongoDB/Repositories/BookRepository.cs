@@ -14,6 +14,12 @@ using Standard.Core.DataManager.MongoDB.Extensions;
 using Book = Book.DataManagement.MongoDB.Models.Book;
 using MongoDB.Driver.Linq;
 using System.Globalization;
+using Book.DataManagement.OverallModels;
+using MongoDB.Bson.Serialization;
+
+//
+//  NINCS LOGIKA   
+//
 
 namespace Book.DataManagement.MongoDB.Repositories
 {
@@ -37,13 +43,13 @@ namespace Book.DataManagement.MongoDB.Repositories
 
         //MINDENHOVA KELL HIBAKEZELÉS KB
 
-        public async Task<Models.Book> GetBookByTitle(string title)
+        public async Task<Models.Book> GetBookByTitle(string title)  //enum hiba
         {
             var book = await Books.FindAsynchronous(book1 => book1.Title == title);
             return book[0];
         }
 
-        public async Task<Models.Book> GetBookById(int id)
+        public async Task<Models.Book> GetBookById(int id)  //enum hiba
         {
             var book = await Books.FindAsynchronous(book1 => book1.BookId == id);
             return book[0];
@@ -59,17 +65,17 @@ namespace Book.DataManagement.MongoDB.Repositories
             //TODO exception kezelés
         }
 
-        public async Task<bool> UpdateReadPageNumber(UpdateLog updateLog, int userid, int bookid)
+        public async Task<bool> UpdateReadPageNumber(UpdateLog updateLog, int userid, int bookid )
         {
             var timenow = DateTime.Now;
             var currentStateOfBook = await GetOnGoingBookByIds(userid, bookid);
 
 
             var updateDef = Builders<OnGoingBook>.Update
-                .Set(book => book.LastUpdate.PageNumber, currentStateOfBook.LastUpdate.PageNumber +updateLog.PageNumber)
+                .Set(book => book.LastUpdate.PageNumber, currentStateOfBook.LastUpdate.PageNumber + updateLog.PageNumber)
                 .Set(book => book.LastUpdate.HoursRead, currentStateOfBook.LastUpdate.HoursRead + updateLog.HoursRead)
-                .Set(book => book.LastUpdate.MinutesRead, currentStateOfBook.LastUpdate.MinutesRead +updateLog.MinutesRead)
-                .Set(book=>book.LastUpdate.UpDateTime, currentStateOfBook.LastUpdate.UpDateTime)
+                .Set(book => book.LastUpdate.MinutesRead, currentStateOfBook.LastUpdate.MinutesRead + updateLog.MinutesRead)
+                .Set(book => book.LastUpdate.UpDateTime, currentStateOfBook.LastUpdate.UpDateTime)
                 .Push("Updates", new UpdateLog()
                 {
                     UpDateTime = updateLog.UpDateTime,
@@ -88,7 +94,7 @@ namespace Book.DataManagement.MongoDB.Repositories
         {
             var book = await OnGoingBooks.FindAsynchronous(model => model.BookId == bookid && model.UserId == userid);
 
-            if (book.Count!=0)
+            if (book.Count != 0)
                 return book[0];
 
             return null;
@@ -157,16 +163,17 @@ namespace Book.DataManagement.MongoDB.Repositories
             await Queue.DeleteOneAsync(model => model.UserId == userId && model.Book.BookId == queueBook.BookId);
         }
 
-        public async Task<List<InternalBook>> GetRecommendations(int userid)
+        public async Task<List<InternalBook>> GetRecommendationsByUserId(int userid)
         {
             //Helper változó
             List<Models.Book> onGoingBooks = new List<Models.Book>();
+
 
             //Folyamatban lévő könyvek összegyűjtése
             var onGoingBooksId = await OnGoingBooks.FindAsynchronous(book => book.UserId == userid);
             foreach (var onGoingBook in onGoingBooksId)
             {
-                var book = await GetBookById(onGoingBook.BookId);
+                var book = await GetBookById(onGoingBook.BookId);  //hiba enummal
                 onGoingBooks.Add(book);
             }
 
@@ -181,10 +188,14 @@ namespace Book.DataManagement.MongoDB.Repositories
             Dictionary<string, int> bookGenresCount = new Dictionary<string, int>();
             foreach (var genre in genres)
             {
-                //var countMaxOnGoing = onGoingBooks.Count(model => model.Genre == genre);
-                //var countMaxFinished = finishedBooks.Count(model => model.book.Genre == genre);
+                var countMaxOnGoing = onGoingBooks.Count(model => model.Genre == genre.ToString());
+                var countMaxFinished = finishedBooks.Count(model => model.Book.Genre == genre.ToString());
 
-                //bookGenresCount.Add(genre.ToString(), countMaxFinished + countMaxOnGoing);
+                if (countMaxFinished + countMaxOnGoing != 0)
+                {
+                    bookGenresCount.Add(genre.ToString(), countMaxFinished + countMaxOnGoing);
+                }
+
             }
 
             bookGenresCount.OrderByDescending(x => x.Value);
@@ -196,29 +207,87 @@ namespace Book.DataManagement.MongoDB.Repositories
                 stringListGenres.Add(genre.Key);
             }
 
-            return await GetBooksForRecommendation(3, stringListGenres);
-        }
-
-        public async Task<List<InternalBook>> GetBooksForRecommendation(int k, List<string> genres)
-        {
-            //választunk egy véletlen genret és véletlenül adunk vissza k könyvet
-            if (genres.Count != 0)
+            //ajánláshoz megnézem tudunk-e 'k könyvet ajánlani'
+            var allBooks = await Books.CountDocumentsAsync(x => x.BookId >= 0);
+            var k = 3;
+            while (allBooks - (onGoingBooksId.Count + finishedBooks.Count) < k && k > 0)
             {
-                Random rnd = new Random();
-                int genreIndex = rnd.Next(1, genres.Count + 1);
-                var booksForRecommend = Books.AsQueryable().Where(x => x.Genre.ToString() == genres[0]).Sample(k);
-
-                //convert to internal to be able to return
-                var returnableBooks = new List<InternalBook>();
-                foreach (var book in booksForRecommend)
-                {
-                    returnableBooks.Add(new Converter().ConvertMongoToInternalBook(book));
-                }
-
-                return returnableBooks;
+                k--;
             }
 
+            return await GetBooksForRecommendation(k, stringListGenres, stringListGenres.Count, onGoingBooksId);
+
+        }
+
+        public async Task<List<InternalBook>> GetBooksForRecommendation(int k, List<string> genres, int topX, List<OnGoingBook> onGoingBooks)
+        {
+            List<InternalBook> recommendedBooks = new List<InternalBook>();
+            var booksWithSpecificGenre = await Books.FindAsynchronous(x => x.Genre == genres[0]);
+            var copyBooksWithGenre = new List<Models.Book>(booksWithSpecificGenre);
+
+            //törlöm az ongoing bookokat az osszesnek a listajabol, hogy konnyebb legyen ajanlani
+            foreach (var onGoingBook in onGoingBooks)
+            {
+                foreach (var book in booksWithSpecificGenre)
+                {
+                    if (onGoingBook.BookId == book.BookId)
+                    {
+                        copyBooksWithGenre.Remove(book);
+                    }
+                }
+            }
+
+            Random rnd = new Random();
+
+
+
+            if (recommendedBooks.Count != 1)
+            {
+                var usedIndexes = new List<int>();
+                for (int i = 0; i < copyBooksWithGenre.Count; i++)
+                {
+                    var randomIndex = rnd.Next(0, copyBooksWithGenre.Count);
+                    while (usedIndexes.Contains(randomIndex))
+                    {
+                        randomIndex = rnd.Next(0, copyBooksWithGenre.Count);
+                    }
+                    
+                    recommendedBooks.Add(new Converter().ConvertMongoToInternalBook(copyBooksWithGenre[randomIndex]));
+                    usedIndexes.Add(randomIndex);
+                }
+            }
+            else
+            {
+                recommendedBooks.Add(new Converter().ConvertMongoToInternalBook(copyBooksWithGenre[0]));
+                return recommendedBooks;
+            }
+            
+
+
             return null;
+        }
+
+        public async Task<List<Models.Book>> GetRecommendationsByString(string supposedTitle)
+        {
+            var booksWithThisName =
+                await Books.FindAsynchronous(book => book.Title.ToLower().Contains(supposedTitle.ToLower()));
+
+            if (booksWithThisName != null)
+                return booksWithThisName;
+
+            return null;
+        }
+
+        public async Task<bool> IsBookInOnGoing(int bookid)
+        {
+            var count = await OnGoingBooks.CountDocumentsAsync(book => book.BookId == bookid);
+            return count == 1;
+        }
+
+        public async Task<bool> IsBookFinished(int bookid)
+        {
+            var count = await FinishedBooks.CountDocumentsAsync(book => book.Book.BookId == bookid);
+            return count == 1;
         }
 
         public async Task<bool> IsBookExist(int bookid)

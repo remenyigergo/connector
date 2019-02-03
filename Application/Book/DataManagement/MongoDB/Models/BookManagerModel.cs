@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Book.DataManagement.MongoDB.Models
 {
-    class BookManagerModel
+    public class BookManagerModel
     {
         [BsonId]
         [BsonIgnoreIfNull]

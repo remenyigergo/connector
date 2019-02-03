@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using DesktopClient.Modules.Helpers.Series;
 using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 using HtmlAgilityPack;
 
@@ -120,8 +121,8 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                 //A felsőben csak egy kötőjel, megnézi a SOROZATxEPIZÓD stílust, és a leírásos (Season X) stílust is
                 if (magyarNode.InnerText == "-")
                 {
-                    EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
-                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
+                    EpisodeFromFeliratokInfo = SeriesHelper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
+                    SeasonFromFeliratokInfo = SeriesHelper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
 
                     if (EpisodeFromFeliratokInfo.Length != 0 && SeasonFromFeliratokInfo.Length != 0 && CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
                     {
@@ -131,7 +132,7 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                     {
                         EpisodeFromFeliratokInfo = subtitleModel.EpisodeNumber.ToString();  //beállítom, hogy a check ne dobjon hibát
                         SeasonFromFeliratokInfo =
-                            Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
+                            SeriesHelper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
                         if (SeasonFromFeliratokInfo.Length != 0 && CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
                         {
                             return Download(htmlDocument, downloadXPath, url, folderPath, filename, subtitleModel, false);
@@ -143,13 +144,13 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                 //Ekkor van sima neve(felsőben), ezért ráapplikálom a (8. évad) stílust a felsőre,
                 //az alsóra meg a (Season 8) félét ha nincs a felsőben találat
                 
-                SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfoEvad(magyarNode.InnerText).ToString();
+                SeasonFromFeliratokInfo = SeriesHelper.GetSeasonFromFeliratokInfoEvad(magyarNode.InnerText).ToString();
 
                 if (Int32.Parse(SeasonFromFeliratokInfo) != -1)
                 {
                     EpisodeFromFeliratokInfo =
                         subtitleModel.EpisodeNumber.ToString(); //beállítom, hogy a check ne dobjon hibát
-                    var seasonOnSite = Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText);
+                    var seasonOnSite = SeriesHelper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText);
                     if (seasonOnSite == subtitleModel.SeasonNumber && CheckMatching(subtitleModel,
                             SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
                     {
@@ -158,7 +159,7 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                 }
                 else
                 {
-                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
+                    SeasonFromFeliratokInfo = SeriesHelper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
 
                     if (Int32.Parse(SeasonFromFeliratokInfo) != -1)
                     {
@@ -175,13 +176,13 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                 //PONTOS EGYEZÉS
                 if (EpisodeFromFeliratokInfo.Length == 0 || (SeasonFromFeliratokInfo.Length == 0 || SeasonFromFeliratokInfo.Length == -1))
                 {
-                    EpisodeFromFeliratokInfo = Helpers.Helper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
-                    SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
+                    EpisodeFromFeliratokInfo = SeriesHelper.GetEpisodeFromFeliratokInfo1x2(originalNode.InnerText);
+                    SeasonFromFeliratokInfo = SeriesHelper.GetSeasonFromFeliratokInfo1x2(originalNode.InnerText);
 
                     if (SeasonFromFeliratokInfo.Length == 0)
                     {
                         EpisodeFromFeliratokInfo = subtitleModel.EpisodeNumber.ToString();
-                        SeasonFromFeliratokInfo = Helpers.Helper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
+                        SeasonFromFeliratokInfo = SeriesHelper.GetSeasonFromFeliratokInfoThird(originalNode.InnerText).ToString();
                     }
 
                     if (CheckMatching(subtitleModel, SeasonFromFeliratokInfo, EpisodeFromFeliratokInfo, originalNode))
@@ -252,8 +253,8 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
 
                     foreach (FileInfo subtitle in Subtitles)
                     {
-                        int subtitleSeason = Helpers.Helper.GetSeasonNumber(subtitle.ToString());
-                        int subtitleEpisode = Helpers.Helper.GetEpisodeNumber(subtitle.ToString());
+                        int subtitleSeason = SeriesHelper.GetSeasonNumber(subtitle.ToString());
+                        int subtitleEpisode = SeriesHelper.GetEpisodeNumber(subtitle.ToString());
                         if (subtitleSeason == season && episode == subtitleEpisode)
                         {
                             var subname = SubtitleFetcher.TrimFileName(filename);
@@ -268,8 +269,8 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
 
                     foreach (FileInfo subtitle in Subtitles)
                     {
-                        int subtitleSeason = Helpers.Helper.GetSeasonNumber(subtitle.ToString());
-                        int subtitleEpisode = Helpers.Helper.GetEpisodeNumber(subtitle.ToString());
+                        int subtitleSeason = SeriesHelper.GetSeasonNumber(subtitle.ToString());
+                        int subtitleEpisode = SeriesHelper.GetEpisodeNumber(subtitle.ToString());
                         if (subtitleSeason == season && episode == subtitleEpisode)
                         {
                             var subname = SubtitleFetcher.TrimFileName(filename);

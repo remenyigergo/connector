@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Book.DataManagement.Helpers;
 using Book.DataManagement.MongoDB.Models;
 using Book.DataManagement.MongoDB.Repositories;
-using Book.Service.Models.Request;
 using Microsoft.Extensions.DependencyInjection;
 using Standard.Contracts.Models.Books;
-using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Book;
 using Standard.Core.Dependency;
+using Book.Service.Models.Request;
+using MongoDB.Driver;
 
 namespace Book.Service
 {
@@ -41,6 +41,8 @@ namespace Book.Service
 
         public async Task<bool> UpdateReadPageNumber(UpdateLog updateLog, int userid, int bookid)
         {
+            
+
             return await _repo.UpdateReadPageNumber(updateLog,userid,bookid);
         }
 
@@ -92,9 +94,27 @@ namespace Book.Service
             await _repo.DeleteQueueBook(userid, new Converter().ConvertInternalToMongoBook(model));
         }
 
-        public async Task<List<InternalBook>> GetRecommendations(int userid)
+        public async Task<List<InternalBook>> GetRecommendationsByUserId(int userid)
         {
-            return await _repo.GetRecommendations(userid);
+            return await _repo.GetRecommendationsByUserId(userid);
+        }
+
+        public async Task<List<InternalBook>> GetRecommendationsByString(string supposedTitle)
+        {
+            var returnedMongoBooks = await _repo.GetRecommendationsByString(supposedTitle);
+            if (returnedMongoBooks != null)
+            {
+                List<InternalBook> convertedInternalBooks = new List<InternalBook>();
+
+                foreach (var returnedMongoBook in returnedMongoBooks)
+                {
+                    convertedInternalBooks.Add(new Converter().ConvertMongoToInternalBook(returnedMongoBook));
+                }
+
+                return convertedInternalBooks;
+            }
+
+            return null;
         }
 
         public async Task<bool> IsBookExist(int bookid)

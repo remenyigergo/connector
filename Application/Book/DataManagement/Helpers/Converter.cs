@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Book.DataManagement.MongoDB.Models;
+using Book.DataManagement.OverallModels;
+using Book.Service.Models.Request;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Requests.Book;
 using Book = Book.DataManagement.MongoDB.Models.Book;
@@ -15,6 +17,8 @@ namespace Book.DataManagement.Helpers
 
         public MongoDB.Models.Book ConvertInternalToMongoBook(InternalBook internalBook)
         {
+            //var convertedGenre = (Genres)Enum.Parse(typeof(Genres), genre);
+
             return new MongoDB.Models.Book()
             {
                 BookId = internalBook.BookId,
@@ -30,6 +34,8 @@ namespace Book.DataManagement.Helpers
 
         public InternalBook ConvertMongoToInternalBook(MongoDB.Models.Book mongoBook)
         {
+            //var convertedGenre = (Genres) Enum.Parse(typeof(Genres), genre);
+
             return new InternalBook()
             {
                 BookId = mongoBook.BookId,
@@ -40,6 +46,15 @@ namespace Book.DataManagement.Helpers
                 Title = mongoBook.Title,
                 Writer = mongoBook.Writer,
                 Genre = mongoBook.Genre
+            };
+        }
+
+        public MongoDB.Models.BookManagerModel ConvertInternalBookManagerModelToMongoBookManagerModel(InternalBookManagerModel internalBook)
+        {
+            return new MongoDB.Models.BookManagerModel()
+            {
+                UserId = internalBook.UserId,
+                Book = ConvertInternalToMongoBook(internalBook.Book)
             };
         }
 

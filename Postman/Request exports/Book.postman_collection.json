@@ -1,0 +1,527 @@
+{
+	"info": {
+		"_postman_id": "733315d8-a911-43f0-8e36-56f26f04a19c",
+		"name": "Book",
+		"description": "Ezt a könyv hívásokhoz hoztam létre.\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST",
+			"item": [
+				{
+					"name": "insert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"BookId\": 1,\n    \"Title\": \"Star Wars - Kirajzás\",\n    \"Writer\": \"Timothy Zahn\",\n    \"Pages\": 362,\n    \"PublicationYear\": 2016,\n    \"OverallRating\": 0,\n    \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\",\n    \"Genre\": \"StarWars\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/insert/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"insert",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert/ongoing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"BookId\": 3,\n    \"LastUpdate\": {\n        \"PagerNumbe\": 1,\n        \"HoursRead\": null,\n        \"MinutesRead\": \"15\",\n        \"UpDateTime\": \"2019-01-30 16:40:00\"\n    },\n    \"Updates\": [\n        {\n            \"PagerNumbe\": 1,\n            \"HoursRead\": null,\n            \"MinutesRead\": \"15\",\n            \"UpDateTime\": \"2019-01-30 16:40:00\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/insert/ongoing",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"insert",
+								"ongoing"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert/finished",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/insert/finished",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"insert",
+								"finished"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert/favorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/insert/favorite",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"insert",
+								"favorite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert/queue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/insert/queue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"insert",
+								"queue"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get/title",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"title\""
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/get/title",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"get",
+								"title"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get/id",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "1"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/get/id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"get",
+								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update/userid={userid}/bookid={bookid}",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"PagerNumbe\":1,\r\n\t\"HoursRead\":null,\r\n\t\"MinutesRead\":\"15\",\r\n\t\"UpDateTime\":\"2019-01-30 16:40:00\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/update/userid=1/bookid=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"update",
+								"userid=1",
+								"bookid=3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "isfavorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"UserId\":1,\r\n\t\"BookId\":null,\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/isfavorite",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"isfavorite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get/recommendations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "1"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/get/recommendations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"get",
+								"recommendations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get/exist/book",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "3"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/get/exist/book",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"get",
+								"exist",
+								"book"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET",
+			"item": []
+		},
+		{
+			"name": "DELETE",
+			"item": [
+				{
+					"name": "delete/ongoing",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"BookId\": 3,\n    \"LastUpdate\": {\n        \"PagerNumbe\": 1,\n        \"HoursRead\": null,\n        \"MinutesRead\": \"15\",\n        \"UpDateTime\": \"2019-01-30 16:40:00\"\n    },\n    \"Updates\": [\n        {\n            \"PagerNumbe\": 1,\n            \"HoursRead\": null,\n            \"MinutesRead\": \"15\",\n            \"UpDateTime\": \"2019-01-30 16:40:00\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/delete/ongoing",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"delete",
+								"ongoing"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete/finished",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/delete/finished",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"delete",
+								"finished"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete/favorite",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/delete/favorite",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"delete",
+								"favorite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete/queue",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserId\": 1,\n    \"Book\": {\n        \"BookId\": 1,\n        \"Title\": \"Star Wars - Kirajzás\",\n        \"Writer\": \"Timothy Zahn\",\n        \"Pages\": 472,\n        \"PublicationYear\": 2018,\n        \"OverallRating\": 0,\n        \"Sample\": \"A klónháborúk kitörésének elõestéjén Jorus C’baoth Jedi-mester egy különleges tervvel ostromolja a Szenátust és a Jedi-tanácsot. Sokáig úgy tûnik, hogy a szûk látókörû hivatalnokok zátonyra futtatják a nagyszabású tervet, ám végül C’baoth mester valóra váltja a Kirajzásról szõtt álmait. Hat Jedi-mester, tizenkét Jedi-lovag, továbbá ötvenezer férfi és nõ indul útnak, hogy értelmes lényeket, az erõre fogékony teremtményeket, és lakható világokat keressenek az ismert galaxis határain túl. Noha a titokzatos és gonosz Darth Sidious ezúttal is megkezdi saját játszmáját, az expedíció résztvevõinek mégsem a Sith nagyúr lesz a legveszélyesebb ellenfele. Miután a gigászi kötelék mélyen behatol az Ismeretlen Szektorokba, az utazók váratlanul szemben találják magukat a Chiss Birodalommal és a világmindenség egyik legnagyobb stratégájával…\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5002/book/delete/queue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"book",
+								"delete",
+								"queue"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "64ee9745-472c-484b-8f52-d63d6f22c9f6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "be1de2cf-c676-48c5-892a-18227ce4c624",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

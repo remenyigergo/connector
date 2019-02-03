@@ -14,7 +14,7 @@ namespace Standard.Contracts.Models.Books
         public int PublicationYear;
         public int OverallRating;
         public string Sample;
-        public System.Enum Genre;
+        public string Genre;
 
     }
 }

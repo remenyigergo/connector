@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.IO;
+using Standard.Contracts.Models.Books;
 
 namespace Standard.Core.NetworkManager
 {
@@ -176,6 +177,20 @@ namespace Standard.Core.NetworkManager
             }
         }
 
+        public async Task<List<InternalBook>> RecommendBooksByString(string url)
+        {
+            var request = WebRequest.Create(url);
+            string text;
+            var response = (HttpWebResponse)request.GetResponse();
+            request.ContentType = "application/json; charset=utf-8";
+            using (var sr = new StreamReader(response.GetResponseStream()))
+            {
+                text = sr.ReadToEnd();
+                var result = JsonConvert.DeserializeObject<List<InternalBook>>(text);
+
+                return result;
+            }
+        }
 
     }
 }

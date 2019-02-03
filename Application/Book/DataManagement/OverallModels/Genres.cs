@@ -8,7 +8,7 @@ namespace Book.DataManagement.OverallModels
     public enum Genres
     {
         [Description("Sci-fi")]
-        StarWars,
+        StarWars=1,
         StarTrek,
         MassEffect,
 

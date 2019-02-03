@@ -7,6 +7,7 @@ using DesktopClient.Modules.Helpers;
 using DesktopClient.Modules.MPCManager;
 using DesktopClient.Modules.SubtitleManager.FeliratokInfo;
 using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.Helpers.Series;
 
 namespace DesktopClient.Modules.SubtitleManager
 {
@@ -21,9 +22,9 @@ namespace DesktopClient.Modules.SubtitleManager
             foreach (var d in System.IO.Directory.GetDirectories(downloadPath))
             {
                 var dirName = new DirectoryInfo(d).Name;
-                var dirNameCleaned = Helper.GetTitle(dirName);
+                var dirNameCleaned = SeriesHelper.GetTitle(dirName);
 
-                var showName = Helper.GetTitle(new MPC().IsMediaRunning().MainWindowTitle);
+                var showName = SeriesHelper.GetTitle(new MPC().IsMediaRunning().MainWindowTitle);
 
 
 
@@ -111,9 +112,9 @@ namespace DesktopClient.Modules.SubtitleManager
             foreach (var file1 in fileArray)
             {
                 var file = TrimFileName(file1).ToLower();
-                var downloadedSubSeason = Helper.GetSeasonNumber(file);
-                var downloadedSubEpisode= Helper.GetEpisodeNumber(file);
-                var downloadedSubName = Helper.GetTitle(file);
+                var downloadedSubSeason = SeriesHelper.GetSeasonNumber(file);
+                var downloadedSubEpisode= SeriesHelper.GetEpisodeNumber(file);
+                var downloadedSubName = SeriesHelper.GetTitle(file);
                 if (downloadedSubSeason == seasonNum && downloadedSubEpisode == episodeNum && downloadedSubName == showName)
                 {
                     return true;
@@ -125,7 +126,7 @@ namespace DesktopClient.Modules.SubtitleManager
 
         public static bool DownloadSubtitle(SubtitleModel subtitleModel, string path, string filename)
         {
-            if (!Helper.DoesItContainHun(filename))
+            if (!SeriesHelper.DoesItContainHun(filename))
             {
                 return FeliratokInfoDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path, filename) != false;
             }

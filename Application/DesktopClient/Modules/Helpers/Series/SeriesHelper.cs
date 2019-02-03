@@ -8,9 +8,9 @@ using Series.Service.Models;
 using Standard.Contracts.Requests;
 using Standard.Core.NetworkManager;
 
-namespace DesktopClient.Modules.Helpers
+namespace DesktopClient.Modules.Helpers.Series
 {
-    public static class Helper
+    public static class SeriesHelper
     {
         //public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)?$";
         public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)\.(mkv|avi|mp4|srt)?$";
@@ -133,6 +133,18 @@ namespace DesktopClient.Modules.Helpers
             return -1;
         }
 
+        public static bool DoesItContainSeasonAndEpisode(string title)
+        {
+            var result = SeasonXEpisodePattern.Matches(title);
+
+            if (result.Count != 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static async Task<int> GetShow(string title)
         {
             var requestbody = new InternalImportRequest() { Title = title };
@@ -155,7 +167,7 @@ namespace DesktopClient.Modules.Helpers
         }
 
 
-        public static async Task<bool> UpdateStartedSeries(InternalEpisodeStartedModel internalEpisode,string title)
+        public static async Task<bool> UpdateStartedSeries(InternalEpisodeStartedModel internalEpisode, string title)
         {
 
             var isUpdated = await new WebClientManager().Post<bool>($"http://localhost:5001/series/updateStartedEpisode/{title}", internalEpisode);
