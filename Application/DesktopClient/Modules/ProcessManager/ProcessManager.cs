@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Management;
 using DesktopClient.Modules.ApplicationManager.ProcessEqualityComparer;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace DesktopClient.Modules.ProcessManager
 {
@@ -21,8 +22,29 @@ namespace DesktopClient.Modules.ProcessManager
         public Process FindProcessByName(string processName)
         {
             //var p = Process.GetProcessesByName(processName).First(process => process.MainModule.FileName.Contains(processName));
-            var s = GetProcesses().FirstOrDefault(process => process.MainModule.FileVersionInfo.FileDescription.ToLower().Contains(processName.ToLower()));
-            return s;
+            var processes = Process.GetProcesses();
+
+            foreach (var process in processes)
+            {
+                try
+                {
+                    if (process.MainModule.FileVersionInfo.FileDescription != null && process.MainModule.FileVersionInfo.FileDescription.ToLower().Contains(processName.ToLower()))
+                    {
+                        return process;
+                    }
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    
+                }
+            }
+
+
+            //return processes.FirstOrDefault(process => process.MainModule != null && process.MainModule.FileVersionInfo.FileDescription.ToLower().Contains(processName.ToLower()));
+
+
+
+            return null;
 
         }
 
@@ -47,7 +69,7 @@ namespace DesktopClient.Modules.ProcessManager
                 }
                 catch (System.InvalidOperationException IOE)
                 {
-                    
+
                 }
             }
 

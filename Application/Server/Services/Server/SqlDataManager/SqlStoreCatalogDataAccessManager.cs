@@ -17,6 +17,8 @@ namespace Server.SqlDataManager
         private string programsFollowedTable = "[programsFollowed]";
         private string programsFollowedUpdates = "[programsFollowedUpdates]";
         private string programsTable = "[programs]";
+        private string activatedModulesTable = "[ActivatedModules]";
+        private string moduleTable = "[Modules]";
 
         public SqlStoreCatalogDataAccessManager()
         {
@@ -330,8 +332,47 @@ namespace Server.SqlDataManager
 
                 return null;
             }
+        }
+
+        public async Task<int> IsBookModuleActivated(int userId)
+        {
+            var moduleId = await GetModuleId("book");
+
+            var commandText = "SELECT moduleId FROM " + SchemaName + "." + activatedModulesTable + " WHERE userid=" +
+                              userId + " AND moduleId=" + moduleId;
+
+            var parameters = new List<DbParameter>();
 
 
+            using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
+            {
+                if (select.HasRows)
+                {
+                    while (select.Read())
+                    {
+                        return Int32.Parse(select["moduleId"].ToString());
+                    }
+                }
+                return -1;
+            }
+        }
+
+        public async Task<int> GetModuleId(string moduleName)
+        {
+            var commandText = "SELECT moduleId FROM " + SchemaName + "." + moduleTable + " WHERE name LIKE '"+ moduleName + "'";
+
+            var parameters = new List<DbParameter>();
+            using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
+            {
+                if (select.HasRows)
+                {
+                    while (select.Read())
+                    {
+                        return Int32.Parse(select["moduleId"].ToString());
+                    }
+                }
+                return -1;
+            }
         }
     }
 }

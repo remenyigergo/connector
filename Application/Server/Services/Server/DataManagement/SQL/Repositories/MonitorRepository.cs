@@ -58,5 +58,11 @@ namespace Server.DataManagement.SQL.Repositories
             return await SqlCatalogDataAccessManager.UpdateFollowedProgramCategory(userId, programId, categoryId);
         }
 
+        public async Task<bool> IsBookModuleActivated(int userid)
+        {
+            return await SqlCatalogDataAccessManager.IsBookModuleActivated(userid) == 1;
+        }
+
+
     }
 }

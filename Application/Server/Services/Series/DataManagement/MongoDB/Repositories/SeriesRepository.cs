@@ -683,5 +683,9 @@ namespace Series.DataManagement.MongoDB.Repositories
             return startedAndSeenEpisodes;
         }
 
+        public Task<List<InternalSeries>> RecommendSeries(int userid, int genre)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

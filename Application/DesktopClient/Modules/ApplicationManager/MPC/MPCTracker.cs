@@ -35,9 +35,9 @@ namespace KeyEventForm.Modules.ApplicationManager.MPC
                 regexedTitle = MovieHelper.GetTitle(title);
             }
             
-            var books = await new WebClientManager().RecommendBooksByString(_endpoint + "/book/get/recommendations/" + regexedTitle);
+            //var books = await new WebClientManager().RecommendBooksByString(_endpoint + "/book/get/recommendations/" + regexedTitle);
 
-            MessageBox.Show("Recommended book by this:"+books[0].Title);
+            //MessageBox.Show("Recommended book by this:"+books[0].Title);
         }
 
         public async Task RecommendBookFromSites(string title)

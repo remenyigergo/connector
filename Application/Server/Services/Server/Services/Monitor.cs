@@ -63,5 +63,10 @@ namespace Server.Services
         {
             return await _repo.UpdateFollowedProgramCategory(userId, programId, categoryId);
         }
+
+        public async Task<bool> IsBookModuleActivated(int userid)
+        {
+            return await _repo.IsBookModuleActivated(userid);
+        }
     }
 }

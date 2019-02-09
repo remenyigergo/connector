@@ -38,6 +38,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task RateSeries(int userid, int tvmazeid, int tmdbid, int rate);  //folyamatos frissítéssel akárhányszor
         Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate); //folyamatos frissítéssel akárhányszor
         Task<StartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
+        Task<List<InternalSeries>> RecommendSeries(int userid, int genre);
     }
 }
 

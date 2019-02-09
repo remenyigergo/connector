@@ -253,6 +253,11 @@ namespace Series.Service
             return -2;
         }
 
+        public async Task<List<InternalSeries>> RecommendSeriesFromDb()
+        {
+            await _repo.RecommendSeries();
+        }
+
         public string RemoveAccent(string text)
         {
             var decomposed = text.Normalize(NormalizationForm.FormD);

@@ -182,10 +182,18 @@ CREATE TABLE SeenEpisodes(
 )
 
 CREATE TABLE Programs(
-	programId IDENTITY(1,1),
+	programId int IDENTITY(1,1),
 	programName VARCHAR(128) NOT NULL,
 	PRIMARY KEY(programId)
 )
+
+
+CREATE TABLE ProgramBaseCategories(
+	categoryId INT IDENTITY(1,1),
+	name NVARCHAR(32) NOT NULL,
+	PRIMARY KEY(categoryId)
+)
+SET IDENTITY_INSERT ProgramBaseCategories ON; 
 
 CREATE TABLE ProgramsFollowed(
 	userId INT NOT NULL,
@@ -209,7 +217,3 @@ CREATE TABLE ProgramsFollowedUpdates(
 	FOREIGN KEY(programId) REFERENCES Programs(programId)
 )
 
-CREATE TABLE ProgramBaseCategories(
-	categoryId INT IDENTITY(1,1),
-	name NVARCHAR(32) NOT NULL,
-)

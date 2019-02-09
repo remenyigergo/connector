@@ -20,5 +20,6 @@ namespace Server.DataManagement.SQL.Repositories
 
         Task<bool> CheckInsertedById(int id);
 
+        Task<bool> IsBookModuleActivated(int userid);
     }
 }

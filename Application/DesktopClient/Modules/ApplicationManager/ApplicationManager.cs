@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer;
 
 
@@ -14,7 +15,7 @@ namespace DesktopClient.Modules.ApplicationManager
         private Dictionary<int, Stopwatch> followedProgramsRunning = new Dictionary<int, Stopwatch>();
 
 
-        public async void RunApplicationManager()
+        public async Task RunApplicationManager()
         {
             while (true)
             {
@@ -53,6 +54,7 @@ namespace DesktopClient.Modules.ApplicationManager
                 {
                     program.Value.Stop();
                     stoppedApps.Add(program.Key, (int)program.Value.ElapsedMilliseconds / 1000);
+
                     //followedProgramsRunning.Remove(program.Key);
                 }
             }

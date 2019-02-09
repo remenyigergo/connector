@@ -28,19 +28,16 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
                 List<HtmlNode> subtitleList = null;
                 int page = 1;
 
-                //string route =
-                //    $"/?search={subtitleModel.ShowName}&soriSorszam=&nyelv={lang}&sorozatnev=&sid=&complexsearch=true&knyelv=0&evad={subtitleModel.SeasonNumber}&epizod{subtitleModel.EpisodeNumber}=2&cimke=0&minoseg=0&rlsr=0&tab=all&page={page}";
-                //var data = client.DownloadString(new Uri(url + route));
 
                 do
                 {
                     var route =
                         $"/?search={subtitleModel.ShowName}&soriSorszam=&nyelv={lang}&sorozatnev=&sid=&complexsearch=true&knyelv=0&evad={subtitleModel.SeasonNumber}&epizod={subtitleModel.EpisodeNumber}&cimke=0&minoseg=0&rlsr=0&tab=all&page={page}";
                     data = client.DownloadString(new Uri(url + route));
-                    subtitleList = GetSubtitles(data);
 
-                    subtitleFound =
-                        FindAdherentSubtitleAndDownload(subtitleList, subtitleModel, url, folderPath, filename);
+                    subtitleList = GetSubtitles(data);
+                    subtitleFound = FindAdherentSubtitleAndDownload(subtitleList, subtitleModel, url, folderPath, filename);
+
                     page++;
                 } while (!subtitleFound && subtitleList != null);
 
@@ -56,10 +53,12 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
             //string xPath = "/html/body/div/table/tbody/tr[2]/td[2]/table/tbody";
             string xPath = "//tr[@id=\'vilagit\']";
             string xPath2 = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr";
+            string pagination = "/html/body/div[2]/div";
 
             List<HtmlNode> listOfSubtitles = new List<HtmlNode>();
             try
             {
+                
                 foreach (var tr in htmlDocument.DocumentNode.SelectNodes(xPath2))
                 {
                     listOfSubtitles.Add(tr);
@@ -295,13 +294,20 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
             Regex trimEnd = new Regex($"({name})(.*?)(\\(.*\\))\\s*(-)\\s.*");
             
             var nameRegexed = trimEnd.Matches(originalNode.InnerText.ToLower());
-            var dash = nameRegexed[0].Groups[4].Value;
-            var namefromgroup = nameRegexed[0].Groups[1].Value;
+
+            var dash = string.Empty;
+            var namefromgroup = string.Empty;
+            try
+            {
+                dash = nameRegexed[0].Groups[4].Value;
+                namefromgroup = nameRegexed[0].Groups[1].Value;
+            } catch (ArgumentOutOfRangeException aoore) { }
+            
 
             if (subtitleModel.SeasonNumber == Int32.Parse(SeasonFromFeliratokInfo) && subtitleModel.EpisodeNumber ==
                 Int32.Parse(EpisodeFromFeliratokInfo)
                 && originalNode.InnerText.ToLower().Contains(subtitleModel.Releaser.ToLower()) &&
-                originalNode.InnerText.ToLower().Contains(subtitleModel.Quality.ToLower()) && namefromgroup == name && dash == "-")
+                originalNode.InnerText.ToLower().Contains(subtitleModel.Quality.ToLower()))
             {
                 return true;
             }

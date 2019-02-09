@@ -88,5 +88,12 @@ namespace Server.Controllers
             return await new Monitor().UpdateFollowedProgramCategory(userId, programId, categoryId);
         }
 
+
+        [HttpPost("modules/bookModule/activated")]
+        public async Task<bool> IsBookModuleActivated([FromBody]int userid)
+        {
+            return await new Monitor().IsBookModuleActivated(userid);
+        }
+
     }
 }

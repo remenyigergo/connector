@@ -177,19 +177,40 @@ namespace Standard.Core.NetworkManager
             }
         }
 
-        public async Task<List<InternalBook>> RecommendBooksByString(string url)
+        public async Task<List<InternalBook>> RecommendBooksByString(string url, string title)
         {
-            var request = WebRequest.Create(url);
-            string text;
-            var response = (HttpWebResponse)request.GetResponse();
-            request.ContentType = "application/json; charset=utf-8";
-            using (var sr = new StreamReader(response.GetResponseStream()))
-            {
-                text = sr.ReadToEnd();
-                var result = JsonConvert.DeserializeObject<List<InternalBook>>(text);
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(title);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
 
-                return result;
-            }
+            var response = await request.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<List<InternalBook>>(response);
+        }
+
+
+        public async Task<string> IsShowExist(string url, InternalImportRequest body)
+        {
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+
+            return response;
+            //return bool.TryParse(response, out var result);
+        }
+
+        public async Task<bool> IsBookModuleActivated(string url, int userid)
+        {
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(userid);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+            var response = await request.Content.ReadAsStringAsync();
+            return bool.TryParse(response, out var result);
         }
 
     }
