@@ -68,5 +68,10 @@ namespace Server.Services
         {
             return await _repo.IsBookModuleActivated(userid);
         }
+
+        public async Task<int> GetUserIdFromUsername(string username)
+        {
+            return await _repo.GetUserIdFromUsername(username);
+        }
     }
 }

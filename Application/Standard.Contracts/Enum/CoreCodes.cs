@@ -11,6 +11,7 @@
         NotAdded = 603,
         AlreadyStarted = 604,
         SeriesNotFound = 605,
-        AlreadySeen = 606
+        AlreadySeen = 606,
+        SeriesNotUpdated = 607,
     }
 }

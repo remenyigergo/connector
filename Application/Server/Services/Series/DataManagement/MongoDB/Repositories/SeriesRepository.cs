@@ -16,6 +16,7 @@ using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Parsers.TvMaze;
 using Series.Service.Models;
 using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Core.NetworkManager;
 
 /*
     IDE SEMMILYEN LOGIKA NEM KERÜL
@@ -45,8 +46,10 @@ namespace Series.DataManagement.MongoDB.Repositories
 
         private IMongoCollection<SeriesRate> SeriesRates =>
             Database.GetCollection<SeriesRate>("SeriesRates");
+
         private IMongoCollection<EpisodeRate> EpisodeRates =>
             Database.GetCollection<EpisodeRate>("EpisodeRates");
+
 
         public SeriesRepository(IOptions<MongoDbSettings> settings) : base(settings)
         {
@@ -59,7 +62,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task AddInternalSeries(InternalSeries internalSeries)
         {
             //Valódi mongoSeries, ami letárolásra kerül
-            var mongoSeries = ConvertInternalToMongoSeries(internalSeries);
+            var mongoSeries = new DataManagement.Converters.Converter().ConvertInternalToMongoSeries(internalSeries);
 
             await Series.InsertOneAsync(mongoSeries);
         }
@@ -114,7 +117,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <returns></returns>
         public async Task<bool> Update(InternalSeries internalSeries)
         {
-            var mongoSeries = ConvertInternalToMongoSeries(internalSeries);
+            var mongoSeries = new DataManagement.Converters.Converter().ConvertInternalToMongoSeries(internalSeries);
             var result = await Series.ReplaceOneAsync(x => x.Title == internalSeries.Title, mongoSeries);
             return result.ModifiedCount > 0;
         }
@@ -137,124 +140,9 @@ namespace Series.DataManagement.MongoDB.Repositories
             return false;
         }
 
-        /// <summary>
-        /// Sorozat átalakítás:   Internal -> Mongo TODO kiszedni
-        /// </summary>
-        /// <param name="internalSeries"></param>
-        /// <returns></returns>
-        public MongoSeries ConvertInternalToMongoSeries(InternalSeries internalSeries)
-        {
-            var seasons = ConvertInternalSeasonToMongoSeason(internalSeries.Seasons);
 
-            var mongoSeries = new MongoSeries()
-            {
-                TvMazeId = internalSeries.TvMazeId,
-                TmdbId = internalSeries.TmdbId,
-                Title = internalSeries.Title,
-                //TvMazeId = internalSeries.Id,
-                Runtime = internalSeries.Runtime,
-                TotalSeasons = internalSeries.TotalSeasons,
-                Categories = internalSeries.Categories,
-                Description = internalSeries.Description,
-                Rating = internalSeries.Rating,
-                Year = internalSeries.Year,
-                LastUpdated = internalSeries.LastUpdated,
-                Seasons = seasons,
-                Cast = internalSeries.Cast,
-                CreatedBy = internalSeries.CreatedBy,
-                EpisodeRunTime = internalSeries.EpisodeRunTime,
-                FirstAirDate = internalSeries.FirstAirDate,
-                Genres = internalSeries.Genres,
-                OriginalLanguage = internalSeries.OriginalLanguage,
-                LastEpisodeSimpleToAir = internalSeries.LastEpisodeSimpleToAir,
-                Networks = internalSeries.Networks,
-                Popularity = internalSeries.Popularity,
-                ProductionCompanies = internalSeries.ProductionCompanies,
-                Status = internalSeries.Status,
-                Type = internalSeries.Type,
-                VoteCount = internalSeries.VoteCount
-            };
-            return mongoSeries;
-        }
 
-        /// <summary>
-        /// Sorozat átalakítás:   Mongo -> Internal  TODO ezt is kiszedni külön fájlba
-        /// </summary>
-        /// <param name="mongoSeries"></param>
-        /// <returns></returns>
-        public InternalSeries ConvertMongoToInternalSeries(MongoSeries mongoSeries)
-        {
-            //var seasons = ConvertInternalSeasonToMongoSeason(mongoSeries.Seasons);
 
-            var internalSeries = new InternalSeries()
-            {
-                Title = mongoSeries.Title,
-                TvMazeId = mongoSeries.Id,
-                Runtime = mongoSeries.Runtime,
-                TotalSeasons = mongoSeries.TotalSeasons,
-                Categories = mongoSeries.Categories,
-                Description = mongoSeries.Description,
-                Rating = mongoSeries.Rating,
-                Year = mongoSeries.Year,
-                LastUpdated = mongoSeries.LastUpdated,
-                //Seasons = seasons,
-                Cast = mongoSeries.Cast,
-                CreatedBy = mongoSeries.CreatedBy,
-                EpisodeRunTime = mongoSeries.EpisodeRunTime,
-                FirstAirDate = mongoSeries.FirstAirDate,
-                Genres = mongoSeries.Genres,
-                OriginalLanguage = mongoSeries.OriginalLanguage,
-                LastEpisodeSimpleToAir = mongoSeries.LastEpisodeSimpleToAir,
-                Networks = mongoSeries.Networks,
-                Popularity = mongoSeries.Popularity,
-                ProductionCompanies = mongoSeries.ProductionCompanies,
-                Status = mongoSeries.Status,
-                Type = mongoSeries.Type,
-                VoteCount = mongoSeries.VoteCount
-            };
-            return internalSeries;
-        }
-
-        /// <summary>
-        /// Évad átalakítás:  Internal -> Mongo    TODO ezt szerintem ki lehetne szedni külön fájlba
-        /// </summary>
-        /// <param name="internalSeasons"></param>
-        public List<MongoSeason> ConvertInternalSeasonToMongoSeason(List<InternalSeason> internalSeasons)
-        {
-            var seasonsList = new List<MongoSeason>();
-            foreach (var internalSeason in internalSeasons)
-            {
-                var episodeList = new List<MongoEpisode>();
-                foreach (var episode in internalSeason.Episodes)
-                {
-                    episodeList.Add(new MongoEpisode()
-                    {
-                        Title = episode.Title,
-                        Length = episode.Length,
-                        Rating = episode.Rating,
-                        Description = episode.Description,
-                        SeasonNumber = episode.SeasonNumber,
-                        EpisodeNumber = episode.EpisodeNumber,
-                        AirDate = episode.AirDate,
-                        TmdbShowId = episode.TmdbShowId,
-                        VoteCount = episode.VoteCount,
-                        Crew = episode.Crew,
-                        GuestStars = episode.GuestStars
-                    });
-                }
-
-                seasonsList.Add(new MongoSeason()
-                {
-                    SeasonNumber = internalSeason.SeasonNumber,
-                    EpisodesCount = internalSeason.EpisodesCount,
-                    Episodes = episodeList,
-                    Summary = internalSeason.Summary,
-                    Airdate = internalSeason.Airdate,
-                    Name = internalSeason.Name
-                });
-            }
-            return seasonsList;
-        }
 
         /// <summary>
         /// Látottként jelöl egy epizódot. (teljesen láttuk)
@@ -286,7 +174,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episode"></param>
         public async Task<bool> IsItSeen(int userid, string tvmazeid, string tmdbid, int season, int episode)
         {
-            var s = await SeenEpisodes.CountDocumentsAsync(ep => ep.TmdbId == tmdbid || ep.TvMazeId == tvmazeid && ep.UserId == userid && ep.SeasonNumber == season && ep.EpisodeNumber == episode);
+            var s = await SeenEpisodes.CountDocumentsAsync(
+                ep => ep.TmdbId == tmdbid || ep.TvMazeId == tvmazeid && ep.UserId == userid &&
+                      ep.SeasonNumber == season && ep.EpisodeNumber == episode);
             return s > 0;
         }
 
@@ -350,7 +240,10 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episode"></param>
         public async Task<bool> DeleteStartedEpisode(string tvmazeid, string tmdbid, int season, int episode)
         {
-            var deleteEpisode = await EpisodeStarted.DeleteOneAsync(ep => ep.TvMazeId == Int32.Parse(tvmazeid) || ep.TmdbId == Int32.Parse(tmdbid) && ep.EpisodeNumber == episode && ep.SeasonNumber == season);
+            var deleteEpisode =
+                await EpisodeStarted.DeleteOneAsync(ep => ep.TvMazeId == Int32.Parse(tvmazeid) ||
+                                                          ep.TmdbId == Int32.Parse(tmdbid) &&
+                                                          ep.EpisodeNumber == episode && ep.SeasonNumber == season);
             return deleteEpisode.DeletedCount > 0;
         }
 
@@ -360,7 +253,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episodeStartedModel"></param>
         public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
         {
-            var s = await EpisodeStarted.CountDocumentsAsync(ep => ep.TvMazeId == episodeStartedModel.TvMazeId || ep.TmdbId == episodeStartedModel.TmdbId);
+            var s = await EpisodeStarted.CountDocumentsAsync(ep => ep.TvMazeId == episodeStartedModel.TvMazeId ||
+                                                                   ep.TmdbId == episodeStartedModel.TmdbId);
             return s > 0;
         }
 
@@ -382,7 +276,8 @@ namespace Series.DataManagement.MongoDB.Repositories
                 List<EpisodeStarted> series = new List<EpisodeStarted>();
                 if (!coll.Empty())
                 {
-                    series = coll.Where(b => b.TvMazeId.ToString() == show[0].TvMazeId.ToString() || b.TmdbId.ToString() == show[0].TmdbId.ToString()).ToList();
+                    series = coll.Where(b => b.TvMazeId.ToString() == show[0].TvMazeId.ToString() ||
+                                             b.TmdbId.ToString() == show[0].TmdbId.ToString()).ToList();
                 }
 
                 if (series.Count > 0)
@@ -401,7 +296,8 @@ namespace Series.DataManagement.MongoDB.Repositories
                         WatchedPercentage = episodeStarted.WatchedPercentage
                     };
                     await EpisodeStarted.ReplaceOneAsync(
-                        s => (s.TvMazeId == ep.TvMazeId || s.TmdbId == ep.TmdbId) && s.SeasonNumber == ep.SeasonNumber &&
+                        s => (s.TvMazeId == ep.TvMazeId || s.TmdbId == ep.TmdbId) &&
+                             s.SeasonNumber == ep.SeasonNumber &&
                              s.EpisodeNumber == ep.EpisodeNumber, ep);
                 }
                 else
@@ -449,7 +345,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             var series = seriesList.FirstOrDefault();
             if (series != null)
             {
-                return ConvertMongoToInternalSeries(series);
+                return new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(series);
             }
 
             return null;
@@ -462,8 +358,13 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="showName"></param>
         public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
         {
-            var updateDef = Builders<EpisodeStarted>.Update.Set(o => o.HoursElapsed, internalEpisode.HoursElapsed).Set(o => o.MinutesElapsed, internalEpisode.MinutesElapsed).Set(o => o.SecondsElapsed, internalEpisode.SecondsElapsed).Set(o => o.WatchedPercentage, internalEpisode.WatchedPercentage);
-            var s = await EpisodeStarted.UpdateOneAsync(episodeStarted => (episodeStarted.TvMazeId == internalEpisode.TvMazeId) || (episodeStarted.TmdbId == internalEpisode.TmdbId), updateDef);
+            var updateDef = Builders<EpisodeStarted>.Update.Set(o => o.HoursElapsed, internalEpisode.HoursElapsed)
+                .Set(o => o.MinutesElapsed, internalEpisode.MinutesElapsed)
+                .Set(o => o.SecondsElapsed, internalEpisode.SecondsElapsed)
+                .Set(o => o.WatchedPercentage, internalEpisode.WatchedPercentage);
+            var s = await EpisodeStarted.UpdateOneAsync(
+                episodeStarted => (episodeStarted.TvMazeId == internalEpisode.TvMazeId) ||
+                                  (episodeStarted.TmdbId == internalEpisode.TmdbId), updateDef);
 
             return s.ModifiedCount > 0;
         }
@@ -492,7 +393,6 @@ namespace Series.DataManagement.MongoDB.Repositories
         {
             var seriesList = await FavoriteSeries.FindAsynchronous(favoriteseries => favoriteseries.UserId == userid);
             return seriesList.ToList();
-
         }
 
         /// <summary>
@@ -503,7 +403,11 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="tmdbid"></param>
         public async Task<bool> IsSeriesFavoriteAlready(int userid, int tvmazeid, int tmdbid)
         {
-            var isSeriesFavorite = await FavoriteSeries.CountDocumentsAsync(favoriteseries => favoriteseries.UserId == userid && (favoriteseries.TvMazeId == tvmazeid.ToString() || favoriteseries.TmdbId == tmdbid.ToString()));
+            var isSeriesFavorite =
+                await FavoriteSeries.CountDocumentsAsync(
+                    favoriteseries => favoriteseries.UserId == userid &&
+                                      (favoriteseries.TvMazeId == tvmazeid.ToString() ||
+                                       favoriteseries.TmdbId == tmdbid.ToString()));
             return isSeriesFavorite > 0;
         }
 
@@ -520,7 +424,10 @@ namespace Series.DataManagement.MongoDB.Repositories
             var isItFavoriteAlready = await IsEpisodeFavoriteAlready(userid, tvmazeid, tmdbid, episodeNum, seasonNum);
             if (isItFavoriteAlready)
             {
-                await FavoriteEpisode.DeleteOneAsync(episode => (episode.TvMazeId == tvmazeid.ToString() || episode.TmdbId == tmdbid.ToString()) && episode.UserId == userid && episode.SeasonNumber == seasonNum && episode.EpisodeNumber == episodeNum);
+                await FavoriteEpisode.DeleteOneAsync(
+                    episode => (episode.TvMazeId == tvmazeid.ToString() || episode.TmdbId == tmdbid.ToString()) &&
+                               episode.UserId == userid && episode.SeasonNumber == seasonNum &&
+                               episode.EpisodeNumber == episodeNum);
             }
             else
             {
@@ -533,8 +440,6 @@ namespace Series.DataManagement.MongoDB.Repositories
                     SeasonNumber = seasonNum
                 });
             }
-
-
         }
 
         /// <summary>
@@ -547,8 +452,12 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="season"></param>
         public async Task<bool> IsEpisodeFavoriteAlready(int userid, int tvmazeid, int tmdbid, int episode, int season)
         {
-            var isEpisodeFound = await FavoriteEpisode.CountDocumentsAsync(favoriteEpisode => favoriteEpisode.UserId == userid && (favoriteEpisode.TvMazeId == tvmazeid.ToString() || favoriteEpisode.TmdbId == tmdbid.ToString())
-            && favoriteEpisode.SeasonNumber == season && favoriteEpisode.EpisodeNumber == episode);
+            var isEpisodeFound = await FavoriteEpisode.CountDocumentsAsync(
+                favoriteEpisode => favoriteEpisode.UserId == userid &&
+                                   (favoriteEpisode.TvMazeId == tvmazeid.ToString() ||
+                                    favoriteEpisode.TmdbId == tmdbid.ToString())
+                                   && favoriteEpisode.SeasonNumber == season &&
+                                   favoriteEpisode.EpisodeNumber == episode);
             return isEpisodeFound > 0;
         }
 
@@ -580,7 +489,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episode"></param>
         /// <param name="season"></param>
         /// <param name="message"></param>
-        public async Task CommentOnEpisode(int userid, int tvmazeid, int tmdbid, int episode, int season, string message)
+        public async Task CommentOnEpisode(int userid, int tvmazeid, int tmdbid, int episode, int season,
+            string message)
         {
             await EpisodeComments.InsertOneAsync(new EpisodeComment()
             {
@@ -608,7 +518,9 @@ namespace Series.DataManagement.MongoDB.Repositories
                 .Set(o => o.TmdbId, tmdbid)
                 .Set(o => o.Rate, rate);
 
-            var s = await SeriesRates.UpdateOneAsync(seriesRate => (seriesRate.UserId == userid) && (seriesRate.TmdbId == tmdbid) && (seriesRate.TvMazeId == tvmazeid), updateDef, new UpdateOptions { IsUpsert = true });
+            var s = await SeriesRates.UpdateOneAsync(
+                seriesRate => (seriesRate.UserId == userid) && (seriesRate.TmdbId == tmdbid) &&
+                              (seriesRate.TvMazeId == tvmazeid), updateDef, new UpdateOptions { IsUpsert = true });
         }
 
         /// <summary>
@@ -622,7 +534,6 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="rate"></param>
         public async Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate)
         {
-
             var updateDef = Builders<EpisodeRate>.Update
                 .Set(o => o.UserId, userid)
                 .Set(o => o.TvMazeId, tvmazeid)
@@ -631,8 +542,12 @@ namespace Series.DataManagement.MongoDB.Repositories
                 .Set(o => o.EpisodeNumber, episode)
                 .Set(o => o.Rate, rate);
 
-            var s = await EpisodeRates.UpdateOneAsync(episodeRate => (episodeRate.UserId == userid) && (episodeRate.TmdbId == tmdbid) && (episodeRate.TvMazeId == tvmazeid)
-            && (episodeRate.SeasonNumber == season) && (episodeRate.EpisodeNumber == episode), updateDef, new UpdateOptions { IsUpsert = true });
+            var s = await EpisodeRates.UpdateOneAsync(episodeRate => (episodeRate.UserId == userid) &&
+                                                                     (episodeRate.TmdbId == tmdbid) &&
+                                                                     (episodeRate.TvMazeId == tvmazeid)
+                                                                     && (episodeRate.SeasonNumber == season) &&
+                                                                     (episodeRate.EpisodeNumber == episode), updateDef,
+                new UpdateOptions { IsUpsert = true });
         }
 
 
@@ -647,7 +562,8 @@ namespace Series.DataManagement.MongoDB.Repositories
             List<EpisodeStarted> episodeStartedList = new List<EpisodeStarted>();
             List<EpisodeSeen> episodeSeenList = new List<EpisodeSeen>();
 
-            DateTime dateDaysBefore = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - days, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            DateTime dateDaysBefore = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day - days,
+                DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
 
             int daysInSeconds = days * (24 * 60) * 60;
 
@@ -683,9 +599,384 @@ namespace Series.DataManagement.MongoDB.Repositories
             return startedAndSeenEpisodes;
         }
 
-        public Task<List<InternalSeries>> RecommendSeries(int userid, int genre)
+        /// <summary>
+        /// Ezt egy befejezett sorozat után esetleg. De az oldalon is igénybevehető lesz
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public async Task<List<InternalSeries>> RecommendSeries(int userid)
         {
-            throw new NotImplementedException();
+            List<InternalSeries> recommendedSeries = new List<InternalSeries>();
+            Dictionary<InternalGenre, int> mostWatchedGenres = new Dictionary<InternalGenre, int>();
+            //
+
+            var startedEpisodes =
+                await EpisodeStarted.FindAsynchronous(episodeStarted => episodeStarted.Userid == userid);
+
+            var startedSeriesIds = new HashSet<int[]>();
+            foreach (var startedEpisode in startedEpisodes)
+            {
+                startedSeriesIds.Add(new int[2] { startedEpisode.TvMazeId, startedEpisode.TmdbId });
+            }
+
+            var startedSeries = new List<InternalSeries>();
+            foreach (var startedSeriesId in startedSeriesIds)
+            {
+                var searchedSeries =
+                    await Series.FindAsynchronous(
+                        series => series.TvMazeId == startedSeriesId[0].ToString() ||
+                                  series.TmdbId == startedSeriesId[1].ToString());
+
+                var converted = new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(searchedSeries[0]);
+
+                startedSeries.Add(converted);
+
+                //a genre egy adott filmnél és sorozatnál több elemből áll így ezeket szeparáljuk és hozzáadjuk a legtöbbet nézetthez
+                foreach (var genre in converted.Genres)
+                {
+                    if (!mostWatchedGenres.ContainsKey(genre))
+                    {
+                        mostWatchedGenres.Add(genre, 1);
+                    }
+                    else
+                    {
+                        mostWatchedGenres[genre] += 1;
+                    }
+                }
+
+            }
+
+            //sorrendbe vágom a legtöbbet nzéett genréket
+            mostWatchedGenres.OrderBy(o => o.Value);
+
+            //Olyan sorozatot ajánlunk, ahol a genre a mostWatchedból megegyezik, és nem szerepel még a sorozat a listánkon
+
+            //1 kiszedem azokat a sorozatokat amelyeknek megegyezik a genre-je a listából
+            var allSeries = await Series.FindAsynchronous(s => s.Title != "");
+            var listOfMatchingGenresSeries = new List<InternalSeries>();
+            var mostWatchedGenresCount = mostWatchedGenres.Count();
+            Dictionary<InternalSeries, int> genresCountChecked = new Dictionary<InternalSeries, int>();
+
+
+
+            //összegyűjtöm azokat a sorozatokat amelyekben a legtöbb genre van meg a mostWatchedból, de abból is csak az első 3-4ből
+            int cycleMax = 0;
+            if (mostWatchedGenresCount >= 4)
+            {
+                cycleMax = 4;
+            }
+            else
+            {
+                cycleMax = mostWatchedGenresCount;
+            }
+
+            foreach (var series in allSeries)
+            {
+                int genreCounter = 0;
+                for (int i = 0; i < cycleMax; i++)
+                {
+                    if (series.Genres.Contains(mostWatchedGenres.ElementAt(i).Key))
+                    {
+                        genreCounter++;
+                    }
+                }
+
+                if (!genresCountChecked.Keys.Contains(new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(series)))
+                {
+                    genresCountChecked.Add(new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(series), genreCounter);
+                }
+
+
+                //foreach (var mostWatchedGenre in mostWatchedGenres)  MŰKÖDIK
+                //{
+                //    if (series.Genres.Contains(mostWatchedGenre.Key))
+                //    {
+                //        if (!listOfMatchingGenresSeries.Contains(ConvertMongoToInternalSeries(series)))
+                //        {
+                //            listOfMatchingGenresSeries.Add(ConvertMongoToInternalSeries(series));
+                //        }
+
+                //        break;
+                //    }
+                //}
+            }
+
+            //sorba vágom a genreCountCheck listát is, hogy tudjuk mi az amiben a legtöbbször szerepelnek a legtöbbet nézett genrek
+            var genresCountOrdered = genresCountChecked.OrderByDescending(o => o.Value).ToList();
+            var genreCountWatchedMax = genresCountOrdered.ElementAt(0).Value;
+            const int genreMatchAtLeast = 2;
+
+            //2 ezekből randomra ajánlok egyet ami nincs még felvéve
+
+
+            //addig kell újat ajánlani amíg olyat találunk, amit nem vettünk még fel.
+            //ez viszont oda vezethet, hogy nincs olyan a Series listájában amit nem vettünk fel. Ezért számon tartjuk hogy miket ellenőriztem le eddig, és ha már nincs
+            // olyan amit megnézhetnénk akkor nem tudunk ajánlani
+
+            // UPDATE először kitörlöm azokat a sorozatokat a Matchelt Genres sorozatokból, amelyeket felvettem már
+            var listOfMatchingGenresSeriesWithoutStarted =
+                new List<KeyValuePair<InternalSeries, int>>(genresCountOrdered);
+            foreach (var genreCountSeries in genresCountOrdered)
+            {
+                foreach (var _startedSeries in startedSeries)
+                {
+                    if (_startedSeries.TmdbId == genreCountSeries.Key.TmdbId ||
+                        _startedSeries.TvMazeId == genreCountSeries.Key.TvMazeId)
+                    {
+                        listOfMatchingGenresSeriesWithoutStarted.Remove(genreCountSeries);
+                        continue;
+                    }
+                }
+            }
+
+
+
+            
+            switch (listOfMatchingGenresSeriesWithoutStarted.Count)
+            {
+                case 1:
+                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+                    return recommendedSeries;
+                case 2:
+                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+                    return recommendedSeries;
+                default:
+                    if (listOfMatchingGenresSeriesWithoutStarted.Count >= 3)
+                    {
+                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[2].Key);
+                        return recommendedSeries;
+                    }
+                    break;
+            }
+
+            
+
+            //if (listOfMatchingGenresSeriesWithoutStarted.Count == 1)  ezt írtam bele a switchbe - még tesztigényes
+            //{
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //    return recommendedSeries;
+            //}
+            //else if (listOfMatchingGenresSeriesWithoutStarted.Count == 2)
+            //{
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+            //    return recommendedSeries;
+            //}
+            //else if (listOfMatchingGenresSeriesWithoutStarted.Count >= 3)
+            //{
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+            //    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[2].Key);
+            //    return recommendedSeries;
+            //}
+            //else if (listOfMatchingGenresSeriesWithoutStarted.Count > 3)
+            //{
+            //    while (recommendedSeries.Count < 3)
+            //    {
+            //        var random = new Random();
+            //        int randIndex = random.Next(0, listOfMatchingGenresSeriesWithoutStarted.Count);
+
+            //        if (!recommendedSeries.Contains(listOfMatchingGenresSeriesWithoutStarted.ElementAt(randIndex).Key))
+            //        {
+            //            recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted.ElementAt(randIndex).Key);
+            //        }
+            //    }
+            //}
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Ezt az oldalon való böngészéshez
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<InternalSeries>> RecommendSeries(List<InternalGenre> genre, string username, int userid)
+        {
+            const int recommendNumber = 3;
+
+
+            //copy kód
+            var startedEpisodes =
+                await EpisodeStarted.FindAsynchronous(episodeStarted => episodeStarted.Userid == userid);
+
+            var startedSeriesIds = new HashSet<int[]>();
+            foreach (var startedEpisode in startedEpisodes)
+            {
+                startedSeriesIds.Add(new int[2] { startedEpisode.TvMazeId, startedEpisode.TmdbId });
+            }
+
+            var startedSeries = new List<InternalSeries>();
+            foreach (var startedSeriesId in startedSeriesIds)
+            {
+                var searchedSeries =
+                    await Series.FindAsynchronous(
+                        series => series.TvMazeId == startedSeriesId[0].ToString() ||
+                                  series.TmdbId == startedSeriesId[1].ToString());
+
+                var converted = new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(searchedSeries[0]);
+
+                startedSeries.Add(converted);
+            } // copy kód
+
+            //1. Először pontosan azokat ajánljuk, amelyikben ugyanazok a genre-k vannak meg.
+
+            int genreParameterCount = genre.Count;
+
+            //var allSeriesFromDb = await Series.FindAsynchronous(s => s.Id == s.Id);
+            var allSeriesFromDb = await Series.FindAsynchronous(s => s.Title != "");
+            List<MongoSeries> allSeries = new List<MongoSeries>(allSeriesFromDb);
+
+            //kiválogattam azokat amiket nem követünk
+            foreach (var series in allSeriesFromDb)
+            {
+                foreach (var startedSeries1 in startedSeries)
+                {
+                    if (series.TvMazeId == startedSeries1.TvMazeId || series.TmdbId == startedSeries1.TmdbId)
+                    {
+                        allSeries.Remove(series);
+                    }
+                }
+            }
+
+
+
+            //megszámoljuk melyik parameter genre hányszor szerepel a db sorozatokban
+            var genreCountedSeriesList = new Dictionary<InternalSeries, int>();
+            foreach (var series in allSeries)
+            {
+                int genreMatchCount = 0;
+                foreach (var seriesGenre in series.Genres)
+                {
+                    foreach (var internalGenre in genre)
+                    {
+                        if (internalGenre.Name == seriesGenre.Name)
+                        {
+                            genreMatchCount++;
+                        }
+                    }
+                }
+
+                //beadjuk melyik sorozatnál hányszor szerepelnek a paraméterben kapott genrek
+                if (genreMatchCount != 0)
+                {
+                    genreCountedSeriesList.Add(new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(series), genreMatchCount);
+                }
+            }
+
+            //descending sort by genreCount
+            var recommendedDescendedSort = genreCountedSeriesList.OrderByDescending(o => o.Value).ToList();
+
+
+            //1. Abból ajánlunk ahol pontosan ugyanannyi genre szerepel a db sorozatban mint a parameter genreben
+            //2. Ajánlunk olyat, amikben fellelhetőek azok a genre-k amiket nézünk
+            var recommendedSeries = new List<InternalSeries>();
+            List<InternalSeries> exactlyMatchingList = new List<InternalSeries>();
+            List<InternalSeries> notExactlyMatchingList = new List<InternalSeries>();
+            foreach (var series in recommendedDescendedSort)
+            {
+                //kigyűjtöm ahol megegyezik a genre countja
+                if (series.Value == genreParameterCount)
+                {
+                    exactlyMatchingList.Add(series.Key);
+                }
+                else
+                //kigyűjtöm ahol előfordul a parameterben kapott genréböl valamelyik
+                if (series.Value < genreParameterCount && series.Value > 0)
+                {
+                    notExactlyMatchingList.Add(series.Key);
+                }
+            }
+
+            while (recommendedSeries.Count < recommendNumber)
+            {
+                foreach (var matchingSeries in exactlyMatchingList)
+                {
+                    //TODO ebből még lehet randomizálni is, ha sok van
+                    //plusz még a RATING-et is figyelembe lehet venni később
+                    if (recommendedSeries.Count < recommendNumber)
+                    {
+                        recommendedSeries.Add(matchingSeries);
+                    }
+                }
+
+                foreach (var notExactlyMatching in notExactlyMatchingList)
+                {
+                    //TODO ebből is lehet randomizálni
+                    if (recommendedSeries.Count < recommendNumber)
+                    {
+                        recommendedSeries.Add(notExactlyMatching);
+                    }
+                }
+
+                //3. Bármit ajánlunk véletlenszerűen. Ez lesz az utolsó lehetőség
+                if (recommendedSeries.Count < recommendNumber && allSeries.Count >= recommendNumber + 1)
+                {
+                    while (recommendedSeries.Count < recommendNumber)
+                    {
+                        var random = new Random();
+                        int randIndex = random.Next(0, allSeries.Count);
+
+                        if (!recommendedSeries.Contains(new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(allSeries.ElementAt(randIndex))))
+                        {
+                            recommendedSeries.Add(new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(allSeries.ElementAt(randIndex)));
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+            return recommendedSeries;
+
+        }
+
+        public async Task<ReturnSeriesEpisodeModel> GetSeriesByStartedEpisode(string showName, int seasonnum, int episodenum, int userid)
+        {
+            var series = await Series.FindAsynchronous(show => show.Title == showName);
+            var startedEpisode = await EpisodeStarted.FindAsynchronous(episodeStarted => episodeStarted.Userid == userid && episodeStarted.SeasonNumber == seasonnum && episodeStarted.EpisodeNumber == episodenum);
+
+
+
+            return new ReturnSeriesEpisodeModel()
+            {
+                foundSeriesList = series,
+                startedEpisodesList = startedEpisode[0]
+            };
+        }
+
+        public async Task<List<EpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid, int userid)
+        {
+            return await SeenEpisodes.FindAsynchronous(seen => seen.SeasonNumber == seasonnum && seen.EpisodeNumber < episodenum && (seen.TvMazeId == tvmazeid.ToString() || seen.TmdbId == tmbdid.ToString()) && seen.UserId == userid);
+        }
+
+        //public async Task<List<InternalEpisode>> GetNotSeenEpisodes(int seasonNum, List<int> notSeenEpisodeIds, int tvmazeid, int tmdbid)
+        //{
+        //    var notSeenEpisodes = new List<InternalEpisode>();
+        //    var theSeries = await GetSeriesById(tvmazeid,tmdbid);
+
+        //    foreach (var notSeenEpisodeId in notSeenEpisodeIds)
+        //    {
+        //        if (theSeries != null)
+        //        {
+        //            var internalEpisode = ConvertMongoToInternalEpisode(theSeries.Seasons[seasonNum].Episodes[notSeenEpisodeId]);
+        //            notSeenEpisodes.Add(internalEpisode);
+        //        }
+        //    }
+
+        //    return notSeenEpisodes;
+        //}
+
+        public async Task<MongoSeries> GetSeriesById(int tvmazeid, int tmdbid)
+        {
+            var serieslist = await Series.FindAsynchronous(series => series.TvMazeId == tvmazeid.ToString() || series.TmdbId == tmdbid.ToString());
+            return serieslist[0];
         }
     }
 }

@@ -4,6 +4,7 @@ using Standard.Contracts.Models.Series;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.Service.Models;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {
@@ -38,7 +39,13 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task RateSeries(int userid, int tvmazeid, int tmdbid, int rate);  //folyamatos frissítéssel akárhányszor
         Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate); //folyamatos frissítéssel akárhányszor
         Task<StartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
-        Task<List<InternalSeries>> RecommendSeries(int userid, int genre);
+        Task<List<InternalSeries>> RecommendSeries(int userid);
+        Task<List<InternalSeries>> RecommendSeries(List<InternalGenre> genre,string username,int userid);
+
+        Task<ReturnSeriesEpisodeModel> GetSeriesByStartedEpisode(string show, int seasonnum, int episodenum, int userid);
+        Task<List<EpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid, int userid);
+        //Task<List<InternalEpisode>> GetNotSeenEpisodes(int seasonNum, List<int> notSeenEpisodeIds, int tvmazeid, int tmbdid);
     }
 }
+
 

@@ -63,6 +63,10 @@ namespace Server.DataManagement.SQL.Repositories
             return await SqlCatalogDataAccessManager.IsBookModuleActivated(userid) == 1;
         }
 
+        public async Task<int> GetUserIdFromUsername(string username)
+        {
+            return await SqlCatalogDataAccessManager.GetUserIdFromUsername(username);
+        }
 
     }
 }

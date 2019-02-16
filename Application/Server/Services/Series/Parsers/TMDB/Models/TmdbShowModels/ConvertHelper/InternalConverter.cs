@@ -7,7 +7,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 {
     public static class InternalConverter
     {
-        
+
 
         public static List<InternalSeason> ConvertTmdbSeasonToInternalSeason(List<TmdbSeason> tmdbSeasons)
         {
@@ -35,7 +35,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                         Description = tmdbEpisode.Overview,
                         SeasonNumber = tmdbEpisode.SeasonNumber,
                         EpisodeNumber = tmdbEpisode.EpisodeNumber,
-                        
+
                         AirDate = tmdbEpisode.AirDate,
                         TmdbShowId = tmdbEpisode.ShowId,
                         VoteCount = tmdbEpisode.VoteCount,
@@ -71,10 +71,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 
             foreach (var genre in genres)
             {
-                internalGenreList.Add(new InternalGenre()
-                {
-                    Name = genre.Name
-                });
+                internalGenreList.Add(new InternalGenre(genre.Name));
             }
 
             return internalGenreList;
@@ -96,7 +93,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 
         public static List<InternalEpisodeCrew> ConvertTmdbCrewToInternal(List<Crew> crew)
         {
-            List<InternalEpisodeCrew> crewList =new List<InternalEpisodeCrew>();
+            List<InternalEpisodeCrew> crewList = new List<InternalEpisodeCrew>();
             foreach (var crewMember in crew)
             {
                 crewList.Add(new InternalEpisodeCrew()
@@ -139,7 +136,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 
         public static List<InternalProductionCompany> ConvertTmdbProductionCompanyToInternal(List<ProductionCompany> companies)
         {
-            List<InternalProductionCompany> companyList= new List<InternalProductionCompany>();
+            List<InternalProductionCompany> companyList = new List<InternalProductionCompany>();
 
             foreach (var productionCompany in companies)
             {

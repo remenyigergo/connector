@@ -95,5 +95,12 @@ namespace Server.Controllers
             return await new Monitor().IsBookModuleActivated(userid);
         }
 
+        [HttpGet("users/get/{username}")]
+        public async Task<int> GetUserIdFromUsername(string username)
+        {
+            return await new Monitor().GetUserIdFromUsername(username);
+        }
+
+
     }
 }

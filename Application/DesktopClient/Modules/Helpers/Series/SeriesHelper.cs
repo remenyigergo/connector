@@ -5,7 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Series.Service.Models;
+using Standard.Contracts.Models.Series;
 using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Series;
 using Standard.Core.NetworkManager;
 
 namespace DesktopClient.Modules.Helpers.Series
@@ -176,6 +178,13 @@ namespace DesktopClient.Modules.Helpers.Series
         public static async Task<string> MarkRequest(InternalMarkRequest imr)
         {
             var marked = await new WebClientManager().PostMarkAsSeen<bool>($"http://localhost:5001/series/mark", imr);
+            return marked;
+        }
+
+        public static async Task<List<InternalEpisode>> PreviousEpisodesSeen(InternalPreviousEpisodeSeenRequest model)
+        {
+            var marked = await new WebClientManager().PreviousEpisodesSeen<List<InternalEpisode>>($"http://localhost:5001/series/check/seen/previous", model);
+
             return marked;
         }
     }

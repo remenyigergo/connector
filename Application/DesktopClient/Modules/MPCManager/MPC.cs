@@ -83,7 +83,7 @@ namespace DesktopClient.Modules.MPCManager
                                 Quality = quality
                             };
 
-                            if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
+                            if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName)) 
                             {
                                 runningMedia.Kill();
                                 System.Diagnostics.Process.Start(path + "\\" + fileName);
@@ -104,6 +104,22 @@ namespace DesktopClient.Modules.MPCManager
                     }
                     else if (IsMediaRunning() != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                     {
+                        //Előző rész látott?
+                        var previousEpisodes = await SeriesHelper.PreviousEpisodesSeen(new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest()
+                        {
+                            title = showName,
+                            episodeNum = episodeNumber,
+                            seasonNum = seasonNumber,
+                            userid = userId
+                        });
+
+                        //Ha vannak nem látott részek/ kihagyott részek.
+                        if (previousEpisodes!=null)
+                        {
+                            
+                        }
+
+                        //Az adott pozíció elmentése
                         await Task.Run(async () =>
                         {
                             await SavePosition(showName, seasonNumber, episodeNumber);

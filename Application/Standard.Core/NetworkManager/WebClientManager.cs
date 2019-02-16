@@ -12,6 +12,8 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.IO;
 using Standard.Contracts.Models.Books;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Requests.Series;
 
 namespace Standard.Core.NetworkManager
 {
@@ -211,6 +213,33 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
             var response = await request.Content.ReadAsStringAsync();
             return bool.TryParse(response, out var result);
+        }
+
+        public async Task<int> GetUserIdFromUsername(string url)
+        {
+            var request = WebRequest.Create(url);
+            string text;
+            var response = (HttpWebResponse)request.GetResponse();
+            request.ContentType = "application/json; charset=utf-8";
+            using (var sr = new StreamReader(response.GetResponseStream()))
+            {
+                text = sr.ReadToEnd();
+                var result = JsonConvert.DeserializeObject<int>(text);
+
+                return result;
+            }
+        }
+
+        public async Task<List<InternalEpisode>> PreviousEpisodesSeen<T>(string url, InternalPreviousEpisodeSeenRequest model)
+        {
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(model);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<List<InternalEpisode>>(response);
+            return result;
         }
 
     }

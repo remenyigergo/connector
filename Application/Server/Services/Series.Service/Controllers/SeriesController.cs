@@ -16,6 +16,7 @@ using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Series;
 
 namespace Series.Service.Controllers
 {
@@ -212,15 +213,82 @@ namespace Series.Service.Controllers
         //}
 
         [HttpPost("update")]
-        public async Task UpdateSeries([FromBody] ImportRequest request)
+        public async Task<Result<bool>> UpdateSeries([FromBody] ImportRequest request)
         {
-            await new Series().UpdateSeries(request.Title);
+            try
+            {
+                if (request.Title == null)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "All of the fields must be filled up."
+                    };
+                }
+
+                await new Series().UpdateSeries(request.Title);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.UpToDate)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+
+                if (ex.ErrorCode == (int)CoreCodes.SeriesNotUpdated)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<bool>()
+                {
+                    Data = false,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int)CoreCodes.NoError,
+                ResultMessage = "Successfully updated."
+            };
+
         }
 
         [HttpPost("getshow")]
-        public async Task<bool> GetShow([FromBody] GetShowRequest request)
+        public async Task<Result<bool>> GetShow([FromBody] GetShowRequest request)
         {
-            return await new Series().GetShow(request.Episode, request.Title);
+            try
+            {
+
+                await new Series().GetShow(request.Episode, request.Title);
+            }
+            catch ()
+            {
+                
+            }
+
+            
         }
 
         [HttpPost("getseries")]
@@ -253,6 +321,22 @@ namespace Series.Service.Controllers
             return await new Series().GetLastDays(days, userid);
         }
 
+        [HttpPost("recommend")]
+        public async Task<List<InternalSeries>> RecommendSeriesFromDb([FromBody]int userid)
+        {
+            return await new Series().RecommendSeriesFromDb(userid);
+        }
 
+        [HttpPost("recommend/genre")]
+        public async Task<List<InternalSeries>> RecommendSeriesFromDb([FromBody]RecommendByGenreRequest model)
+        {
+            return await new Series().RecommendSeriesFromDbByGenre(model.Genres, model.username, model.userid);
+        }
+
+        [HttpPost("check/seen/previous")]
+        public async Task<List<InternalEpisode>> PreviousEpisodeSeen([FromBody] InternalPreviousEpisodeSeenRequest model)
+        {
+            return await new Series().PreviousEpisodeSeen(model.title, model.seasonNum, model.episodeNum, model.userid);
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace Standard.Contracts.Models.Series
             TmdbId = from.TmdbId;
             EpisodeRunTime = from.EpisodeRunTime;
             FirstAirDate = from.FirstAirDate;
-            Genres = from.Genres;
+            //Genres = from.Genres;
             LastEpisodeSimpleToAir = from.LastEpisodeSimpleToAir;
             CreatedBy = from.CreatedBy;
             Networks = from.Networks;
@@ -55,7 +55,28 @@ namespace Standard.Contracts.Models.Series
             Year = from.Year;
             Type = from.Type;
             OriginalLanguage = from.OriginalLanguage;
-            TotalSeasons = from.TotalSeasons;            
+            TotalSeasons = from.TotalSeasons;
+
+            //Mergeljük a Categoriest és Genret
+            List<InternalGenre> genreList = new List<InternalGenre>();
+            foreach (var category in Categories)
+            {
+                var genre = new InternalGenre(category);
+                genreList.Add(genre);
+            }
+            Genres = genreList;
+
+            if (from.Genres.Count > 0)
+            {
+                foreach (var internalGenre in from.Genres)
+                {
+                    if (!Genres.Contains(internalGenre))
+                    {
+                        Genres.Add(internalGenre);
+                    }
+                }
+            }
+                
 
             foreach (var season in from.Seasons)
             {
@@ -83,12 +104,44 @@ namespace Standard.Contracts.Models.Series
                             else
                             {
                                 matchingEpisode.Title = matchingEpisode.Title ?? episode.Title;
+                                matchingEpisode.Length = matchingEpisode.Length ?? episode.Length;
+                                matchingEpisode.Rating = matchingEpisode.Rating ?? episode.Rating;
+                                matchingEpisode.Description = matchingEpisode.Description ?? episode.Description;
+                                if (matchingEpisode.SeasonNumber == 0 && matchingEpisode.EpisodeNumber == 0)
+                                {
+                                    matchingEpisode.SeasonNumber = episode.SeasonNumber;
+                                    matchingEpisode.EpisodeNumber = episode.EpisodeNumber;
+                                }
+                                matchingEpisode.AirDate = matchingEpisode.AirDate ?? episode.AirDate;
+                                matchingEpisode.TmdbShowId = matchingEpisode.TmdbShowId ?? episode.AirDate;
+                                if (matchingEpisode.VoteCount == 0)
+                                {
+                                    matchingEpisode.VoteCount = episode.VoteCount;
+                                }
+                                matchingEpisode.Crew = matchingEpisode.Crew ?? episode.Crew;
+                                matchingEpisode.GuestStars = matchingEpisode.GuestStars ?? episode.GuestStars;
                                 // TODO folytatni
                             }
                         }
                     }
                 }
             }
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            var series = obj as InternalSeries;
+
+            if (series == null)
+                return false;
+
+            return Title.Equals(series.Title);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Title.GetHashCode();
         }
     }
 }

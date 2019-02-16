@@ -374,5 +374,23 @@ namespace Server.SqlDataManager
                 return -1;
             }
         }
+
+        public async Task<int> GetUserIdFromUsername(string username)
+        {
+            var commandText = "SELECT id FROM " + SchemaName + "." + usersTable + " WHERE username LIKE '" + username + "'";
+
+            var parameters = new List<DbParameter>();
+            using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
+            {
+                if (select.HasRows)
+                {
+                    while (select.Read())
+                    {
+                        return Int32.Parse(select["id"].ToString());
+                    }
+                }
+                return -1;
+            }
+        }
     }
 }

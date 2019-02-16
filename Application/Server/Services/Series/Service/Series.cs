@@ -19,6 +19,8 @@ using System.Globalization;
 using System.Text;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Contracts.Requests;
+using Standard.Core.NetworkManager;
+using Series.DataManagement.MongoDB.SeriesFunctionModels;
 
 /*
     IDE KERÜLNEK A LOGIKAI KÓDOK
@@ -52,6 +54,7 @@ namespace Series.Service
                 var tmdbInternalSeries = await new TmdbParser().ImportTmdbSeries(title);
                 tvMazeInternalSeries.Merge(tmdbInternalSeries);
                 tvMazeInternalSeries.Seasons = tvMazeInternalSeries.Seasons.OrderBy(x => x.SeasonNumber).ToList();
+
                 await _repo.AddInternalSeries(tvMazeInternalSeries);
             }
             else
@@ -118,7 +121,12 @@ namespace Series.Service
         {
             var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
             await CheckSeriesUpdate(tvMazeSeries);
-            await _repo.Update(tvMazeSeries);
+
+            if (!await _repo.Update(tvMazeSeries))
+            {
+                throw new InternalException(607, "Error. Series couldn't be updated.");
+            }
+            
         }
 
         public async Task IsSeriesImported(string title)
@@ -253,10 +261,82 @@ namespace Series.Service
             return -2;
         }
 
-        public async Task<List<InternalSeries>> RecommendSeriesFromDb()
+        public async Task<List<InternalSeries>> RecommendSeriesFromDb(int userid)
         {
-            await _repo.RecommendSeries();
+            return await _repo.RecommendSeries(userid);
         }
+
+        public async Task<List<InternalSeries>> RecommendSeriesFromDbByGenre(List<string> genres, string username, int userid)
+        {
+            List<InternalGenre> genreList = new List<InternalGenre>();
+            foreach (var genre in genres)
+            {
+                genreList.Add(new InternalGenre(genre));
+            }
+
+            var userId = await new WebClientManager().GetUserIdFromUsername("http://localhost:5000/users/get/" + username);
+            return await _repo.RecommendSeries(genreList, username, userid);
+        }
+
+        public async Task<List<InternalEpisode>> PreviousEpisodeSeen(string showTitle, int seasonNum, int episodeNum, int userid)
+        {
+            //a látott sorozatokat és magát a sorozatot keresm ki ahol egyezik az id
+            var model = await _repo.GetSeriesByStartedEpisode(showTitle, seasonNum, episodeNum, userid);
+
+
+
+            var foundSeries = new InternalSeries();
+            foreach (var mongoSeries in model.foundSeriesList)
+            {
+                if (Int32.Parse(mongoSeries.TvMazeId) == model.startedEpisodesList.TvMazeId || Int32.Parse(mongoSeries.TmdbId) == model.startedEpisodesList.TmdbId)
+                {
+                    foundSeries = new DataManagement.Converters.Converter().ConvertMongoToInternalSeries(mongoSeries);
+                }
+            }
+
+            if (foundSeries != null)
+            {
+                //id-k tryparsolása külön
+                if (foundSeries.TvMazeId == null)
+                    foundSeries.TvMazeId = "0";
+                if (foundSeries.TmdbId == null)
+                    foundSeries.TmdbId = "0";
+
+                var seenEpisodesMongo = await _repo.PreviousEpisodeSeen(seasonNum, episodeNum, Int32.Parse(foundSeries.TvMazeId), Int32.Parse(foundSeries.TmdbId),userid);
+                var seenEpisodesInternal = new List<InternalEpisodeSeen>();
+                //Convert to Internal
+                foreach (var seenEpisode in seenEpisodesMongo)
+                {
+                    seenEpisodesInternal.Add(new DataManagement.Converters.Converter().ConvertMongoToInternalEpisode(seenEpisode));
+                }
+
+                //ebbe fogom gyűjteni azokat az epizódszámokat amelyeket nem láttunk
+                var notSeenEpisodes = new List<int>();
+
+                //ha nem láttuk az összes előzőleges részt
+                if (seenEpisodesInternal.Count != episodeNum - 1)
+                {
+                    int episodeCounter = foundSeries.Seasons[seasonNum].Episodes.First().EpisodeNumber;
+                    //megnézzük melyiket nem láttuk
+                    foreach (var seenEpisodeInternal in seenEpisodesInternal)
+                    {
+                        if (seenEpisodeInternal.EpisodeNumber != episodeCounter)
+                        {
+                            foundSeries.Seasons[seasonNum].Episodes.RemoveAll(x=>x.SeasonNumber == seenEpisodeInternal.SeasonNumber && x.EpisodeNumber == seenEpisodeInternal.EpisodeNumber || x.EpisodeNumber > episodeNum);
+                            notSeenEpisodes.Add(episodeCounter);
+                        }
+                        episodeCounter++;
+                    }
+
+                    //a notSeenEpisodes lista intjei alapján kikeresem azokat a részeket amiket nem láttunk, a returnhoz
+                    //var notseen =  await _repo.GetNotSeenEpisodes(seasonNum, notSeenEpisodes, Int32.Parse(foundSeries.TvMazeId), Int32.Parse(foundSeries.TmdbId));
+                    return foundSeries.Seasons[seasonNum].Episodes;
+                }
+            }
+            return null;
+
+        }
+
 
         public string RemoveAccent(string text)
         {
@@ -267,5 +347,6 @@ namespace Series.Service
                 .ToArray();
             return new String(filtered);
         }
+
     }
 }
