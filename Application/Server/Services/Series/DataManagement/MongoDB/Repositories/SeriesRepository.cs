@@ -732,27 +732,29 @@ namespace Series.DataManagement.MongoDB.Repositories
 
 
             
-            switch (listOfMatchingGenresSeriesWithoutStarted.Count)
-            {
-                case 1:
-                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
-                    return recommendedSeries;
-                case 2:
-                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
-                    recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
-                    return recommendedSeries;
-                default:
-                    if (listOfMatchingGenresSeriesWithoutStarted.Count >= 3)
-                    {
-                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
-                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
-                        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[2].Key);
-                        return recommendedSeries;
-                    }
-                    break;
-            }
+            //switch (listOfMatchingGenresSeriesWithoutStarted.Count)
+            //{
+            //    case 1:
+            //        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //        return recommendedSeries;
+            //    case 2:
+            //        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //        recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+            //        return recommendedSeries;
+            //    default:
+            //        if (listOfMatchingGenresSeriesWithoutStarted.Count >= 3)
+            //        {
+            //            recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[0].Key);
+            //            recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[1].Key);
+            //            recommendedSeries.Add(listOfMatchingGenresSeriesWithoutStarted[2].Key);
+            //            return recommendedSeries;
+            //        }
+            //        break;
+            //}
 
-            
+            return listOfMatchingGenresSeriesWithoutStarted.Take(3).Select(x => x.Key).ToList();            
+
+
 
             //if (listOfMatchingGenresSeriesWithoutStarted.Count == 1)  ezt írtam bele a switchbe - még tesztigényes
             //{

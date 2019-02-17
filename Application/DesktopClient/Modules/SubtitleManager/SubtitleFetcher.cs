@@ -128,6 +128,7 @@ namespace DesktopClient.Modules.SubtitleManager
         {
             if (!SeriesHelper.DoesItContainHun(filename))
             {
+                // TODO async
                 return FeliratokInfoDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path, filename) != false;
             }
             return false;

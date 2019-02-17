@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Book\Book.csproj" />
-    <ProjectReference Include="..\Standard.Contracts\Standard.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

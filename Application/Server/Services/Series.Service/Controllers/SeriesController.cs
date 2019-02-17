@@ -275,21 +275,21 @@ namespace Series.Service.Controllers
 
         }
 
-        [HttpPost("getshow")]
-        public async Task<Result<bool>> GetShow([FromBody] GetShowRequest request)
-        {
-            try
-            {
+        //[HttpPost("getshow")]
+        //public async Task<Result<bool>> GetShow([FromBody] GetShowRequest request)
+        //{
+        //    try
+        //    {
 
-                await new Series().GetShow(request.Episode, request.Title);
-            }
-            catch ()
-            {
+        //        await new Series().GetShow(request.Episode, request.Title);
+        //    }
+        //    catch ()
+        //    {
                 
-            }
+        //    }
 
             
-        }
+        //}
 
         [HttpPost("getseries")]
         public async Task<InternalSeries> GetSeries([FromBody] GetSeriesRequest request)

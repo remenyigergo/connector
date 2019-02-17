@@ -37,11 +37,12 @@ namespace DesktopClient.Modules.MPCManager
             int userId = 1;
 
             Thread.Sleep(1000);
-            try
+
+            //await Task.Run(async () =>
+            // {
+            while (true)
             {
-                //await Task.Run(async () =>
-                // {
-                while (true)
+                try
                 {
                     var runningMedia = IsMediaRunning();
 
@@ -66,6 +67,7 @@ namespace DesktopClient.Modules.MPCManager
                     {
 
                         var isNewSeries = await SeriesHelper.IsTheShowExist(showName);
+                        // TODO enum
                         if (isNewSeries != 1) //nincs a mongoban
                         {
                             await SeriesHelper.ImportRequest(showName);
@@ -83,7 +85,7 @@ namespace DesktopClient.Modules.MPCManager
                                 Quality = quality
                             };
 
-                            if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName)) 
+                            if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
                             {
                                 runningMedia.Kill();
                                 System.Diagnostics.Process.Start(path + "\\" + fileName);
@@ -94,7 +96,7 @@ namespace DesktopClient.Modules.MPCManager
                         stopWatch.Start(); //timer indul
                         mediaJustStarted = true;
                     }
-                    else if (mediaJustStarted && new MPC().IsMediaRunning() == null)
+                    else if (mediaJustStarted && IsMediaRunning() == null)
                     {
                         stopWatch.Stop();  //timer stop
                         var duration = stopWatch.ElapsedMilliseconds / 1000;
@@ -102,8 +104,9 @@ namespace DesktopClient.Modules.MPCManager
 
                         await RecommendBook(userId);
                     }
-                    else if (IsMediaRunning() != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                    else if (IsMediaRunning() != null && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                     {
+                        // TODO elso if részbe tenni (bekapcsoláskor nézni egyből)
                         //Előző rész látott?
                         var previousEpisodes = await SeriesHelper.PreviousEpisodesSeen(new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest()
                         {
@@ -114,9 +117,9 @@ namespace DesktopClient.Modules.MPCManager
                         });
 
                         //Ha vannak nem látott részek/ kihagyott részek.
-                        if (previousEpisodes!=null)
+                        if (previousEpisodes != null)
                         {
-                            
+
                         }
 
                         //Az adott pozíció elmentése
@@ -128,12 +131,14 @@ namespace DesktopClient.Modules.MPCManager
 
                     Thread.Sleep(1000);
                 }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+
+                }
+                catch (Exception e) { }
                 // });
             }
-            catch (System.ComponentModel.Win32Exception ex)
-            {
 
-            }
         }
 
         public async Task RecommendBook(int userId)

@@ -17,10 +17,7 @@ namespace DesktopClient.Modules.SubtitleManager.FeliratokInfo
         public static string subFolderName = "ConSubs";
 
         public static bool GetFeliratokInfoHtml(SubtitleModel subtitleModel, string url, string folderPath, string filename)
-        {
-
-
-
+        {            
             using (WebClient client = new WebClient())
             {
                 bool subtitleFound = false;
