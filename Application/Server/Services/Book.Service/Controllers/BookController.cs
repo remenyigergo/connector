@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Standard.Contracts.Models.Books;
@@ -11,6 +12,9 @@ using MongoDB.Bson;
 using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Book;
 using Book.DataManagement.Helpers;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
 
 namespace Book.Service.Controllers
 {
@@ -131,9 +135,49 @@ namespace Book.Service.Controllers
         }
 
         [HttpPost("get/recommendations/string")]
-        public async Task<List<InternalBook>> GetRecommendationsByString([FromBody] string supposedTitle)
+        public async Task<Result<List<InternalBook>>> GetRecommendationsByString([FromBody] string supposedTitle)
         {
-            return await new BookService().GetRecommendationsByString(supposedTitle);
+            try
+            {
+                var result = await new BookService().GetRecommendationsByString(supposedTitle);
+                return new Result<List<InternalBook>>()
+                {
+                    Data = result,
+                    ResultCode = (int) CoreCodes.NoError,
+                    ResultMessage = "Recommendation done."
+                };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.ModuleNotActivated)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NoContent;
+                    return new Result<List<InternalBook>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<List<InternalBook>>()
+                {
+                    Data = null,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<List<InternalBook>>()
+            {
+                Data = null,
+                ResultCode = (int)CoreCodes.RecommendFailed,
+                ResultMessage = "Book recommend failed."
+            };
+
         }
 
         [HttpPost("get/exist/book")]

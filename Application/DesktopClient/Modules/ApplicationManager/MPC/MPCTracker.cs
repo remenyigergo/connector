@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DesktopClient.Modules.Helpers.Series;
+using DesktopClient.Modules.Helpers.Movie;
 
 namespace KeyEventForm.Modules.ApplicationManager.MPC
 {

@@ -1,0 +1,21 @@
+//REGEX : ^(?<showName>[ .\w']+?)(?<aSallang_a_releasig>\W(?<year>\d{4})\W(\d{1}D)?.*)(?<release_language>Hun|hun|HuN)??-(?<release_group>[^-]+)$
+
+Bohemian.Rhapsody.2018.BDRiP.x264.HuN-HyperX
+Venom.2018.HUN.BDRiP.x264-Gianni
+Skyscraper.2018.BDRip.x264.HuN-No1
+Halloween.2018.BDRiP.x264.HuN-HyperX
+
+Batman.v.Superman.Dawn.of.Justice.2016.BLABLABLA-XDAWEFFF
+
+
+#angol filmek
+At.First.Light.2018.LiMiTED.1080p.BluRay.x264-CADAVER
+Lethal.Admirer.2018.1080p.AMZN.WEB-DL.DDP2.0.H.264-ABM
+Serenity.2019.720p.BDRip.AC3.X264-CMRG
+
+#magyar filmek
+Blade.Runner.2049.2017.READ.NFO.Open.Matte.1080p.Hybrid.BluRay.DTS.x264.HuN-CRLS
+Life.of.Pi.2012.3D.REMUX.1080p.Blu-ray.AVC.DTS-HD.MA.7.1.Hun-Fodyna
+Point.Break.2015.3D.REMUX.1080p.Blu-ray.AVC.DTS-HD.MA.7.1.Hun-Fodyna
+Priest.2011.3D.REMUX.1080p.Blu-ray.AVC.DTS-HD.MA.5.1.Hun-Fodyna
+A.Star.Is.Born.2018.RETAiL.720p.BluRay.DD5.1.x264.HuN-No1

@@ -10,6 +10,7 @@ using Standard.Contracts.Requests.Book;
 using Standard.Core.Dependency;
 using Book.Service.Models.Request;
 using MongoDB.Driver;
+using Standard.Contracts.Exceptions;
 
 namespace Book.Service
 {
@@ -96,7 +97,12 @@ namespace Book.Service
 
         public async Task<List<InternalBook>> GetRecommendationsByUserId(int userid)
         {
-            return await _repo.GetRecommendationsByUserId(userid);
+            var result = await _repo.GetRecommendationsByUserId(userid);
+            if (result.Count == 0 || result == null)
+            {
+                throw new InternalException(615,"Recommendation failed in repository.");
+            }
+            return result;
         }
 
         public async Task<List<InternalBook>> GetRecommendationsByString(string supposedTitle)

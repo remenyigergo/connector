@@ -12,6 +12,23 @@
         AlreadyStarted = 604,
         SeriesNotFound = 605,
         AlreadySeen = 606,
-        SeriesNotUpdated = 607,
+        UpdateFailed = 607,
+        EpisodeStartedUpdated = 608,
+        EpisodeStartedNotUpdated = 609,
+        EpisodeRated = 610,
+        EpisodeNotRated = 611,
+        FollowEpisodeError = 612,
+        ProcessNotFound = 613,
+        ModuleNotActivated = 614,
+        RecommendFailed = 615,
+        EpisodeNotFound = 616,
+        EpisodeStartedAndSeenNotFound = 617,
+        UserNotFound = 618,
+
+
+
+        MovieNotFound = 650,
+        
+
     }
 }

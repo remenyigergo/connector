@@ -31,11 +31,11 @@ namespace Series.Service.Controllers
             {
                 if (string.IsNullOrEmpty(request.Title))
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
@@ -44,9 +44,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyImported)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyImported)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    Response.StatusCode = (int) HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -57,11 +57,11 @@ namespace Series.Service.Controllers
             }
             catch (Exception e)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -69,7 +69,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -82,34 +82,35 @@ namespace Series.Service.Controllers
                 //ebben a vizsgálatban még a többi paramétert is le kell checkolni, userid, stb
                 if (string.IsNullOrEmpty(request.SeasonNumber) || string.IsNullOrEmpty(request.EpisodeNumber))
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
 
-                var markseen = await new Series().MarkAsSeen(Int32.Parse(request.UserId), request.TvMazeId, request.TmdbId,
+                var markseen = await new Series().MarkAsSeen(Int32.Parse(request.UserId), request.TvMazeId,
+                    request.TmdbId,
                     Int32.Parse(request.SeasonNumber), Int32.Parse(request.EpisodeNumber), request.ShowName);
                 if (!markseen)
                 {
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.AlreadySeen,
+                        ResultCode = (int) CoreCodes.AlreadySeen,
                         ResultMessage = "The series is already seen."
                     };
                 }
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -118,7 +119,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -130,11 +131,11 @@ namespace Series.Service.Controllers
             {
                 if (request.Seriesid == null || request.Userid == null)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -143,9 +144,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyAdded)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyAdded)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    Response.StatusCode = (int) HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -157,11 +158,11 @@ namespace Series.Service.Controllers
 
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -170,7 +171,7 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -219,11 +220,11 @@ namespace Series.Service.Controllers
             {
                 if (request.Title == null)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "All of the fields must be filled up."
                     };
                 }
@@ -232,9 +233,9 @@ namespace Series.Service.Controllers
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.UpToDate)
+                if (ex.ErrorCode == (int) CoreCodes.UpToDate)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -243,9 +244,9 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                if (ex.ErrorCode == (int)CoreCodes.SeriesNotUpdated)
+                if (ex.ErrorCode == (int) CoreCodes.UpdateFailed)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -256,11 +257,11 @@ namespace Series.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -269,10 +270,9 @@ namespace Series.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully updated."
             };
-
         }
 
         //[HttpPost("getshow")]
@@ -285,58 +285,489 @@ namespace Series.Service.Controllers
         //    }
         //    catch ()
         //    {
-                
+
         //    }
 
-            
+
         //}
 
         [HttpPost("getseries")]
-        public async Task<InternalSeries> GetSeries([FromBody] GetSeriesRequest request)
+        public async Task<Result<InternalSeries>> GetSeries([FromBody] GetSeriesRequest request)
         {
-            return await new Series().GetSeries(request.Title);
+            try
+            {
+
+                var series = await new Series().GetSeries(request.Title);
+                if (series != null)
+                {
+                    return new Result<InternalSeries>()
+                    {
+                        Data = series,
+                        ResultCode = (int)HttpStatusCode.OK,
+                        ResultMessage = "Series found."
+                    };
+                }
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.SeriesNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.SeriesNotFound;
+                    return new Result<InternalSeries>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<InternalSeries>()
+                {
+                    Data = null,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<InternalSeries>()
+            {
+                Data = null,
+                ResultCode = (int) CoreCodes.SeriesNotFound,
+                ResultMessage = "Error getting show."
+            };
+            
         }
 
         [HttpPost("exist")]
-        public async Task<int> IsShowExist([FromBody] InternalImportRequest request) //DB : 1, TVMAZE: 2, TMDB: 3, Egyik sem: -1, Request hiba: -2
+        public async Task<Result<int>>IsShowExist([FromBody] InternalImportRequest request)
         {
-            return await new Series().IsShowExist(request);
+            try
+            {
+                if (request.Title == null)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<int>()
+                    {
+                        Data = 0,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "All of the fields must be filled up."
+                    };
+                }
+
+                var existEnumType = await new Series().IsShowExist(request);
+                var enumVal = (MediaExistIn) existEnumType;
+                return new Result<int>()
+                {
+                    Data = existEnumType,
+                    ResultCode = (int)HttpStatusCode.OK,
+                    ResultMessage = "It exists in" + enumVal.ToString()
+            };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.EpisodeNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.EpisodeNotFound;
+                    return new Result<int>()
+                    {
+                        Data = 0,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+
+                if (ex.ErrorCode == (int)CoreCodes.SeriesNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.SeriesNotFound;
+                    return new Result<int>()
+                    {
+                        Data = 0,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<int>()
+                {
+                    Data = 0,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<int>()
+            {
+                Data = 0,
+                ResultCode = (int)CoreCodes.SeriesNotFound,
+                ResultMessage = "Show doesn't exist."
+            };
+
         }
 
         [HttpPost("updateStartedEpisode/{showName}")]
-        public async Task<bool> UpdateStartedEpisode([FromBody]InternalEpisodeStartedModel internalEpisode, string showName)
+        public async Task<Result<bool>> UpdateStartedEpisode([FromBody] InternalEpisodeStartedModel internalEpisode, string showName)
         {
-            return await new Series().UpdateStartedEpisode(internalEpisode, showName);
+            try
+            {
+                //internalEpisode.TvMazeId == 0 && internalEpisode.TmdbId == 0 || 
+                if (showName.Length == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "All of the fields must be filled up."
+                    };
+                }
+
+                var update = await new Series().UpdateStartedEpisode(internalEpisode, showName);
+                if (update)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.OK;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int) CoreCodes.EpisodeStartedUpdated,
+                        ResultMessage = "Update was successful."
+                    };
+                }
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.UpToDate)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+                if (ex.ErrorCode == (int)CoreCodes.SeriesNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.SeriesNotFound;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<bool>()
+                {
+                    Data = false,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int) CoreCodes.EpisodeStartedNotUpdated,
+                ResultMessage = "Update failed."
+            };
         }
 
         [HttpPost("rate/episode")]
-        public async Task RateEpisode([FromBody] EpisodeRateRequest episodeRate)
+        public async Task<Result<bool>> RateEpisode([FromBody] EpisodeRateRequest episodeRate)
         {
-            await new Series().RateEpisode(episodeRate.UserId, episodeRate.TvMazeId, episodeRate.TmdbId, episodeRate.EpisodeNumber, episodeRate.SeasonNumber, episodeRate.Rate);
+            try
+            {
+                if (episodeRate.TmdbId == null && episodeRate.TvMazeId == null || episodeRate.UserId == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "All of the fields must be filled up."
+                    };
+                }
+
+                await new Series().RateEpisode(episodeRate.UserId, episodeRate.TvMazeId, episodeRate.TmdbId,
+                    episodeRate.EpisodeNumber, episodeRate.SeasonNumber, episodeRate.Rate);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.EpisodeNotRated)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<bool>()
+                {
+                    Data = false,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int) CoreCodes.EpisodeRated,
+                ResultMessage = "Episode rated successfully."
+            };
         }
 
         [HttpGet("getdays/{days}")]
-        public async Task<List<InternalStartedAndSeenEpisodes>> GetLastDaysEpisodes(int days, int userid)
+        public async Task<Result<InternalStartedAndSeenEpisodes>> GetLastDaysEpisodes(int days, int userid)
         {
-            return await new Series().GetLastDays(days, userid);
+            try
+            {
+                if (days == 0 || userid == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<InternalStartedAndSeenEpisodes>()
+                    {
+                        Data = null,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "Not a correct input."
+                    };
+                }
+                var res = await new Series().GetLastDays(days, userid);
+
+                return new Result<InternalStartedAndSeenEpisodes>()
+                {
+                    Data = res,
+                    ResultCode = (int) HttpStatusCode.OK,
+                    ResultMessage = "Last days episodes fetched successfully."
+                };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.EpisodeNotRated)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
+                    return new Result<InternalStartedAndSeenEpisodes>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<InternalStartedAndSeenEpisodes>()
+                {
+                    Data = null,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<InternalStartedAndSeenEpisodes>()
+            {
+                Data = null,
+                ResultCode = (int) CoreCodes.EpisodeStartedAndSeenNotFound,
+                ResultMessage = "Started and seen episodes couldn't be fetched."
+            };
         }
 
         [HttpPost("recommend")]
-        public async Task<List<InternalSeries>> RecommendSeriesFromDb([FromBody]int userid)
+        public async Task<Result<List<InternalSeries>>> RecommendSeriesFromDb([FromBody] int userid)
         {
-            return await new Series().RecommendSeriesFromDb(userid);
+            try
+            {
+                if (userid == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<List<InternalSeries>>()
+                    {
+                        Data = null,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "Input incorrect."
+                    };
+                }
+
+                var result = await new Series().RecommendSeriesFromDb(userid);
+                return new Result<List<InternalSeries>>()
+                {
+                    Data = result,
+                    ResultCode = (int) HttpStatusCode.OK,
+                    ResultMessage = "Recommend is done."
+                };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.RecommendFailed)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.NotModified;
+                    return new Result<List<InternalSeries>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<List<InternalSeries>>()
+                {
+                    Data = null,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<List<InternalSeries>>()
+            {
+                Data = null,
+                ResultCode = (int) CoreCodes.RecommendFailed,
+                ResultMessage = "Recommend failed."
+            };
         }
 
         [HttpPost("recommend/genre")]
-        public async Task<List<InternalSeries>> RecommendSeriesFromDb([FromBody]RecommendByGenreRequest model)
+        public async Task<Result<List<InternalSeries>>> RecommendSeriesFromDb([FromBody] RecommendByGenreRequest model)
         {
-            return await new Series().RecommendSeriesFromDbByGenre(model.Genres, model.username, model.userid);
+            try
+            {
+                if (model.userid == 0 ||model.username.Length == 0 || model.Genres == null || model.Genres.Count == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<List<InternalSeries>>()
+                    {
+                        Data = null,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Input incorrect."
+                    };
+                }
+
+                var result =
+                    await new Series().RecommendSeriesFromDbByGenre(model.Genres, model.username, model.userid);
+                return new Result<List<InternalSeries>>()
+                {
+                    Data = result,
+                    ResultCode = (int) HttpStatusCode.OK,
+                    ResultMessage = "Recommended from DB is successful."
+                };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.RecommendFailed)
+                {
+                    Response.StatusCode = (int) CoreCodes.RecommendFailed;
+                    return new Result<List<InternalSeries>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+
+                if (ex.ErrorCode == (int) CoreCodes.UserNotFound)
+                {
+                    Response.StatusCode = (int) CoreCodes.UserNotFound;
+                    return new Result<List<InternalSeries>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                return new Result<List<InternalSeries>>()
+                {
+                    Data = null,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<List<InternalSeries>>()
+            {
+                Data = null,
+                ResultCode = (int) CoreCodes.RecommendFailed,
+                ResultMessage = "Recommend failed."
+            };
         }
 
         [HttpPost("check/seen/previous")]
-        public async Task<List<InternalEpisode>> PreviousEpisodeSeen([FromBody] InternalPreviousEpisodeSeenRequest model)
+        public async Task<Result<List<InternalEpisode>>> PreviousEpisodeSeen([FromBody] InternalPreviousEpisodeSeenRequest model)
         {
-            return await new Series().PreviousEpisodeSeen(model.title, model.seasonNum, model.episodeNum, model.userid);
+            try
+            {
+                if (model.userid == 0 || model.title.Length == 0 || model.episodeNum == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<List<InternalEpisode>>()
+                    {
+                        Data = null,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Input incorrect."
+                    };
+                }
+
+
+                var result = await new Series().PreviousEpisodeSeen(model.title, model.seasonNum, model.episodeNum, model.userid);
+                return new Result<List<InternalEpisode>>()
+                {
+                    Data = result,
+                    ResultCode = (int)HttpStatusCode.OK,
+                    ResultMessage = "Recommend is a success."
+                };
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.RecommendFailed)
+                {
+                    Response.StatusCode = (int)CoreCodes.RecommendFailed;
+                    return new Result<List<InternalEpisode>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<List<InternalEpisode>>()
+                {
+                    Data = null,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<List<InternalEpisode>>()
+            {
+                Data = null,
+                ResultCode = (int)CoreCodes.RecommendFailed,
+                ResultMessage = "Recommend failed."
+            };
+
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
+using Series.Service.Models;
 using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.Converters
 {
@@ -205,6 +207,69 @@ namespace Series.DataManagement.Converters
                 });
             }
             return seasonsList;
+        }
+
+        public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(StartedAndSeenEpisodes mongoEpisodes)
+        {
+            List<InternalEpisodeSeen> seenEpisodes = new List<InternalEpisodeSeen>();
+            foreach (var mongoEpisodesSeenEpisode in mongoEpisodes.seenEpisodes)
+            {
+                seenEpisodes.Add(this.ConvertMongoEpisodeSeenToInternal(mongoEpisodesSeenEpisode));
+            }
+
+            List<InternalEpisodeStartedModel> startedEpisodes = new List<InternalEpisodeStartedModel>();
+            foreach (var mongoEpisodesStarted in mongoEpisodes.startedEpisodes)
+            {
+                startedEpisodes.Add(this.ConvertMongoToInternalEpisodeStartedModel(mongoEpisodesStarted));
+            }
+
+            return new InternalStartedAndSeenEpisodes()
+            {
+                seenEpisodeList = seenEpisodes,
+                startedEpisodeList = startedEpisodes
+            };
+        }
+
+
+        public InternalEpisodeSeen ConvertMongoEpisodeSeenToInternal(EpisodeSeen mongoEpisodeSeen)
+        {
+            return new InternalEpisodeSeen()
+            {
+                EpisodeNumber = mongoEpisodeSeen.EpisodeNumber,
+                SeasonNumber = mongoEpisodeSeen.SeasonNumber,
+                TmdbId = mongoEpisodeSeen.TmdbId,
+                TvMazeId = mongoEpisodeSeen.TvMazeId,
+                UserId = mongoEpisodeSeen.UserId
+            };
+        }
+
+        public EpisodeSeen ConvertInternalEpisodeSeenToMongo(InternalEpisodeSeen internalEpisodeSeen)
+        {
+            return new EpisodeSeen()
+            {
+                EpisodeNumber = internalEpisodeSeen.EpisodeNumber,
+                SeasonNumber = internalEpisodeSeen.SeasonNumber,
+                TmdbId = internalEpisodeSeen.TmdbId,
+                TvMazeId = internalEpisodeSeen.TvMazeId,
+                UserId = internalEpisodeSeen.UserId
+            };
+        }
+
+        public InternalEpisodeStartedModel ConvertMongoToInternalEpisodeStartedModel(EpisodeStarted mongoStartedEpisode)
+        {
+            return new InternalEpisodeStartedModel()
+            {
+                Date = mongoStartedEpisode.Date,
+                EpisodeNumber = mongoStartedEpisode.EpisodeNumber,
+                HoursElapsed = mongoStartedEpisode.HoursElapsed,
+                MinutesElapsed = mongoStartedEpisode.MinutesElapsed,
+                SeasonNumber = mongoStartedEpisode.SeasonNumber,
+                SecondsElapsed = mongoStartedEpisode.SecondsElapsed,
+                TmdbId = mongoStartedEpisode.TmdbId,
+                TvMazeId = mongoStartedEpisode.TvMazeId,
+                Userid = mongoStartedEpisode.Userid,
+                WatchedPercentage = mongoStartedEpisode.WatchedPercentage
+            };
         }
     }
 }

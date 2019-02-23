@@ -32,8 +32,8 @@ namespace Series.Service
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
             services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
+
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IFeedRepository, FeedRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();

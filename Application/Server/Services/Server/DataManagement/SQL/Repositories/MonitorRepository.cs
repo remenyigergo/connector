@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using Server.SqlDataManager;
+using Standard.Contracts.Exceptions;
 
 namespace Server.DataManagement.SQL.Repositories
 {
@@ -22,9 +23,9 @@ namespace Server.DataManagement.SQL.Repositories
             return await SqlCatalogDataAccessManager.CheckProgram(programName);
         }
 
-        public async Task FollowProgramRequest(int userId, int programId)
+        public async Task<int> FollowProgramRequest(int userId, int programId)
         {
-            await SqlCatalogDataAccessManager.InsertProgramFollow(userId, programId);
+            return await SqlCatalogDataAccessManager.InsertProgramFollow(userId, programId);
         }
 
         public async Task<int> InsertProgram(List<string> processes)

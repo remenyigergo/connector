@@ -12,7 +12,7 @@ namespace DesktopClient.Modules.MPCManager
 
         Task<bool> RecognizeMedia(Process process);
 
-        Task SavePosition(string showName, int seasonNum, int episodeNum);
+        //Task SavePosition(string showName, int seasonNum, int episodeNum, string mpcUrl);
 
     }
 }

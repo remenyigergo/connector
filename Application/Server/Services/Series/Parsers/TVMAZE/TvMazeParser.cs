@@ -162,7 +162,7 @@ namespace Series.Parsers.TvMaze
         }
 
 
-        public async Task<bool> IsShowExistInTvMaze(string title)
+        public async Task<bool> IsMediaExistInTvMaze(string title)
         {
             var boolean = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
             if (boolean.Count>0)

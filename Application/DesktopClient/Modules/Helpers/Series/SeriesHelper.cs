@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 using Series.Service.Models;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Requests;
@@ -18,10 +20,12 @@ namespace DesktopClient.Modules.Helpers.Series
         public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)\.(mkv|avi|mp4|srt)?$";
         public static string Quality = "(1080|720)[pi]";
         public static string FeliratokInfoSeasonXEpisode = "-(\\s?)(([0-9]{1,2})x([0-9]{1,2}))";
+        public static string S01E01Pattern = "s(\\d+)[. _-]*e(\\d+)";
 
         public static Regex regexPattern = new Regex(Pattern, RegexOptions.IgnoreCase);
         public static Regex QualityPattern = new Regex(Quality, RegexOptions.IgnoreCase);
         public static Regex SeasonXEpisodePattern = new Regex(FeliratokInfoSeasonXEpisode, RegexOptions.IgnoreCase);
+        public static Regex S01E01PatternRegex = new Regex(S01E01Pattern, RegexOptions.IgnoreCase);
 
         public static async Task<int> Parse(string title)
         {
@@ -94,26 +98,6 @@ namespace DesktopClient.Modules.Helpers.Series
         }
 
 
-        public static string GetQuality(string text)
-        {
-            var regexResult = QualityPattern.Matches(text);
-            if (regexResult.Count != 0)
-            {
-                return regexResult[0].Groups[0].Value;
-            }
-            return "";
-        }
-
-        public static string GetReleaser(string text)
-        {
-            var regexResult = regexPattern.Matches(text);
-            if (regexResult.Count != 0)
-            {
-                return regexResult[0].Groups[12].Value;
-            }
-            return "";
-
-        }
 
         public static int GetSeasonNumber(string text)
         {
@@ -147,11 +131,23 @@ namespace DesktopClient.Modules.Helpers.Series
             return false;
         }
 
-        public static async Task<int> GetShow(string title)
+        public static bool DoesItContainSeasonAndEpisodeS01E01(string title)
+        {
+            var result = S01E01PatternRegex.Matches(title);
+
+            if (result.Count != 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static async Task<InternalSeries> GetShow(string title)
         {
             var requestbody = new InternalImportRequest() { Title = title };
             var showExist = await new WebClientManager().GetShowPost<string>($"http://localhost:5001/series/getseries", requestbody);
-            return showExist.Length;
+            return showExist;
         }
 
         public static async Task<int> IsTheShowExist(string title)
@@ -175,7 +171,7 @@ namespace DesktopClient.Modules.Helpers.Series
             var isUpdated = await new WebClientManager().Post<bool>($"http://localhost:5001/series/updateStartedEpisode/{title}", internalEpisode);
             return isUpdated;
         }
-        public static async Task<string> MarkRequest(InternalMarkRequest imr)
+        public static async Task<bool> MarkRequest(InternalMarkRequest imr)
         {
             var marked = await new WebClientManager().PostMarkAsSeen<bool>($"http://localhost:5001/series/mark", imr);
             return marked;
@@ -187,5 +183,64 @@ namespace DesktopClient.Modules.Helpers.Series
 
             return marked;
         }
+
+        public static async Task SavePosition(string showName, int seasonNum, int episodeNum, string mpcVariablesSiteUrl)
+        {
+            string positionPath = "(/html/body/p)[9]";
+            string durationPath = "(/html/body/p)[11]";
+
+            using (WebClient client = new WebClient())
+            {
+                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                HtmlDocument htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(htmlString);
+
+                HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
+                HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationPath);
+
+                var pos = Regex.Split(position.InnerText, ":");
+                var dur = Regex.Split(duration.InnerText, ":");
+
+                double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
+                double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
+                double percentage = (100 / totalSeconds) * seenSeconds;
+
+                InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
+                {
+                    Date = DateTime.Now,
+                    EpisodeNumber = episodeNum,
+                    SeasonNumber = seasonNum,
+                    HoursElapsed = Int32.Parse(pos[0]),
+                    MinutesElapsed = Int32.Parse(pos[1]),
+                    SecondsElapsed = Int32.Parse(pos[2]),
+                    WatchedPercentage = percentage
+
+                    //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
+                };
+
+                if (percentage <= 98)
+                {
+                    await SeriesHelper.UpdateStartedSeries(episode, showName);
+                }
+                else
+                {
+                    await SeriesHelper.MarkRequest(new InternalMarkRequest()
+                    {
+                        //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
+                        //átküldés után lekell kérni a showt névszerint
+                        UserId = 1,
+                        TvMazeId = "",
+                        TmdbId = "",
+                        ShowName = showName,
+                        EpisodeNumber = episodeNum,
+                        SeasonNumber = seasonNum
+                    });
+                }
+            }
+        }
+
+
+
+
     }
 }

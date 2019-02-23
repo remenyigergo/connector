@@ -14,6 +14,8 @@ using System.IO;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Requests.Series;
+using Standard.Contracts;
+using Standard.Contracts.Requests.Movie;
 
 namespace Standard.Core.NetworkManager
 {
@@ -76,12 +78,12 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
-
-            return Int32.Parse(response);
+            var res = JsonConvert.DeserializeObject<Result<int>>(response);
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
-        public async Task<string> PostMarkAsSeen<T>(string url, InternalMarkRequest body)
+        public async Task<int> Exist<T>(string url, InternalImportRequest body)
         {
 
             HttpClient c = new HttpClient();
@@ -91,7 +93,24 @@ namespace Standard.Core.NetworkManager
 
             var response = await request.Content.ReadAsStringAsync();
 
-            return response;
+            var res = JsonConvert.DeserializeObject<Result<int>>(response);
+
+            return res.Data;
+            //return bool.TryParse(response, out var result);
+        }
+
+        public async Task<bool> PostMarkAsSeen<T>(string url, InternalMarkRequest body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
+
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
@@ -104,12 +123,13 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
 
-            return bool.Parse(response);
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
-        public async Task<string> GetShowPost<T>(string url, InternalImportRequest body)
+        public async Task<bool> Post<T>(string url, InternalStartedMovieUpdateRequest body)
         {
 
             HttpClient c = new HttpClient();
@@ -118,12 +138,28 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
 
-            return response;
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
-        public async Task<string> InsertPrograms(string url, List<string> body)
+        public async Task<InternalSeries> GetShowPost<T>(string url, InternalImportRequest body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<InternalSeries>>(response);
+
+            return res.Data;
+            //return bool.TryParse(response, out var result);
+        }
+
+        public async Task<bool> InsertPrograms(string url, List<string> body)
         {
             HttpClient c = new HttpClient();
             string json = JsonConvert.SerializeObject(body);
@@ -131,12 +167,12 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
-
-            return response;
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
-        public async Task<string> UpdateProgramsFollowedRequest(string url, Dictionary<int, int> body)
+        public async Task<bool> UpdateProgramsFollowedRequest(string url, Dictionary<int, int> body)
         {
             HttpClient c = new HttpClient();
             string json = JsonConvert.SerializeObject(body);
@@ -144,8 +180,9 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
 
-            return response;
+            return res.Data;
             //return bool.TryParse(response, out var result);
         }
 
@@ -157,10 +194,9 @@ namespace Standard.Core.NetworkManager
             request.ContentType = "application/json; charset=utf-8";
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
-                text = sr.ReadToEnd();
-                var result = JsonConvert.DeserializeObject<List<string>>(text);
-
-                return result;
+                text = await sr.ReadToEndAsync();  //átírtam asyncra
+                var result = JsonConvert.DeserializeObject<Result<List<string>>>(text);
+                return result.Data;
             }
         }
 
@@ -172,10 +208,10 @@ namespace Standard.Core.NetworkManager
             request.ContentType = "application/json; charset=utf-8";
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
-                text = sr.ReadToEnd();
-                var result = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
+                text = await sr.ReadToEndAsync();  //átírtam asyncra
+                var result = JsonConvert.DeserializeObject<Result<Dictionary<string, int>>>(text);
 
-                return result;
+                return result.Data;
             }
         }
 
@@ -188,22 +224,23 @@ namespace Standard.Core.NetworkManager
 
             var response = await request.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<List<InternalBook>>(response);
+            var res = JsonConvert.DeserializeObject<Result<List<InternalBook>>>(response);
+            return res.Data;
         }
 
 
-        public async Task<string> IsShowExist(string url, InternalImportRequest body)
-        {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
-            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var request = await c.PostAsync(new Uri(url), httpContent);
+        //public async Task<string> IsShowExist(string url, InternalImportRequest body)
+        //{
+        //    HttpClient c = new HttpClient();
+        //    string json = JsonConvert.SerializeObject(body);
+        //    var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+        //    var request = await c.PostAsync(new Uri(url), httpContent);
 
-            var response = await request.Content.ReadAsStringAsync();
+        //    var response = await request.Content.ReadAsStringAsync();
 
-            return response;
-            //return bool.TryParse(response, out var result);
-        }
+        //    return response;
+        //    //return bool.TryParse(response, out var result);
+        //}
 
         public async Task<bool> IsBookModuleActivated(string url, int userid)
         {
@@ -212,7 +249,12 @@ namespace Standard.Core.NetworkManager
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
             var response = await request.Content.ReadAsStringAsync();
-            return bool.TryParse(response, out var result);
+
+            var result = JsonConvert.DeserializeObject<Result<bool>>(response);
+
+            return result.Data;
+
+            //return bool.TryParse(response, out var result);
         }
 
         public async Task<int> GetUserIdFromUsername(string url)
@@ -224,9 +266,9 @@ namespace Standard.Core.NetworkManager
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
                 text = sr.ReadToEnd();
-                var result = JsonConvert.DeserializeObject<int>(text);
+                var res = JsonConvert.DeserializeObject<Result<int>>(text);
 
-                return result;
+                return res.Data;
             }
         }
 
@@ -238,8 +280,9 @@ namespace Standard.Core.NetworkManager
             var request = await c.PostAsync(new Uri(url), httpContent);
 
             var response = await request.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<List<InternalEpisode>>(response);
-            return result;
+            var res = JsonConvert.DeserializeObject<Result<List<InternalEpisode>>>(response);
+
+            return res.Data;
         }
 
     }

@@ -14,7 +14,7 @@ namespace Server.DataManagement.SQL.Repositories
 
         Task<List<string>> GetAllPrograms();
 
-        Task FollowProgramRequest(int userId, int programId);
+        Task<int> FollowProgramRequest(int userId, int programId);
 
         Task<int?> CheckProgramRequest(string programName);
 

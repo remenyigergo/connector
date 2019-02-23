@@ -85,13 +85,18 @@
     <Compile Include="Modules\Helpers\Book\BookHelper.cs" />
     <Compile Include="Modules\Helpers\Movie\MovieHelper.cs" />
     <Compile Include="Modules\Helpers\Series\SeriesHelper.cs" />
+    <Compile Include="Modules\Helpers\SubtitleHelper.cs" />
     <Compile Include="Modules\MonitorModule\MPC.cs" />
     <Compile Include="Modules\MPCManager\IMPCManager.cs" />
     <Compile Include="Modules\MPCManager\MPC.cs" />
     <Compile Include="Modules\ApplicationManager\ApplicationManager.cs" />
     <Compile Include="Modules\ProcessManager\ProcessManager.cs" />
-    <Compile Include="Modules\SubtitleManager\FeliratokInfo\FeliratokInfoDownloader.cs" />
-    <Compile Include="Modules\SubtitleManager\FeliratokInfo\Models\SubtitleModel.cs" />
+    <Compile Include="Modules\SubtitleManager\MovieSubtitleManager\FeliratokInfo\FeliratokInfoMovieDownloader.cs" />
+    <None Include="Modules\SubtitleManager\SeriesSubtitleManager\FeliratokInfo\FeliratInfoSeriesDownloader" />
+    <Compile Include="Modules\SubtitleManager\MovieSubtitleManager\FeliratokInfo\Models\FoundSubtitle.cs" />
+    <Compile Include="Modules\SubtitleManager\MovieSubtitleManager\FeliratokInfo\Models\SubtitleModel.cs" />
+    <Compile Include="Modules\SubtitleManager\SeriesSubtitleManager\FeliratokInfo\FeliratokInfoSeriesDownloader.cs" />
+    <Compile Include="Modules\SubtitleManager\SeriesSubtitleManager\FeliratokInfo\Models\SubtitleModel.cs" />
     <Compile Include="Modules\SubtitleManager\SubtitleFetcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -147,5 +152,6 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

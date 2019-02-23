@@ -21,6 +21,8 @@ namespace Series.Parsers.TMDB
         //https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}?api_key=<<api_key>>&language=en-US  EZ EGY NEM SIMPLE SEASON
 
 
+
+
         private const string _endpoint = "https://api.themoviedb.org";
         private const string _lang = "en-US";
         private const string _key = "e9443688992dbb4fa3940ed77a0a8e1d";
@@ -93,7 +95,7 @@ namespace Series.Parsers.TMDB
         }
 
 
-        public async Task<bool> IsShowExistInTmdb(string title)
+        public async Task<bool> IsMediaExistInTmdb(string title)
         {
             var show = await new WebClientManager().Get<TmdbQueryShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
             Console.WriteLine($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");

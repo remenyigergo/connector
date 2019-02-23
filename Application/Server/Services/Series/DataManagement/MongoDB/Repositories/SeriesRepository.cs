@@ -175,7 +175,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task<bool> IsItSeen(int userid, string tvmazeid, string tmdbid, int season, int episode)
         {
             var s = await SeenEpisodes.CountDocumentsAsync(
-                ep => ep.TmdbId == tmdbid || ep.TvMazeId == tvmazeid && ep.UserId == userid &&
+                ep => (ep.TmdbId == tmdbid || ep.TvMazeId == tvmazeid) && ep.UserId == userid &&
                       ep.SeasonNumber == season && ep.EpisodeNumber == episode);
             return s > 0;
         }
@@ -241,8 +241,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task<bool> DeleteStartedEpisode(string tvmazeid, string tmdbid, int season, int episode)
         {
             var deleteEpisode =
-                await EpisodeStarted.DeleteOneAsync(ep => ep.TvMazeId == Int32.Parse(tvmazeid) ||
-                                                          ep.TmdbId == Int32.Parse(tmdbid) &&
+                await EpisodeStarted.DeleteOneAsync(ep => (ep.TvMazeId == Int32.Parse(tvmazeid) ||
+                                                          ep.TmdbId == Int32.Parse(tmdbid)) &&
                                                           ep.EpisodeNumber == episode && ep.SeasonNumber == season);
             return deleteEpisode.DeletedCount > 0;
         }
@@ -253,8 +253,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episodeStartedModel"></param>
         public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel)
         {
-            var s = await EpisodeStarted.CountDocumentsAsync(ep => ep.TvMazeId == episodeStartedModel.TvMazeId ||
-                                                                   ep.TmdbId == episodeStartedModel.TmdbId);
+            var s = await EpisodeStarted.CountDocumentsAsync(ep => (ep.TvMazeId == episodeStartedModel.TvMazeId || ep.TmdbId == episodeStartedModel.TmdbId) && ep.SeasonNumber == episodeStartedModel.SeasonNumber && ep.EpisodeNumber == episodeStartedModel.EpisodeNumber);
             return s > 0;
         }
 
@@ -329,7 +328,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// Megnézi az adatbázisban, hogy a sorozat amit paraméterben kap, hozzá van e már adva az adatbázishoz.
         /// </summary>
         /// <param name="title"></param>
-        public async Task<bool> IsShowExistInMongoDb(string title)
+        public async Task<bool> IsMediaExistInMongoDb(string title)
         {
             var exist = await Series.FindAsynchronous(x => x.Title.ToLower() == title.ToLower());
             return exist.Count > 0;
@@ -355,8 +354,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// Egy elkezdett epizód frissítése. Frissített értékek: Eltelt óra, eltelt percek, eltelt másodpercek.
         /// </summary>
         /// <param name="internalEpisode"></param>
-        /// <param name="showName"></param>
-        public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
+        public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode)
         {
             var updateDef = Builders<EpisodeStarted>.Update.Set(o => o.HoursElapsed, internalEpisode.HoursElapsed)
                 .Set(o => o.MinutesElapsed, internalEpisode.MinutesElapsed)
@@ -532,7 +530,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="episode"></param>
         /// <param name="season"></param>
         /// <param name="rate"></param>
-        public async Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate)
+        public async Task<bool> RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate)
         {
             var updateDef = Builders<EpisodeRate>.Update
                 .Set(o => o.UserId, userid)
@@ -548,6 +546,8 @@ namespace Series.DataManagement.MongoDB.Repositories
                                                                      && (episodeRate.SeasonNumber == season) &&
                                                                      (episodeRate.EpisodeNumber == episode), updateDef,
                 new UpdateOptions { IsUpsert = true });
+
+            return s.ModifiedCount == 1;
         }
 
 

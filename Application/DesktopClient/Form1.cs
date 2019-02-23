@@ -20,10 +20,10 @@ namespace DesktopClient
             });
 
 
-            //Task.Run(async () =>
-            //{
-            //    new ApplicationManager().RunApplicationManager();
-            //});
+            Task.Run(async () =>
+            {
+                new ApplicationManager().RunApplicationManager();
+            });
 
 
         }

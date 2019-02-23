@@ -24,9 +24,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
         Task<bool> DeleteStartedEpisode(string tvmazeid, string tmdbid, int season, int episode);
         Task<bool> GetShow(EpisodeStarted episodeStarted,string title);
-        Task<bool> IsShowExistInMongoDb(string title);
+        Task<bool> IsMediaExistInMongoDb(string title);
         Task<InternalSeries> GetSeries(string title);
-        Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName);
+        Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode);
 
         //TODO: FELFEJLESZTENI
         Task SetFavoriteSeries(int userid, int tvmazeid, int tmdbid);  //többis lehet
@@ -37,7 +37,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task CommentOnSeries(int userid, int tvmazeid, int tmdbid, string message);  //akármennyi komment lehetséges
         Task CommentOnEpisode(int userid, int tvmazeid, int tmdbid, int episode, int season, string message); //akármennyi lehetséges
         Task RateSeries(int userid, int tvmazeid, int tmdbid, int rate);  //folyamatos frissítéssel akárhányszor
-        Task RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate); //folyamatos frissítéssel akárhányszor
+        Task<bool> RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate); //folyamatos frissítéssel akárhányszor
         Task<StartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
         Task<List<InternalSeries>> RecommendSeries(int userid);
         Task<List<InternalSeries>> RecommendSeries(List<InternalGenre> genre,string username,int userid);

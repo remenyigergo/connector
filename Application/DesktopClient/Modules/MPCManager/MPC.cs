@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using System.Xml;
 using DesktopClient.Modules.Helpers;
 using DesktopClient.Modules.SubtitleManager;
-using DesktopClient.Modules.SubtitleManager.FeliratokInfo.Models;
 using Standard.Contracts.Requests;
 using HtmlAgilityPack;
 using KeyEventForm.Modules.ApplicationManager.MPC;
@@ -19,6 +18,11 @@ using Series.Service.Models;
 using Standard.Core.NetworkManager;
 using DesktopClient.Modules.Helpers.Series;
 using DesktopClient.Modules.Helpers.Book;
+using Standard.Contracts.Enum;
+using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo;
+using DesktopClient.Modules.Helpers.Movie;
+using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
 
 namespace DesktopClient.Modules.MPCManager
 {
@@ -52,92 +56,158 @@ namespace DesktopClient.Modules.MPCManager
                     var showName = SeriesHelper.GetTitle(fileName);
                     var episodeNumber = SeriesHelper.GetEpisodeNumber(fileName);
                     var seasonNumber = SeriesHelper.GetSeasonNumber(fileName);
-                    var releaser = SeriesHelper.GetReleaser(fileName);
-                    var quality = SeriesHelper.GetQuality(fileName);
+                    var releaser = SubtitleHelper.GetReleaser(fileName);
+                    var quality = SubtitleHelper.GetQuality(fileName);
 
                     if (showName != null)
                     {
-                        tempShowName = showName; //leálláskor elvesztettük a nevét, mert újrakértem itt, de már nem volt meg    
+                        tempShowName =
+                            showName; //leálláskor elvesztettük a nevét, mert újrakértem itt, de már nem volt meg    
                     }
 
 
                     Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
 
-                    if (!mediaJustStarted && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                    //bool isItASeries = false;
+                    //Eldöntjük sorozat vagy film
+                    var isItASeries = SeriesHelper.DoesItContainSeasonAndEpisodeS01E01(fileName);
+
+
+
+                    if (!mediaJustStarted && runningMedia != null &&
+                        !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                     {
-
-                        var isNewSeries = await SeriesHelper.IsTheShowExist(showName);
-                        // TODO enum
-                        if (isNewSeries != 1) //nincs a mongoban
-                        {
-                            await SeriesHelper.ImportRequest(showName);
-                        }
-
-
-                        if (!SubtitleFetcher.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
-                        {
-                            var feliratModel = new SubtitleModel()
-                            {
-                                ShowName = SubtitleFetcher.TrimFileName(showName),
-                                SeasonNumber = seasonNumber,
-                                EpisodeNumber = episodeNumber,
-                                Releaser = releaser,
-                                Quality = quality
-                            };
-
-                            if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
-                            {
-                                runningMedia.Kill();
-                                System.Diagnostics.Process.Start(path + "\\" + fileName);
-                                Thread.Sleep(500);
-                            }
-                        }
-
                         stopWatch.Start(); //timer indul
                         mediaJustStarted = true;
+
+                        if (isItASeries)
+                        {
+                            await ManageSeries(showName, path, episodeNumber, seasonNumber, releaser, quality, fileName,
+                                runningMedia, userId);
+                        }
+                        else
+                        {
+                            await ManageMovie(path, fileName);
+                        }
+
                     }
                     else if (mediaJustStarted && IsMediaRunning() == null)
                     {
-                        stopWatch.Stop();  //timer stop
+                        stopWatch.Stop(); //timer stop
                         var duration = stopWatch.ElapsedMilliseconds / 1000;
                         mediaJustStarted = false;
 
                         await RecommendBook(userId);
                     }
-                    else if (IsMediaRunning() != null && runningMedia != null && !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                    else if (IsMediaRunning() != null && runningMedia != null &&
+                             !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                     {
-                        // TODO elso if részbe tenni (bekapcsoláskor nézni egyből)
-                        //Előző rész látott?
-                        var previousEpisodes = await SeriesHelper.PreviousEpisodesSeen(new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest()
+                        if (isItASeries)
                         {
-                            title = showName,
-                            episodeNum = episodeNumber,
-                            seasonNum = seasonNumber,
-                            userid = userId
-                        });
-
-                        //Ha vannak nem látott részek/ kihagyott részek.
-                        if (previousEpisodes != null)
+                            //Az adott pozíció elmentése sorozat esetén
+                            await Task.Run(async () =>
+                            {
+                                await SeriesHelper.SavePosition(showName, seasonNumber, episodeNumber,
+                                    mpcVariablesSiteUrl);
+                            });
+                        }
+                        else
                         {
-
+                            //Az adott pozíció elmentése film esetén
+                            await Task.Run(async () =>
+                            {
+                                var mediaFolderName = MovieHelper.TrimDownloadFolders(path);
+                                var movieTitle = MovieHelper.GetTitle(mediaFolderName);
+                                await MovieHelper.SavePosition(movieTitle, mpcVariablesSiteUrl);
+                            });
                         }
 
-                        //Az adott pozíció elmentése
-                        await Task.Run(async () =>
-                        {
-                            await SavePosition(showName, seasonNumber, episodeNumber);
-                        });
                     }
 
                     Thread.Sleep(1000);
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
-
                 }
-                catch (Exception e) { }
+                catch (Exception e)
+                {
+                }
                 // });
             }
+        }
+
+        public async Task ManageSeries(string showName, string path, int episodeNumber, int seasonNumber,
+            string releaser, string quality, string fileName, Process runningMedia, int userId)
+        {
+            var isNewSeries = await SeriesHelper.IsTheShowExist(showName);
+
+            if (isNewSeries != (int)MediaExistIn.MONGO) //nincs a mongoban
+            {
+                await SeriesHelper.ImportRequest(showName);
+            }
+
+            if (!FeliratokInfoSeriesDownloader.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
+            {
+                var feliratModel = new SubtitleModel()
+                {
+                    ShowName = SubtitleFetcher.TrimFileName(showName),
+                    SeasonNumber = seasonNumber,
+                    EpisodeNumber = episodeNumber,
+                    Releaser = releaser,
+                    Quality = quality
+                };
+
+                if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
+                {
+                    runningMedia.Kill();
+                    System.Diagnostics.Process.Start(path + "\\" + fileName);
+                    Thread.Sleep(500);
+                }
+            }
+
+            // TODO elso if részbe tenni (bekapcsoláskor nézni egyből)
+            //Előző rész látott?
+            var previousEpisodes = await SeriesHelper.PreviousEpisodesSeen(
+                new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest()
+                {
+                    title = showName,
+                    episodeNum = episodeNumber,
+                    seasonNum = seasonNumber,
+                    userid = userId
+                });
+
+            //Ha vannak nem látott részek/ kihagyott részek.
+            if (previousEpisodes != null)
+            {
+            }
+
+
+        }
+
+        public async Task ManageMovie(string folderPath, string fileName)
+        {
+            var mediaFolderName = MovieHelper.TrimDownloadFolders(folderPath);
+
+            var movieTitle = MovieHelper.GetTitle(mediaFolderName);
+            var isNewMovie = await MovieHelper.IsTheMovieExist(movieTitle);
+
+            if (isNewMovie != (int)MediaExistIn.MONGO) //nincs a mongoban
+            {
+                await SeriesHelper.ImportRequest(folderPath);
+            }
+
+
+
+            //Felirat letöltés
+
+            var releaser = SubtitleHelper.GetReleaser(mediaFolderName);
+            var quality = SubtitleHelper.GetQuality(mediaFolderName);
+
+            var subModel = new Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models.SubtitleModel(movieTitle, releaser, quality);
+            var s = new FeliratokInfoMovieDownloader().FindSubtitle(subModel, folderPath, fileName);
+
+            //TODO Most a legelsőt fogom letölteni, de később az asztali alkalmazásban fellehet sorolni amiket talált matching-re.
+            FeliratokInfoMovieDownloader.Download(s[0].DownloadNode, folderPath, fileName);
 
         }
 
@@ -151,66 +221,15 @@ namespace DesktopClient.Modules.MPCManager
                 //check if the user has the book module activated TODO
                 if (book != null)
                 {
-                    MessageBox.Show("Recommended book(s) by this media's theme : \n" + book.Title + "\nPages: " + book.Pages + "\n\nWould You like to add this book to your reading list?", "Recommended book for you.", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                }
-
-            }
-        }
-
-        public async Task SavePosition(string showName, int seasonNum, int episodeNum)
-        {
-            string positionPath = "(/html/body/p)[9]";
-            string durationPath = "(/html/body/p)[11]";
-
-            using (WebClient client = new WebClient())
-            {
-                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                HtmlDocument htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(htmlString);
-
-                HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
-                HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationPath);
-
-                var pos = Regex.Split(position.InnerText, ":");
-                var dur = Regex.Split(duration.InnerText, ":");
-
-                double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
-                double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
-                double percentage = (100 / totalSeconds) * seenSeconds;
-
-                InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
-                {
-                    Date = DateTime.Now,
-                    EpisodeNumber = episodeNum,
-                    SeasonNumber = seasonNum,
-                    HoursElapsed = Int32.Parse(pos[0]),
-                    MinutesElapsed = Int32.Parse(pos[1]),
-                    SecondsElapsed = Int32.Parse(pos[2]),
-                    WatchedPercentage = percentage
-
-                    //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
-                };
-
-                if (percentage <= 98)
-                {
-                    await SeriesHelper.UpdateStartedSeries(episode, showName);
-                }
-                else
-                {
-                    await SeriesHelper.MarkRequest(new InternalMarkRequest()
-                    {
-                        //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
-                        //átküldés után lekell kérni a showt névszerint
-                        UserId = 1,
-                        TvMazeId = "",
-                        TmdbId = "",
-                        ShowName = showName,
-                        EpisodeNumber = episodeNum,
-                        SeasonNumber = seasonNum
-                    });
+                    MessageBox.Show(
+                        "Recommended book(s) by this media's theme : \n" + book.Title + "\nPages: " + book.Pages +
+                        "\n\nWould You like to add this book to your reading list?", "Recommended book for you.",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 }
             }
         }
+
+
 
 
         public Process IsMediaRunning()
@@ -221,15 +240,15 @@ namespace DesktopClient.Modules.MPCManager
         public async Task<bool> RecognizeMedia(Process playerProcess)
         {
             var name = SeriesHelper.GetTitle(playerProcess.MainWindowTitle);
-            var showExistInMongo = await SeriesHelper.Parse(name);
+            var MediaExistInMongo = await SeriesHelper.Parse(name);
 
-            switch (showExistInMongo)
+            switch (MediaExistInMongo)
             {
                 case -1:
                     return false; //EKKOR NINCS ILYEN SOROZAT
 
                 case 1:
-                    var s = await SeriesHelper.GetShow(name);
+                    //var s = await SeriesHelper.GetShow(name);
 
                     var imr = new InternalMarkRequest()
                     {
@@ -252,9 +271,5 @@ namespace DesktopClient.Modules.MPCManager
             }
             return false;
         }
-
     }
-
-
 }
-
