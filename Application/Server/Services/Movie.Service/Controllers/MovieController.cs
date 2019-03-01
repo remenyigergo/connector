@@ -187,8 +187,130 @@ namespace Movie.Service.Controllers
                 ResultCode = (int)CoreCodes.NoError,
                 ResultMessage = "Update was successful."
             };
+        }
 
+        [HttpPost("seen")]
+        public async Task<Result<bool>> IsMovieSeen([FromBody] InternalMovieSeenRequest requestModel)
+        {
+            try
+            {
+                if (requestModel.UserId == 0 || requestModel.Title == "")
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Wrong input."
+                    };
+                }
 
+                var result = await new MovieService().IsMovieSeen(requestModel);
+                
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+
+                if (ex.ErrorCode == (int)CoreCodes.AlreadySeen)
+                {
+                    Response.StatusCode = (int)CoreCodes.AlreadySeen;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<bool>()
+                {
+                    Data = false,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int)CoreCodes.NoError,
+                ResultMessage = "Update was successful."
+            };
+        }
+
+        [HttpPost("started")]
+        public async Task<Result<bool>> IsMovieStarted([FromBody] InternalMovieSeenRequest requestModel)
+        {
+            try
+            {
+                if (requestModel.UserId == 0 || requestModel.Title == "")
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Wrong input."
+                    };
+                }
+
+                var result = await new MovieService().IsMovieStarted(requestModel);
+
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+
+                if (ex.ErrorCode == (int)CoreCodes.AlreadyStarted)
+                {
+                    Response.StatusCode = (int)CoreCodes.AlreadyStarted;
+                    return new Result<bool>()
+                    {
+                        Data = true,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new Result<bool>()
+                {
+                    Data = false,
+                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultMessage = "Common Generic Error"
+                };
+            }
+
+            return new Result<bool>()
+            {
+                Data = false,
+                ResultCode = (int)CoreCodes.NoError,
+                ResultMessage = "Movie is not started."
+            };
         }
     }
 }

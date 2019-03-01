@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DesktopClient.Modules.MPCManager.Model;
 using HtmlAgilityPack;
 using Series.Service.Models;
 using Standard.Contracts.Models.Series;
@@ -184,59 +185,75 @@ namespace DesktopClient.Modules.Helpers.Series
             return marked;
         }
 
-        public static async Task SavePosition(string showName, int seasonNum, int episodeNum, string mpcVariablesSiteUrl)
+        public static async Task SavePosition(string showName, int seasonNum, int episodeNum, int actualSeenSecondsFromMPC, Times elapsedTimesInMedia)
         {
-            string positionPath = "(/html/body/p)[9]";
-            string durationPath = "(/html/body/p)[11]";
+            //string positionPath = "(/html/body/p)[9]";
+            //string durationPath = "(/html/body/p)[11]";
 
-            using (WebClient client = new WebClient())
+            //using (WebClient client = new WebClient())
+            //{
+            //    string htmlString = client.DownloadString(mpcVariablesSiteUrl);
+            //    HtmlDocument htmlDocument = new HtmlDocument();
+            //    htmlDocument.LoadHtml(htmlString);
+
+            //    HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
+            //    HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationPath);
+
+            //    var pos = Regex.Split(position.InnerText, ":");
+            //    var dur = Regex.Split(duration.InnerText, ":");
+
+            //double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
+            double seenSeconds = 0.0;
+            if (elapsedTimesInMedia != null)
             {
-                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                HtmlDocument htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(htmlString);
-
-                HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
-                HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationPath);
-
-                var pos = Regex.Split(position.InnerText, ":");
-                var dur = Regex.Split(duration.InnerText, ":");
-
-                double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
-                double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
-                double percentage = (100 / totalSeconds) * seenSeconds;
-
-                InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
+                seenSeconds = elapsedTimesInMedia.Position;
+            }
+            else
+            {
+                if (Math.Abs(actualSeenSecondsFromMPC - elapsedTimesInMedia.SeenSeconds) < 60)
                 {
-                    Date = DateTime.Now,
-                    EpisodeNumber = episodeNum,
-                    SeasonNumber = seasonNum,
-                    HoursElapsed = Int32.Parse(pos[0]),
-                    MinutesElapsed = Int32.Parse(pos[1]),
-                    SecondsElapsed = Int32.Parse(pos[2]),
-                    WatchedPercentage = percentage
-
-                    //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
-                };
-
-                if (percentage <= 98)
-                {
-                    await SeriesHelper.UpdateStartedSeries(episode, showName);
-                }
-                else
-                {
-                    await SeriesHelper.MarkRequest(new InternalMarkRequest()
-                    {
-                        //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
-                        //átküldés után lekell kérni a showt névszerint
-                        UserId = 1,
-                        TvMazeId = "",
-                        TmdbId = "",
-                        ShowName = showName,
-                        EpisodeNumber = episodeNum,
-                        SeasonNumber = seasonNum
-                    });
+                    seenSeconds = actualSeenSecondsFromMPC;
                 }
             }
+
+
+            //double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
+            //double percentage = (100 / totalSeconds) * seenSeconds;
+            
+            double percentage = (100.0 / (double)elapsedTimesInMedia.Duration) * seenSeconds;
+
+            InternalEpisodeStartedModel episode = new InternalEpisodeStartedModel()
+            {
+                Date = DateTime.Now,
+                EpisodeNumber = episodeNum,
+                SeasonNumber = seasonNum,
+                HoursElapsed = elapsedTimesInMedia.SeenHours,
+                MinutesElapsed = elapsedTimesInMedia.SeenMinutes,
+                SecondsElapsed = Convert.ToInt32(seenSeconds),
+                WatchedPercentage = percentage
+
+                //még 3 mező nincs feltöltve: userid, tmdbid, tvmazeid 
+            };
+
+            if (percentage <= 98)
+            {
+                await SeriesHelper.UpdateStartedSeries(episode, showName);
+            }
+            else
+            {
+                await SeriesHelper.MarkRequest(new InternalMarkRequest()
+                {
+                    //IDE HA LESZ FELHASZNÁLÓ KELL A USERID
+                    //átküldés után lekell kérni a showt névszerint
+                    UserId = 1,
+                    TvMazeId = "",
+                    TmdbId = "",
+                    ShowName = showName,
+                    EpisodeNumber = episodeNum,
+                    SeasonNumber = seasonNum
+                });
+            }
+            //}
         }
 
 

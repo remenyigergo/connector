@@ -203,6 +203,51 @@ namespace Movie.Service
             return result;
         }
 
+        public async Task<bool> IsMovieSeen(InternalMovieSeenRequest model)
+        {
+            var movieIfExist = await _repo.GetMovieByTitle(model.Title);
+
+            if (movieIfExist != null)
+            {
+                var movie = new MongoMovie()
+                {
+                    TmdbId = movieIfExist.TmdbId,
+                    ImdbId = movieIfExist.ImdbId,
+                };
+                var result = await _repo.IsMovieSeen(movie, model.UserId);
+                return result;
+            }
+            else
+            {
+                throw new InternalException(650,"Movie not found");
+            }
+        }
+
+        public async Task<bool> IsMovieStarted(InternalMovieSeenRequest model)
+        {
+            var movieIfExist = await _repo.GetMovieByTitle(model.Title);
+
+            if (movieIfExist != null)
+            {
+                var movie = new MongoMovie()
+                {
+                    TmdbId = movieIfExist.TmdbId,
+                    ImdbId = movieIfExist.ImdbId,
+                };
+                var result = await _repo.IsMovieStarted(model.UserId, movie);
+                if (!result)
+                {
+                    throw new InternalException(619,"Movie already started");
+                }
+                return result;
+            }
+            else
+            {
+                throw new InternalException(650, "Movie not found");
+            }
+        }
+
+
         public async Task<bool> IsMovieExistInTmdb(string title)
         {
             return await new TmdbParser().IsMovieExistInTmdb(title);

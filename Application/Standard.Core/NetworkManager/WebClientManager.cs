@@ -129,7 +129,22 @@ namespace Standard.Core.NetworkManager
             //return bool.TryParse(response, out var result);
         }
 
-        public async Task<bool> Post<T>(string url, InternalStartedMovieUpdateRequest body)
+        public async Task<Result<bool>> Post<T>(string url, InternalStartedMovieUpdateRequest body)
+        {
+
+            HttpClient c = new HttpClient();
+            string json = JsonConvert.SerializeObject(body);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = await c.PostAsync(new Uri(url), httpContent);
+
+            var response = await request.Content.ReadAsStringAsync();
+            var res = JsonConvert.DeserializeObject<Result<bool>>(response);
+
+            return res;
+            //return bool.TryParse(response, out var result);
+        }
+
+        public async Task<bool> SeenMovie<T>(string url, InternalMovieSeenRequest body)
         {
 
             HttpClient c = new HttpClient();

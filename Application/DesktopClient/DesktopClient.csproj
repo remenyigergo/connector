@@ -88,6 +88,7 @@
     <Compile Include="Modules\Helpers\SubtitleHelper.cs" />
     <Compile Include="Modules\MonitorModule\MPC.cs" />
     <Compile Include="Modules\MPCManager\IMPCManager.cs" />
+    <Compile Include="Modules\Model\Times.cs" />
     <Compile Include="Modules\MPCManager\MPC.cs" />
     <Compile Include="Modules\ApplicationManager\ApplicationManager.cs" />
     <Compile Include="Modules\ProcessManager\ProcessManager.cs" />
