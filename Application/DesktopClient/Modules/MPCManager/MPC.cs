@@ -1,55 +1,86 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 using DesktopClient.Modules.Helpers;
-using DesktopClient.Modules.SubtitleManager;
-using Standard.Contracts.Requests;
-using HtmlAgilityPack;
-using KeyEventForm.Modules.ApplicationManager.MPC;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using Timer = System.Timers.Timer;
-using Standard.Contracts.Models.Series;
-using Series.Service.Models;
-using Standard.Core.NetworkManager;
-using DesktopClient.Modules.Helpers.Series;
 using DesktopClient.Modules.Helpers.Book;
-using Standard.Contracts.Enum;
-using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
-using DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo;
 using DesktopClient.Modules.Helpers.Movie;
-using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.Helpers.Series;
 using DesktopClient.Modules.MPCManager.Model;
-using Standard.Contracts.Requests.Movie;
+using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.SubtitleManager;
+using DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo;
+using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace DesktopClient.Modules.MPCManager
 {
-    class MPC : IMPCManager
+    internal class MPC : IMPCManager
     {
-        private static Stopwatch stopWatch = new Stopwatch();
-        private static bool mediaJustStarted = false;
         private const string mpcVariablesSiteUrl = @"http://localhost:13579/variables.html";
         private const string mpcPlayerSiteUrL = @"http://localhost:13579/controls.html";
         private const string apiEndpoint = "http://localhost:5001";
-        private string tempShowName = string.Empty;
+        private static readonly Stopwatch stopWatch = new Stopwatch();
+        private static bool mediaJustStarted;
         private Times elapsedTimeInMedia;
         private string fileName = string.Empty;
+        private string tempShowName = string.Empty;
+
+
+        public Process IsMediaRunning()
+        {
+            return new ProcessManager.ProcessManager().FindProcessByName("mpc-hc");
+        }
+
+        public async Task<bool> RecognizeMedia(Process playerProcess)
+        {
+            var name = SeriesHelper.GetTitle(playerProcess.MainWindowTitle);
+            var MediaExistInMongo = await SeriesHelper.Parse(name);
+
+            switch (MediaExistInMongo)
+            {
+                case -1:
+                    return false; //EKKOR NINCS ILYEN SOROZAT
+
+                case 1:
+                    //var s = await SeriesHelper.GetShow(name);
+
+                    var imr = new InternalMarkRequest
+                    {
+                        ShowName = name,
+                        SeasonNumber = SeriesHelper.GetSeasonNumber(playerProcess.MainWindowTitle),
+                        EpisodeNumber = SeriesHelper.GetEpisodeNumber(playerProcess.MainWindowTitle)
+                    };
+                    await SeriesHelper.MarkRequest(imr);
+                    break;
+
+                case 2:
+                case 3:
+                    await SeriesHelper.ImportRequest(name);
+                    break;
+
+                case -2:
+                    return false; //EKKOR REQUEST HIBA VOLT
+
+                default: return false;
+            }
+            return false;
+        }
 
         public async Task MPCManager()
         {
             // TODO get my id
-            int userId = 1;
+            var userId = 1;
 
             Thread.Sleep(1000);
 
             //await Task.Run(async () =>
             // {
             while (true)
-            {
                 try
                 {
                     var runningMedia = IsMediaRunning();
@@ -58,9 +89,7 @@ namespace DesktopClient.Modules.MPCManager
 
                     var file = SubtitleFetcher.GetFilenameFromMPCweb();
                     if (file != "")
-                    {
                         fileName = file;
-                    }
 
                     var showName = SeriesHelper.GetTitle(fileName);
                     var episodeNumber = SeriesHelper.GetEpisodeNumber(fileName);
@@ -70,10 +99,8 @@ namespace DesktopClient.Modules.MPCManager
 
 
                     if (showName != null)
-                    {
                         tempShowName =
                             showName; //leálláskor elvesztettük a nevét, mert újrakértem itt, de már nem volt meg    
-                    }
 
 
                     Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
@@ -83,7 +110,6 @@ namespace DesktopClient.Modules.MPCManager
                     var isItASeries = SeriesHelper.DoesItContainSeasonAndEpisodeS01E01(fileName);
 
 
-
                     if (!mediaJustStarted && runningMedia != null &&
                         !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
                     {
@@ -91,17 +117,10 @@ namespace DesktopClient.Modules.MPCManager
                         mediaJustStarted = true;
 
                         if (isItASeries)
-                        {
                             await ManageSeries(showName, path, episodeNumber, seasonNumber, releaser, quality, fileName,
                                 runningMedia, userId);
-                        }
                         else
-                        {
-                            
-
                             await ManageMovie(path, fileName, userId);
-                        }
-
                     }
                     else if (mediaJustStarted && IsMediaRunning() == null)
                     {
@@ -110,21 +129,17 @@ namespace DesktopClient.Modules.MPCManager
                         mediaJustStarted = false;
 
                         if (isItASeries)
-                        {
-                            //Az adott pozíció elmentése sorozat esetén
                             await Task.Run(async () =>
                             {
-                                await SeriesHelper.SavePosition(showName, seasonNumber, episodeNumber, (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
+                                await SeriesHelper.SavePosition(showName, seasonNumber, episodeNumber,
+                                    (int) stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
                             });
-                        }
                         else
-                        {
-                            //Az adott pozíció elmentése film esetén
                             await Task.Run(async () =>
                             {
-                                await MovieHelper.SavePosition(tempShowName, (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
+                                await MovieHelper.SavePosition(tempShowName,
+                                    (int) stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
                             });
-                        }
 
                         await RecommendBook(userId);
                     }
@@ -153,22 +168,18 @@ namespace DesktopClient.Modules.MPCManager
 
                         var elapsedTime = GetTimes();
                         if (elapsedTime.SeenSeconds != 0)
-                        {
                             elapsedTimeInMedia = elapsedTime;
-                        }
-
                     }
 
                     Thread.Sleep(1000);
                 }
-                catch (System.ComponentModel.Win32Exception ex)
+                catch (Win32Exception ex)
                 {
                 }
                 catch (Exception e)
                 {
                 }
-                // });
-            }
+            // });
         }
 
         public async Task ManageSeries(string showName, string path, int episodeNumber, int seasonNumber,
@@ -176,14 +187,12 @@ namespace DesktopClient.Modules.MPCManager
         {
             var isNewSeries = await SeriesHelper.IsTheShowExist(showName);
 
-            if (isNewSeries != (int)MediaExistIn.MONGO) //nincs a mongoban
-            {
+            if (isNewSeries != (int) MediaExistIn.MONGO) //nincs a mongoban
                 await SeriesHelper.ImportRequest(showName);
-            }
 
             if (!FeliratokInfoSeriesDownloader.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
             {
-                var feliratModel = new SubtitleModel()
+                var feliratModel = new SubtitleModel
                 {
                     ShowName = SubtitleFetcher.TrimFileName(showName),
                     SeasonNumber = seasonNumber,
@@ -195,7 +204,7 @@ namespace DesktopClient.Modules.MPCManager
                 if (SubtitleFetcher.DownloadSubtitle(feliratModel, path, fileName))
                 {
                     runningMedia.Kill();
-                    System.Diagnostics.Process.Start(path + "\\" + fileName);
+                    Process.Start(path + "\\" + fileName);
                     Thread.Sleep(500);
                 }
             }
@@ -203,7 +212,7 @@ namespace DesktopClient.Modules.MPCManager
             // TODO elso if részbe tenni (bekapcsoláskor nézni egyből)
             //Előző rész látott?
             var previousEpisodes = await SeriesHelper.PreviousEpisodesSeen(
-                new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest()
+                new Standard.Contracts.Requests.Series.InternalPreviousEpisodeSeenRequest
                 {
                     title = showName,
                     episodeNum = episodeNumber,
@@ -215,8 +224,6 @@ namespace DesktopClient.Modules.MPCManager
             if (previousEpisodes != null)
             {
             }
-
-
         }
 
         public async Task ManageMovie(string folderPath, string fileName, int userid)
@@ -234,20 +241,19 @@ namespace DesktopClient.Modules.MPCManager
                 {
                     var isNewMovie = await MovieHelper.IsTheMovieExist(movieTitle);
                     if (isNewMovie != (int) MediaExistIn.MONGO) //nincs a mongoban
-                    {
                         await MovieHelper.ImportRequest(movieTitle);
-                    }
                 }
                 else
                 {
-                    DialogResult messageboxResult = MessageBox.Show("You already started this movie before.", "Started movie", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    var messageboxResult = MessageBox.Show("You already started this movie before.", "Started movie",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             else
             {
-                DialogResult messageboxResult = MessageBox.Show("You already seen this movie. Would you like to watch it again?", "Seen movie", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var messageboxResult = MessageBox.Show("You already seen this movie. Would you like to watch it again?",
+                    "Seen movie", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             }
-
 
 
             //Felirat letöltés
@@ -255,12 +261,13 @@ namespace DesktopClient.Modules.MPCManager
             var releaser = SubtitleHelper.GetReleaser(mediaFolderName);
             var quality = SubtitleHelper.GetQuality(mediaFolderName);
 
-            var subModel = new Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models.SubtitleModel(movieTitle, releaser, quality);
+            var subModel =
+                new SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models.SubtitleModel(movieTitle, releaser,
+                    quality);
             var s = new FeliratokInfoMovieDownloader().FindSubtitle(subModel, folderPath, fileName);
 
             //TODO Most a legelsőt fogom letölteni, de később az asztali alkalmazásban fellehet sorolni amiket talált matching-re.
             FeliratokInfoMovieDownloader.Download(s[0].DownloadNode, folderPath, fileName);
-
         }
 
         public async Task RecommendBook(int userId)
@@ -272,89 +279,43 @@ namespace DesktopClient.Modules.MPCManager
 
                 //check if the user has the book module activated TODO
                 if (book != null)
-                {
                     MessageBox.Show(
                         "Recommended book(s) by this media's theme : \n" + book.Title + "\nPages: " + book.Pages +
                         "\n\nWould You like to add this book to your reading list?", "Recommended book for you.",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                }
             }
-        }
-
-
-
-
-        public Process IsMediaRunning()
-        {
-            return new ProcessManager.ProcessManager().FindProcessByName("mpc-hc");
-        }
-
-        public async Task<bool> RecognizeMedia(Process playerProcess)
-        {
-            var name = SeriesHelper.GetTitle(playerProcess.MainWindowTitle);
-            var MediaExistInMongo = await SeriesHelper.Parse(name);
-
-            switch (MediaExistInMongo)
-            {
-                case -1:
-                    return false; //EKKOR NINCS ILYEN SOROZAT
-
-                case 1:
-                    //var s = await SeriesHelper.GetShow(name);
-
-                    var imr = new InternalMarkRequest()
-                    {
-                        ShowName = name,
-                        SeasonNumber = SeriesHelper.GetSeasonNumber(playerProcess.MainWindowTitle),
-                        EpisodeNumber = SeriesHelper.GetEpisodeNumber(playerProcess.MainWindowTitle)
-                    };
-                    await SeriesHelper.MarkRequest(imr);
-                    break;
-
-                case 2:
-                case 3:
-                    await SeriesHelper.ImportRequest(name);
-                    break;
-
-                case -2:
-                    return false; //EKKOR REQUEST HIBA VOLT
-
-                default: return false;
-            }
-            return false;
         }
 
         public Times GetTimes()
         {
-            string positionPath = "(/html/body/p)[9]";
-            string durationpath = "(/html/body/p)[11]";
+            var positionPath = "(/html/body/p)[9]";
+            var durationpath = "(/html/body/p)[11]";
 
-            using (WebClient client = new WebClient())
+            using (var client = new WebClient())
             {
-                string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                HtmlDocument htmlDocument = new HtmlDocument();
+                var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(htmlString);
 
-                HtmlNode position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
-                HtmlNode duration = htmlDocument.DocumentNode.SelectSingleNode(durationpath);
+                var position = htmlDocument.DocumentNode.SelectSingleNode(positionPath);
+                var duration = htmlDocument.DocumentNode.SelectSingleNode(durationpath);
 
                 var pos = Regex.Split(position.InnerText, ":");
                 var dur = Regex.Split(duration.InnerText, ":");
 
-                double seenSeconds = Int32.Parse(pos[0]) * 60 * 60 + Int32.Parse(pos[1]) * 60 + Int32.Parse(pos[2]);
-                double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
-                double percentage = (100 / totalSeconds) * seenSeconds;
+                double seenSeconds = int.Parse(pos[0]) * 60 * 60 + int.Parse(pos[1]) * 60 + int.Parse(pos[2]);
+                double totalSeconds = int.Parse(dur[0]) * 60 * 60 + int.Parse(dur[1]) * 60 + int.Parse(dur[2]);
+                var percentage = 100 / totalSeconds * seenSeconds;
 
-                return new Times()
+                return new Times
                 {
                     Duration = Convert.ToInt32(totalSeconds),
                     Position = Convert.ToInt32(seenSeconds),
-                    SeenSeconds = Int32.Parse(pos[2]),
-                    SeenHours = Int32.Parse(pos[0]),
-                    SeenMinutes = Int32.Parse(pos[1])
+                    SeenSeconds = int.Parse(pos[2]),
+                    SeenHours = int.Parse(pos[0]),
+                    SeenMinutes = int.Parse(pos[1])
                 };
             }
         }
-
     }
 }

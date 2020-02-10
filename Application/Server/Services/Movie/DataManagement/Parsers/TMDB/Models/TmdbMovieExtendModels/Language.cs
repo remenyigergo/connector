@@ -1,17 +1,10 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
 
 namespace Movie.DataManagement.Parsers.TMDB.Models.TmdbMovieExtendModels
 {
     public class Language
     {
-        [JsonProperty("iso_3166_1")]
-        public string IsoNum;
-        [JsonProperty("name")]
-        public string Name;
-
+        [JsonProperty("iso_3166_1")] public string IsoNum;
+        [JsonProperty("name")] public string Name;
     }
 }

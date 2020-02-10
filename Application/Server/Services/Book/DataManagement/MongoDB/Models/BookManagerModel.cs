@@ -9,6 +9,7 @@ namespace Book.DataManagement.MongoDB.Models
         [BsonIgnoreIfNull]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public Book Book { get; set; }
         public int UserId { get; set; }
     }

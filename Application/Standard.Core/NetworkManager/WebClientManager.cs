@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Standard.Contracts.Requests;
 using Newtonsoft.Json;
 using Series.Service.Models;
-using System.Diagnostics;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.IO;
+using Standard.Contracts;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Models.Series;
-using Standard.Contracts.Requests.Series;
-using Standard.Contracts;
+using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Movie;
+using Standard.Contracts.Requests.Series;
 
 namespace Standard.Core.NetworkManager
 {
@@ -32,7 +29,7 @@ namespace Standard.Core.NetworkManager
 
         public async Task<string> GetFeliratokInfoHtml(string url)
         {
-            using (WebClient client = new WebClient())
+            using (var client = new WebClient())
             {
                 var data = await client.DownloadStringTaskAsync(new Uri(url));
                 return data;
@@ -64,16 +61,15 @@ namespace Standard.Core.NetworkManager
         //            return "timed out";
         //        }
         //    }
-            
+
         //    //var data = await c.DownloadStringTaskAsync(new Uri(url));
         //    //return JsonConvert.DeserializeObject<T>(data);
         //}
 
         public async Task<int> Post<T>(string url, InternalImportRequest body)
         {
-            
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -85,9 +81,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<int> Exist<T>(string url, InternalImportRequest body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -101,9 +96,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> PostMarkAsSeen<T>(string url, InternalMarkRequest body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -116,9 +110,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> Post<T>(string url, InternalEpisodeStartedModel body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -131,9 +124,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<Result<bool>> Post<T>(string url, InternalStartedMovieUpdateRequest body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -146,9 +138,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> SeenMovie<T>(string url, InternalMovieSeenRequest body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -161,9 +152,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<InternalSeries> GetShowPost<T>(string url, InternalImportRequest body)
         {
-
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -176,8 +166,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> InsertPrograms(string url, List<string> body)
         {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -189,8 +179,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> UpdateProgramsFollowedRequest(string url, Dictionary<int, int> body)
         {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(body);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(body);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -205,11 +195,11 @@ namespace Standard.Core.NetworkManager
         {
             var request = WebRequest.Create(url);
             string text;
-            var response = (HttpWebResponse)request.GetResponse();
+            var response = (HttpWebResponse) request.GetResponse();
             request.ContentType = "application/json; charset=utf-8";
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
-                text = await sr.ReadToEndAsync();  //átírtam asyncra
+                text = await sr.ReadToEndAsync(); //átírtam asyncra
                 var result = JsonConvert.DeserializeObject<Result<List<string>>>(text);
                 return result.Data;
             }
@@ -219,11 +209,11 @@ namespace Standard.Core.NetworkManager
         {
             var request = WebRequest.Create(url);
             string text;
-            var response = (HttpWebResponse)request.GetResponse();
+            var response = (HttpWebResponse) request.GetResponse();
             request.ContentType = "application/json; charset=utf-8";
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
-                text = await sr.ReadToEndAsync();  //átírtam asyncra
+                text = await sr.ReadToEndAsync(); //átírtam asyncra
                 var result = JsonConvert.DeserializeObject<Result<Dictionary<string, int>>>(text);
 
                 return result.Data;
@@ -232,8 +222,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<List<InternalBook>> RecommendBooksByString(string url, string title)
         {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(title);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(title);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -259,8 +249,8 @@ namespace Standard.Core.NetworkManager
 
         public async Task<bool> IsBookModuleActivated(string url, int userid)
         {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(userid);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(userid);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
             var response = await request.Content.ReadAsStringAsync();
@@ -276,7 +266,7 @@ namespace Standard.Core.NetworkManager
         {
             var request = WebRequest.Create(url);
             string text;
-            var response = (HttpWebResponse)request.GetResponse();
+            var response = (HttpWebResponse) request.GetResponse();
             request.ContentType = "application/json; charset=utf-8";
             using (var sr = new StreamReader(response.GetResponseStream()))
             {
@@ -287,10 +277,11 @@ namespace Standard.Core.NetworkManager
             }
         }
 
-        public async Task<List<InternalEpisode>> PreviousEpisodesSeen<T>(string url, InternalPreviousEpisodeSeenRequest model)
+        public async Task<List<InternalEpisode>> PreviousEpisodesSeen<T>(string url,
+            InternalPreviousEpisodeSeenRequest model)
         {
-            HttpClient c = new HttpClient();
-            string json = JsonConvert.SerializeObject(model);
+            var c = new HttpClient();
+            var json = JsonConvert.SerializeObject(model);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var request = await c.PostAsync(new Uri(url), httpContent);
 
@@ -299,6 +290,5 @@ namespace Standard.Core.NetworkManager
 
             return res.Data;
         }
-
     }
 }

@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Standard.Contracts.Requests.Movie
 {
     public class InternalStartedMovieUpdateRequest
     {
-        public int UserId;
-        public string Title;
-        public int? TmdbId;
-        public string ImdbId;
+        public DateTime Date;
         public int HoursElapsed;
+        public string ImdbId;
         public int MinutesElapsed;
         public int SecondsElapsed;
-        public DateTime Date;
+        public string Title;
+        public int? TmdbId;
+        public int UserId;
         public double WatchedPercentage;
     }
 }

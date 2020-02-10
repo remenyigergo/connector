@@ -2,7 +2,7 @@
 {
     public class AddedSeries
     {
-        public int Userid;
         public int Seriesid;
+        public int Userid;
     }
 }

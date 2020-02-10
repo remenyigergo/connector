@@ -4,10 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Standard.Contracts.Exceptions;
-using Standard.Contracts.Models.Series;
-using Standard.Contracts.Models.Series.ExtendClasses;
-using Standard.Core.NetworkManager;
 using Series.Parsers.TMDB.Models;
 using Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper;
 using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
@@ -20,13 +16,9 @@ namespace Series.Parsers.TMDB
         //https://api.themoviedb.org/3/tv/60622?api_key=e9443688992dbb4fa3940ed77a0a8e1d&language=en-US ez mindennel együtt visszaadja de ID kell hozzá
         //https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}?api_key=<<api_key>>&language=en-US  EZ EGY NEM SIMPLE SEASON
 
-
-
-
         private const string _endpoint = "https://api.themoviedb.org";
         private const string _lang = "en-US";
         private const string _key = "e9443688992dbb4fa3940ed77a0a8e1d";
-
 
         public async Task<InternalSeries> ImportTmdbSeries(string title)
         {
@@ -42,11 +34,9 @@ namespace Series.Parsers.TMDB
                     await new WebClientManager().Get<TmdbShow>(
                         $"{_endpoint}/3/tv/{tmdbShowForID.Id}?api_key={_key}&language={_lang}");
 
-
                 var seasons = GetSeasons(tmdbShowSimple, tmdbShowForID.Id);
 
-
-                return new InternalSeries()
+                return new InternalSeries
                 {
                     TmdbId = tmdbShowSimple.Id,
                     Runtime = tmdbShowSimple.EpisodeRunTime.Select(x => x.Length.ToString()).ToList(),
@@ -55,7 +45,7 @@ namespace Series.Parsers.TMDB
                     //Categories = tmdbShowSimple.Genres.Select(x => x.Name).ToList(),
                     Description = tmdbShowSimple.Overview,
                     Rating = tmdbShowSimple.VoteAverage,
-                    CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator() { Name = x.Name }).ToList(),
+                    CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator {Name = x.Name}).ToList(),
                     EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
                     FirstAirDate = tmdbShowSimple.FirstAirDate,
                     Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre(x.Name)).ToList(),
@@ -68,7 +58,7 @@ namespace Series.Parsers.TMDB
                     Status = tmdbShowSimple.Status,
                     Type = tmdbShowSimple.Type,
                     VoteCount = tmdbShowSimple.VoteCount,
-                    OriginalLanguage = tmdbShowSimple.OriginalLanguage,
+                    OriginalLanguage = tmdbShowSimple.OriginalLanguage
                     //TODO: CAST FELSZEDÉSE
                 };
             }
@@ -76,28 +66,26 @@ namespace Series.Parsers.TMDB
             {
                 throw new InternalException(605, "Series not found on TMDB.");
             }
-
-
         }
 
         public async Task<List<InternalSeason>> GetSeasons(TmdbShow tmdbShowSimple, string id)
         {
-            List<TmdbSeason> _tmdbSeasons = new List<TmdbSeason>();
+            var _tmdbSeasons = new List<TmdbSeason>();
 
             foreach (var season in tmdbShowSimple.Seasons)
             {
                 var notSimpleTmdbSeason =
                     await new WebClientManager().Get<TmdbSeason>(
-                        $"{_endpoint}/3/tv/{Int32.Parse(id)}/season/{season.SeasonNumber}?api_key={_key}&language={_lang}");
+                        $"{_endpoint}/3/tv/{int.Parse(id)}/season/{season.SeasonNumber}?api_key={_key}&language={_lang}");
                 _tmdbSeasons.Add(notSimpleTmdbSeason);
             }
             return InternalConverter.ConvertTmdbSeasonToInternalSeason(_tmdbSeasons);
         }
 
-
         public async Task<bool> IsMediaExistInTmdb(string title)
         {
-            var show = await new WebClientManager().Get<TmdbQueryShow>($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+            var show = await new WebClientManager().Get<TmdbQueryShow>(
+                $"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
             Console.WriteLine($"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
             if (show.Results.Count > 0)
             {
@@ -111,11 +99,10 @@ namespace Series.Parsers.TMDB
         {
             var decomposed = text.Normalize(NormalizationForm.FormD);
 
-            char[] filtered = decomposed
+            var filtered = decomposed
                 .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 .ToArray();
-            return new String(filtered);
+            return new string(filtered);
         }
-
     }
 }

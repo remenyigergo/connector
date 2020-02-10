@@ -1,11 +1,7 @@
-﻿using Movie.DataManagement.MongoDB.Models;
-using Standard.Contracts;
-using Standard.Contracts.Requests.Movie;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Standard.Contracts.Models.Movie;
+using Movie.DataManagement.MongoDB.Models;
+using Standard.Contracts.Requests.Movie;
 
 namespace Movie.DataManagement.MongoDB.Repositories
 {

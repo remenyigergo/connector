@@ -2,27 +2,19 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Text;
 using System.Threading.Tasks;
 using Server.Models;
-
 
 namespace Server.SqlDataManager
 {
     public class SqlStoreCatalogDataAccessManager : SqlCatalogDataAccessManager
     {
-        private string usersTable = "[users]";
-        private string programsFollowedTable = "[programsFollowed]";
-        private string programsFollowedUpdates = "[programsFollowedUpdates]";
-        private string programsTable = "[programs]";
-        private string activatedModulesTable = "[ActivatedModules]";
-        private string moduleTable = "[Modules]";
-
-        public SqlStoreCatalogDataAccessManager()
-        {
-        }
+        private readonly string activatedModulesTable = "[ActivatedModules]";
+        private readonly string moduleTable = "[Modules]";
+        private readonly string programsFollowedTable = "[programsFollowed]";
+        private readonly string programsFollowedUpdates = "[programsFollowedUpdates]";
+        private readonly string programsTable = "[programs]";
+        private readonly string usersTable = "[users]";
 
         public async Task<User> Get()
         {
@@ -41,26 +33,22 @@ namespace Server.SqlDataManager
             //};
 
             var parameters = new List<DbParameter>();
-            
+
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
                     {
                         user = new User();
-                        user.Id = Int32.Parse(select["id"].ToString());
+                        user.Id = int.Parse(select["id"].ToString());
                         user.Username = select["username"].ToString();
                         user.Password = select["pw"].ToString();
                         user.Email = select["email"].ToString();
-                        user.ModuleId = Int32.Parse(select["moduleId"].ToString());
-                        user.SettingId = Int32.Parse(select["settingId"].ToString());
+                        user.ModuleId = int.Parse(select["moduleId"].ToString());
+                        user.SettingId = int.Parse(select["settingId"].ToString());
                     }
-                }
                 else
-                {
                     return null;
-                }
             }
             return user;
         }
@@ -87,7 +75,7 @@ namespace Server.SqlDataManager
 
         public async Task<int> InsertProgram(List<string> process)
         {
-            int effectedRows = 0;
+            var effectedRows = 0;
             if (process == null) throw new ArgumentNullException(nameof(process));
             foreach (var proc in process)
             {
@@ -98,7 +86,7 @@ namespace Server.SqlDataManager
 
                 var parameters = new List<DbParameter>
                 {
-                    GetParameter("@programName", proc),
+                    GetParameter("@programName", proc)
                 };
 
                 effectedRows += await ExecuteNonQuery(commandText, parameters, CommandType.Text);
@@ -109,7 +97,7 @@ namespace Server.SqlDataManager
 
         public async Task<int> InsertProgramFollow(int userId, int programId)
         {
-            int effectedRows = 0;
+            var effectedRows = 0;
 
             var commandText = "INSERT INTO " + SchemaName + "." + programsFollowedTable +
                               " ([userId],[programId],[duration],[since],[visible]) VALUES " +
@@ -121,7 +109,7 @@ namespace Server.SqlDataManager
                 GetParameter("@programId", programId),
                 GetParameter("@duration", 0),
                 GetParameter("@since", DateTime.Now),
-                GetParameter("@visible", 1),
+                GetParameter("@visible", 1)
             };
 
             effectedRows += await ExecuteNonQuery(commandText, parameters, CommandType.Text);
@@ -140,15 +128,9 @@ namespace Server.SqlDataManager
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        if (Int32.Parse(select["programId"].ToString()) == id)
-                        {
+                        if (int.Parse(select["programId"].ToString()) == id)
                             return true;
-                        }
-                    }
-                }
                 return false;
             }
         }
@@ -158,16 +140,12 @@ namespace Server.SqlDataManager
             var commandText = "SELECT * FROM " + SchemaName + "." + programsTable;
 
             var parameters = new List<DbParameter>();
-            List<string> programs = new List<string>();
+            var programs = new List<string>();
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
                         programs.Add(select["programName"].ToString());
-                    }
-                }
 
                 return programs;
             }
@@ -175,7 +153,7 @@ namespace Server.SqlDataManager
 
         public async Task<Dictionary<string, int>> GetSpecificPrograms(List<int> programsToFind)
         {
-            Dictionary<string, int> programs = new Dictionary<string, int>();
+            var programs = new Dictionary<string, int>();
             foreach (var programId in programsToFind)
             {
                 var commandText = "SELECT * FROM " + SchemaName + "." + programsTable + " WHERE programId=" + programId;
@@ -185,16 +163,11 @@ namespace Server.SqlDataManager
                 using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
                 {
                     if (select.HasRows)
-                    {
                         while (select.Read())
-                        {
-                            programs.Add(select["programName"].ToString(), Int32.Parse(select["programId"].ToString()));
-                        }
-                    }
+                            programs.Add(select["programName"].ToString(), int.Parse(select["programId"].ToString()));
                 }
             }
             return programs;
-
         }
 
         public async Task<Dictionary<string, int>> RetrieveFollowedProgramsByUser(int userId)
@@ -202,18 +175,14 @@ namespace Server.SqlDataManager
             var commandText = "SELECT * FROM " + SchemaName + "." + programsFollowedTable + " WHERE userId=" + userId;
 
             var parameters = new List<DbParameter>();
-            List<int> programsToCollect = new List<int>();
+            var programsToCollect = new List<int>();
 
 
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        programsToCollect.Add(Int32.Parse(select["programId"].ToString()));
-                    }
-                }
+                        programsToCollect.Add(int.Parse(select["programId"].ToString()));
             }
 
             if (programsToCollect.Count > 0)
@@ -233,21 +202,15 @@ namespace Server.SqlDataManager
 
             var parameters = new List<DbParameter>();
 
-            List<int> programs = new List<int>();
+            var programs = new List<int>();
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        programs.Add(Int32.Parse(select["programId"].ToString()));
-                    }
-                }
+                        programs.Add(int.Parse(select["programId"].ToString()));
 
                 if (programs.Count > 0)
-                {
                     return programs[0];
-                }
 
                 return null;
             }
@@ -265,7 +228,7 @@ namespace Server.SqlDataManager
                 {
                     GetParameter("@programId", programToUpdate.Key),
                     GetParameter("@userId", userId),
-                    GetParameter("@duration", programToUpdate.Value),
+                    GetParameter("@duration", programToUpdate.Value)
                 };
 
                 await ExecuteNonQuery(commandText, parameters, CommandType.Text);
@@ -276,7 +239,7 @@ namespace Server.SqlDataManager
 
         public async Task<int> LastUpdateFollowedPrograms(int userId, Dictionary<int, int> programsToUpdate)
         {
-            int effectedRows = 0;
+            var effectedRows = 0;
 
             foreach (var programToUpdate in programsToUpdate)
             {
@@ -289,7 +252,7 @@ namespace Server.SqlDataManager
                     GetParameter("@userId", userId),
                     GetParameter("@programId", programToUpdate.Key),
                     GetParameter("@lastUpdated", DateTime.Now),
-                    GetParameter("@durationAdded", programToUpdate.Value),
+                    GetParameter("@durationAdded", programToUpdate.Value)
                 };
 
                 effectedRows += await ExecuteNonQuery(commandText, parameters, CommandType.Text);
@@ -300,7 +263,6 @@ namespace Server.SqlDataManager
 
         public async Task<bool> UpdateFollowedProgramCategory(int userId, int programId, int? categoryId)
         {
-
             var commandText = "UPDATE " + SchemaName + "." + programsFollowedTable +
                               " SET category = @categoryId WHERE programId= @programId AND userId=@userId";
 
@@ -309,7 +271,7 @@ namespace Server.SqlDataManager
             {
                 GetParameter("@programId", programId),
                 GetParameter("@userId", userId),
-                GetParameter("@categoryId", categoryId),
+                GetParameter("@categoryId", categoryId)
             };
 
             return await ExecuteNonQuery(commandText, parameters, CommandType.Text) == 1;
@@ -317,7 +279,6 @@ namespace Server.SqlDataManager
 
         public async Task<int?> GetCategory(int userId, int programId)
         {
-
             var commandText = "SELECT category FROM " + SchemaName + "." + programsFollowedTable + " WHERE programId=" +
                               programId + " AND userId" + userId;
 
@@ -326,9 +287,7 @@ namespace Server.SqlDataManager
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
-                    return Int32.Parse(select["category"].ToString());
-                }
+                    return int.Parse(select["category"].ToString());
 
                 return null;
             }
@@ -347,48 +306,38 @@ namespace Server.SqlDataManager
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        return Int32.Parse(select["moduleId"].ToString());
-                    }
-                }
+                        return int.Parse(select["moduleId"].ToString());
                 return -1;
             }
         }
 
         public async Task<int> GetModuleId(string moduleName)
         {
-            var commandText = "SELECT moduleId FROM " + SchemaName + "." + moduleTable + " WHERE name LIKE '"+ moduleName + "'";
+            var commandText = "SELECT moduleId FROM " + SchemaName + "." + moduleTable + " WHERE name LIKE '" +
+                              moduleName + "'";
 
             var parameters = new List<DbParameter>();
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        return Int32.Parse(select["moduleId"].ToString());
-                    }
-                }
+                        return int.Parse(select["moduleId"].ToString());
                 return -1;
             }
         }
 
         public async Task<int> GetUserIdFromUsername(string username)
         {
-            var commandText = "SELECT id FROM " + SchemaName + "." + usersTable + " WHERE username LIKE '" + username + "'";
+            var commandText = "SELECT id FROM " + SchemaName + "." + usersTable + " WHERE username LIKE '" + username +
+                              "'";
 
             var parameters = new List<DbParameter>();
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)
-                {
                     while (select.Read())
-                    {
-                        return Int32.Parse(select["id"].ToString());
-                    }
-                }
+                        return int.Parse(select["id"].ToString());
                 return -1;
             }
         }

@@ -34,6 +34,5 @@
         MessagesNull = 661,
 
         GroupNotFound = 670
-
     }
 }

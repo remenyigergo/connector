@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Standard.Core.DataManager.MongoDB.DbModels;
-using Standard.Core.DataManager.MongoDB.IRepository;
-using Standard.Core.DataManager.MongoDB.Repository;
-using Standard.Core.Dependency;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Series.DataManagement.MongoDB;
 using Series.DataManagement.MongoDB.Repositories;
-using Standard.Core.DataManager.Mongo.Repository;
 
 namespace Series.Service
 {
@@ -38,7 +26,6 @@ namespace Series.Service
             services.AddTransient<IFeedRepository, FeedRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
             services.AddTransient<ISeriesRepository, SeriesRepository>();
-            
 
             ServiceDependency.Current = services.BuildServiceProvider();
         }

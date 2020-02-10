@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Service.Models;
-using Standard.Contracts.Models.Series;
-using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.Converters
 {
     public class Converter
     {
         /// <summary>
-        /// Sorozat átalakítás:   Mongo -> Internal  TODO ezt is kiszedni külön fájlba
+        ///     Sorozat átalakítás:   Mongo -> Internal  TODO ezt is kiszedni külön fájlba
         /// </summary>
         /// <param name="mongoSeries"></param>
         /// <returns></returns>
@@ -20,7 +16,7 @@ namespace Series.DataManagement.Converters
         {
             //var seasons = ConvertInternalSeasonToMongoSeason(mongoSeries.Seasons);
 
-            var internalSeries = new InternalSeries()
+            var internalSeries = new InternalSeries
             {
                 Title = mongoSeries.Title,
                 TvMazeId = mongoSeries.TvMazeId,
@@ -52,7 +48,7 @@ namespace Series.DataManagement.Converters
 
 
         /// <summary>
-        /// Évad átalakítás:  Internal -> Mongo    TODO ezt szerintem ki lehetne szedni külön fájlba
+        ///     Évad átalakítás:  Internal -> Mongo    TODO ezt szerintem ki lehetne szedni külön fájlba
         /// </summary>
         /// <param name="internalSeasons"></param>
         public List<InternalSeason> ConvertMongoSeasonToInternalSeason(List<MongoSeason> mongoSeasons)
@@ -62,8 +58,7 @@ namespace Series.DataManagement.Converters
             {
                 var episodeList = new List<InternalEpisode>();
                 foreach (var episode in mongoseason.Episodes)
-                {
-                    episodeList.Add(new InternalEpisode()
+                    episodeList.Add(new InternalEpisode
                     {
                         Title = episode.Title,
                         Length = episode.Length,
@@ -77,9 +72,8 @@ namespace Series.DataManagement.Converters
                         Crew = episode.Crew,
                         GuestStars = episode.GuestStars
                     });
-                }
 
-                seasonsList.Add(new InternalSeason()
+                seasonsList.Add(new InternalSeason
                 {
                     SeasonNumber = mongoseason.SeasonNumber,
                     EpisodesCount = mongoseason.EpisodesCount,
@@ -95,7 +89,7 @@ namespace Series.DataManagement.Converters
 
         public InternalEpisode ConvertMongoToInternalEpisode(MongoEpisode mongoEpisode)
         {
-            var internalEpisode = new InternalEpisode()
+            var internalEpisode = new InternalEpisode
             {
                 Title = mongoEpisode.Title,
                 Length = mongoEpisode.Length,
@@ -115,7 +109,7 @@ namespace Series.DataManagement.Converters
 
         public InternalEpisodeSeen ConvertMongoToInternalEpisode(EpisodeSeen mongoEpisode)
         {
-            var internalEpisode = new InternalEpisodeSeen()
+            var internalEpisode = new InternalEpisodeSeen
             {
                 UserId = mongoEpisode.UserId,
                 EpisodeNumber = mongoEpisode.EpisodeNumber,
@@ -128,7 +122,7 @@ namespace Series.DataManagement.Converters
         }
 
         /// <summary>
-        /// Sorozat átalakítás:   Internal -> Mongo TODO kiszedni
+        ///     Sorozat átalakítás:   Internal -> Mongo TODO kiszedni
         /// </summary>
         /// <param name="internalSeries"></param>
         /// <returns></returns>
@@ -136,7 +130,7 @@ namespace Series.DataManagement.Converters
         {
             var seasons = ConvertInternalSeasonToMongoSeason(internalSeries.Seasons);
 
-            var mongoSeries = new MongoSeries()
+            var mongoSeries = new MongoSeries
             {
                 TvMazeId = internalSeries.TvMazeId,
                 TmdbId = internalSeries.TmdbId,
@@ -169,7 +163,7 @@ namespace Series.DataManagement.Converters
 
 
         /// <summary>
-        /// Évad átalakítás:  Internal -> Mongo    TODO ezt szerintem ki lehetne szedni külön fájlba
+        ///     Évad átalakítás:  Internal -> Mongo    TODO ezt szerintem ki lehetne szedni külön fájlba
         /// </summary>
         /// <param name="internalSeasons"></param>
         public List<MongoSeason> ConvertInternalSeasonToMongoSeason(List<InternalSeason> internalSeasons)
@@ -179,8 +173,7 @@ namespace Series.DataManagement.Converters
             {
                 var episodeList = new List<MongoEpisode>();
                 foreach (var episode in internalSeason.Episodes)
-                {
-                    episodeList.Add(new MongoEpisode()
+                    episodeList.Add(new MongoEpisode
                     {
                         Title = episode.Title,
                         Length = episode.Length,
@@ -194,9 +187,8 @@ namespace Series.DataManagement.Converters
                         Crew = episode.Crew,
                         GuestStars = episode.GuestStars
                     });
-                }
 
-                seasonsList.Add(new MongoSeason()
+                seasonsList.Add(new MongoSeason
                 {
                     SeasonNumber = internalSeason.SeasonNumber,
                     EpisodesCount = internalSeason.EpisodesCount,
@@ -209,21 +201,18 @@ namespace Series.DataManagement.Converters
             return seasonsList;
         }
 
-        public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(StartedAndSeenEpisodes mongoEpisodes)
+        public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(
+            StartedAndSeenEpisodes mongoEpisodes)
         {
             List<InternalEpisodeSeen> seenEpisodes = new List<InternalEpisodeSeen>();
             foreach (var mongoEpisodesSeenEpisode in mongoEpisodes.seenEpisodes)
-            {
-                seenEpisodes.Add(this.ConvertMongoEpisodeSeenToInternal(mongoEpisodesSeenEpisode));
-            }
+                seenEpisodes.Add(ConvertMongoEpisodeSeenToInternal(mongoEpisodesSeenEpisode));
 
             List<InternalEpisodeStartedModel> startedEpisodes = new List<InternalEpisodeStartedModel>();
             foreach (var mongoEpisodesStarted in mongoEpisodes.startedEpisodes)
-            {
-                startedEpisodes.Add(this.ConvertMongoToInternalEpisodeStartedModel(mongoEpisodesStarted));
-            }
+                startedEpisodes.Add(ConvertMongoToInternalEpisodeStartedModel(mongoEpisodesStarted));
 
-            return new InternalStartedAndSeenEpisodes()
+            return new InternalStartedAndSeenEpisodes
             {
                 seenEpisodeList = seenEpisodes,
                 startedEpisodeList = startedEpisodes
@@ -233,7 +222,7 @@ namespace Series.DataManagement.Converters
 
         public InternalEpisodeSeen ConvertMongoEpisodeSeenToInternal(EpisodeSeen mongoEpisodeSeen)
         {
-            return new InternalEpisodeSeen()
+            return new InternalEpisodeSeen
             {
                 EpisodeNumber = mongoEpisodeSeen.EpisodeNumber,
                 SeasonNumber = mongoEpisodeSeen.SeasonNumber,
@@ -245,7 +234,7 @@ namespace Series.DataManagement.Converters
 
         public EpisodeSeen ConvertInternalEpisodeSeenToMongo(InternalEpisodeSeen internalEpisodeSeen)
         {
-            return new EpisodeSeen()
+            return new EpisodeSeen
             {
                 EpisodeNumber = internalEpisodeSeen.EpisodeNumber,
                 SeasonNumber = internalEpisodeSeen.SeasonNumber,
@@ -257,7 +246,7 @@ namespace Series.DataManagement.Converters
 
         public InternalEpisodeStartedModel ConvertMongoToInternalEpisodeStartedModel(EpisodeStarted mongoStartedEpisode)
         {
-            return new InternalEpisodeStartedModel()
+            return new InternalEpisodeStartedModel
             {
                 Date = mongoStartedEpisode.Date,
                 EpisodeNumber = mongoStartedEpisode.EpisodeNumber,

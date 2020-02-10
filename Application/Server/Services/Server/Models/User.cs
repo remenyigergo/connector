@@ -2,11 +2,11 @@
 {
     public class User
     {
-        public int Id { get; set; }
-        public string Username;
-        public string Password;
         public string Email;
         public int ModuleId;
+        public string Password;
         public int SettingId;
+        public string Username;
+        public int Id { get; set; }
     }
 }

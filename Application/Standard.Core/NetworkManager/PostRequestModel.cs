@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Standard.Core.NetworkManager
 {
     public class PostRequestModel
     {
-        [JsonProperty("Title")]
-        public string ShowTitle;
+        public int EpisodeNumber;
+
         //public string UserId;
         //public string TvMazeId;
         public int SeasonNumber;
-        public int EpisodeNumber;
-        //public string Date;
+
+        [JsonProperty("Title")] public string ShowTitle;
+
         //public int WatchedPercentage;
+        //public string Date;
     }
 }

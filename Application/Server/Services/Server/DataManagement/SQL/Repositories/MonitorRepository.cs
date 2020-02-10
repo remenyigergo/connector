@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Server.SqlDataManager;
-using Standard.Contracts.Exceptions;
 
 namespace Server.DataManagement.SQL.Repositories
 {
     public class MonitorRepository : IMonitorRepository
     {
-        private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
+        private readonly SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager =
+            new SqlStoreCatalogDataAccessManager();
 
 
         public async Task<bool> CheckInsertedById(int id)
@@ -46,10 +43,9 @@ namespace Server.DataManagement.SQL.Repositories
         public async Task<bool> UpdateFollowedPrograms(int userId, Dictionary<int, int> programsToUpdate)
         {
             if (await SqlCatalogDataAccessManager.UpdateFollowedPrograms(userId, programsToUpdate))
-            {
-                if (await SqlCatalogDataAccessManager.LastUpdateFollowedPrograms(userId, programsToUpdate) == programsToUpdate.Count)
+                if (await SqlCatalogDataAccessManager.LastUpdateFollowedPrograms(userId, programsToUpdate) ==
+                    programsToUpdate.Count)
                     return true;
-            }
 
             return false;
         }
@@ -70,6 +66,5 @@ namespace Server.DataManagement.SQL.Repositories
         }
 
         //public async Task<Use>
-
     }
 }

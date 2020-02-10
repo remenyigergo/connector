@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Book.DataManagement.MongoDB.Models;
-using Book.DataManagement.OverallModels;
 using Book.Service.Models.Request;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Requests.Book;
-using Book = Book.DataManagement.MongoDB.Models.Book;
 
 namespace Book.DataManagement.Helpers
 {
     public class Converter
     {
-
-        public Converter() {}
-
         public MongoDB.Models.Book ConvertInternalToMongoBook(InternalBook internalBook)
         {
             //var convertedGenre = (Genres)Enum.Parse(typeof(Genres), genre);
 
-            return new MongoDB.Models.Book()
+            return new MongoDB.Models.Book
             {
                 BookId = internalBook.BookId,
                 OverallRating = internalBook.OverallRating,
@@ -36,7 +29,7 @@ namespace Book.DataManagement.Helpers
         {
             //var convertedGenre = (Genres) Enum.Parse(typeof(Genres), genre);
 
-            return new InternalBook()
+            return new InternalBook
             {
                 BookId = mongoBook.BookId,
                 OverallRating = mongoBook.OverallRating,
@@ -49,9 +42,10 @@ namespace Book.DataManagement.Helpers
             };
         }
 
-        public MongoDB.Models.BookManagerModel ConvertInternalBookManagerModelToMongoBookManagerModel(InternalBookManagerModel internalBook)
+        public BookManagerModel ConvertInternalBookManagerModelToMongoBookManagerModel(
+            InternalBookManagerModel internalBook)
         {
-            return new MongoDB.Models.BookManagerModel()
+            return new BookManagerModel
             {
                 UserId = internalBook.UserId,
                 Book = ConvertInternalToMongoBook(internalBook.Book)
@@ -60,14 +54,12 @@ namespace Book.DataManagement.Helpers
 
         public OnGoingBook ConvertInternalToMongoOnGoingBook(InternalOnGoingModel internalOnGoingModel)
         {
-            List<UpdateLog> updates = new List<UpdateLog>();
+            var updates = new List<UpdateLog>();
 
             foreach (var internalUpdateLog in internalOnGoingModel.Updates)
-            {
                 updates.Add(InternalToMongoLog(internalUpdateLog));
-            }
 
-            return new OnGoingBook()
+            return new OnGoingBook
             {
                 BookId = internalOnGoingModel.BookId,
                 UserId = internalOnGoingModel.UserId,
@@ -78,14 +70,12 @@ namespace Book.DataManagement.Helpers
 
         public InternalOnGoingModel ConvertMongoToInternalOnGoingBook(OnGoingBook mongoOnGoingModel)
         {
-            List<InternalUpdateLog> updates = new List<InternalUpdateLog>();
+            var updates = new List<InternalUpdateLog>();
 
             foreach (var mongoUpdateLog in mongoOnGoingModel.Updates)
-            {
                 updates.Add(MongoToInternalLog(mongoUpdateLog));
-            }
-            
-            return new InternalOnGoingModel()
+
+            return new InternalOnGoingModel
             {
                 BookId = mongoOnGoingModel.BookId,
                 UserId = mongoOnGoingModel.UserId,
@@ -96,7 +86,7 @@ namespace Book.DataManagement.Helpers
 
         public InternalUpdateLog MongoToInternalLog(UpdateLog updateMongoLog)
         {
-            return new InternalUpdateLog()
+            return new InternalUpdateLog
             {
                 UpDateTime = updateMongoLog.UpDateTime,
                 MinutesRead = updateMongoLog.MinutesRead,
@@ -107,7 +97,7 @@ namespace Book.DataManagement.Helpers
 
         public UpdateLog InternalToMongoLog(InternalUpdateLog updateInternalLog)
         {
-            return new UpdateLog()
+            return new UpdateLog
             {
                 UpDateTime = updateInternalLog.UpDateTime,
                 MinutesRead = updateInternalLog.MinutesRead,

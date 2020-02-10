@@ -14,6 +14,5 @@ namespace Series.DataManagement.MongoDB.Models.Series
 
 
         public string Picture { get; set; }
-
     }
 }

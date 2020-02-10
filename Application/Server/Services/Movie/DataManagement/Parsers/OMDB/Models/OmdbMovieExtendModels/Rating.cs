@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Movie.DataManagement.Parsers.OMDB.Models.OmdbMovieExtendModels
+﻿namespace Movie.DataManagement.Parsers.OMDB.Models.OmdbMovieExtendModels
 {
     public class Rating
     {

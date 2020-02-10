@@ -1,18 +1,14 @@
-﻿using Standard.Core.NetworkManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer
 {
     public class RequestManager
     {
-        private string _endpoint = "http://localhost:5000";
+        private readonly string _endpoint = "http://localhost:5000";
 
         /// <summary>
-        /// HTTP POST REQUEST - követett programok frissítése
+        ///     HTTP POST REQUEST - követett programok frissítése
         /// </summary>
         /// <param name="programs"></param>
         /// <param name="userId"></param>
@@ -24,10 +20,8 @@ namespace KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer
         }
 
 
-       
-
         /// <summary>
-        /// HTTP POST REQUEST - program hozzáadása a serveren lévő programokhoz
+        ///     HTTP POST REQUEST - program hozzáadása a serveren lévő programokhoz
         /// </summary>
         /// <param name="programs"></param>
         public async void InsertProgramRequest(List<string> programs)
@@ -37,7 +31,7 @@ namespace KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer
 
 
         /// <summary>
-        /// HTTP GET REQUEST - serveren lévő programok listájának lekérése
+        ///     HTTP GET REQUEST - serveren lévő programok listájának lekérése
         /// </summary>
         /// <returns></returns>
         public async Task<List<string>> GetAllPrograms()
@@ -47,7 +41,7 @@ namespace KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer
         }
 
         /// <summary>
-        /// HTTP GET REQUEST - követett programok lekérése
+        ///     HTTP GET REQUEST - követett programok lekérése
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>

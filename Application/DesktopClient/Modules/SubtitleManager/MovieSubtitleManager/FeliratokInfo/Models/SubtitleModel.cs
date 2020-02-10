@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models
+﻿namespace DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models
 {
     public class SubtitleModel
     {
-        public string Title;
         public string Quality;
         public string Releaser;
+        public string Title;
 
         public SubtitleModel()
         {
@@ -22,7 +16,5 @@ namespace DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokIn
             Quality = q;
             Releaser = r;
         }
-
-        
     }
 }

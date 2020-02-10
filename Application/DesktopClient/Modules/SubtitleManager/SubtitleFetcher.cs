@@ -1,25 +1,21 @@
-﻿using System.IO;
-using System.Net;
-using HtmlAgilityPack;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using System.Threading.Tasks;
-using DesktopClient.Modules.Helpers;
-using DesktopClient.Modules.MPCManager;
-using DesktopClient.Modules.Helpers.Series;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Diagnostics;
-using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using System.IO;
+using System.Net;
+using DesktopClient.Modules.Helpers.Series;
+using DesktopClient.Modules.MPCManager;
 using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
+using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using HtmlAgilityPack;
 
 namespace DesktopClient.Modules.SubtitleManager
 {
     public static class SubtitleFetcher
     {
-        private static string lang = "Magyar";
         private const string downloadPath = "D:\\uTorrent";
         private const string mpcVariablesSiteUrl = @"http://localhost:13579/variables.html";
         private const string feliratokInfoEndpoint = @"https://www.feliratok.info";
+        private static string lang = "Magyar";
 
         public static string GetFolderPathByMPCtitle()
         {
@@ -31,12 +27,9 @@ namespace DesktopClient.Modules.SubtitleManager
                 var showName = SeriesHelper.GetTitle(new MPC().IsMediaRunning().MainWindowTitle);
 
 
-
-                if (dirNameCleaned != null && dirNameCleaned.ToLower() == showName)  //TODO sorozat elnevezések ami nem (Title.SeasonEpisode.Coding-Releaser) alakuak nemjók ugye
-                {
-                    //var isThereSubtitle = IsThereSubtitles(dirName, dirNameCleaned);
+                if (dirNameCleaned != null && dirNameCleaned.ToLower() == showName
+                ) //TODO sorozat elnevezések ami nem (Title.SeasonEpisode.Coding-Releaser) alakuak nemjók ugye
                     return "egyezik";
-                }
             }
 
             return "";
@@ -44,46 +37,44 @@ namespace DesktopClient.Modules.SubtitleManager
 
         public static string GetFolderPathFromMPCweb()
         {
-            string path = String.Empty;
+            var path = string.Empty;
 
             try
             {
-                using (WebClient client = new WebClient())
+                using (var client = new WebClient())
                 {
-                    string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                    HtmlDocument htmlDocument = new HtmlDocument();
+                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlDocument = new HtmlDocument();
                     htmlDocument.LoadHtml(htmlString);
-                    string xPath = "(/html/body/p)[5]";
-                    HtmlNode node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    var xPath = "(/html/body/p)[5]";
+                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
                     path = node.InnerHtml.Replace(@"\\", @"\");
                 }
             }
             catch (WebException WebEx)
             {
-                
             }
             return path;
         }
 
         public static string GetFilenameFromMPCweb()
         {
-            string filename = String.Empty;
+            var filename = string.Empty;
 
             try
             {
-                using (WebClient client = new WebClient())
+                using (var client = new WebClient())
                 {
-                    string htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                    HtmlDocument htmlDocument = new HtmlDocument();
+                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlDocument = new HtmlDocument();
                     htmlDocument.LoadHtml(htmlString);
-                    string xPath = "(/html/body/p)[1]";
-                    HtmlNode node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    var xPath = "(/html/body/p)[1]";
+                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
                     filename = node.InnerHtml.Replace(@"\\", @"\");
                 }
             }
             catch (WebException WebEx)
             {
-
             }
             return filename;
         }
@@ -109,58 +100,48 @@ namespace DesktopClient.Modules.SubtitleManager
         //}
 
 
-        
-
         public static bool DownloadSubtitle(SubtitleModel subtitleModel, string path, string filename)
         {
             if (!SeriesHelper.DoesItContainHun(filename))
-            {
-                // TODO async
-                return FeliratokInfoSeriesDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path, filename) != false;
-            }
+                return FeliratokInfoSeriesDownloader.GetFeliratokInfoHtml(subtitleModel, feliratokInfoEndpoint, path,
+                    filename);
             return false;
         }
 
 
         public static string TrimFileName(string path)
         {
-            for (int i = path.Length - 1; i > 0; i--)
-            {
+            for (var i = path.Length - 1; i > 0; i--)
                 if (path[i] == '\\')
                 {
-                    int length = path.Length;
+                    var length = path.Length;
                     var sub = path.Substring(i + 1, length - (i + 1));
                     return sub;
                 }
-            }
             return path;
         }
 
         public static List<HtmlNode> GetSubtitles(string data)
         {
-            HtmlDocument htmlDocument = new HtmlDocument();
+            var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(data);
 
             //string xPath = "/html/body/div/table/tbody/tr[2]/td[2]/table/tbody";
-            string xPath = "//tr[@id=\'vilagit\']";
-            string xPath2 = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr";
-            string pagination = "/html/body/div[2]/div";
+            var xPath = "//tr[@id=\'vilagit\']";
+            var xPath2 = "/html[1]/body[1]/table[1]/tr[2]/td[2]/table[1]/tr";
+            var pagination = "/html/body/div[2]/div";
 
-            List<HtmlNode> listOfSubtitles = new List<HtmlNode>();
+            var listOfSubtitles = new List<HtmlNode>();
             try
             {
-
                 foreach (var tr in htmlDocument.DocumentNode.SelectNodes(xPath2))
-                {
                     listOfSubtitles.Add(tr);
-                }
                 return listOfSubtitles;
             }
             catch (NullReferenceException nullException)
             {
                 return null;
             }
-
         }
     }
 }

@@ -1,10 +1,5 @@
-﻿using DesktopClient.Modules.Helpers.Movie;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
+using DesktopClient.Modules.Helpers.Movie;
 
 namespace DesktopClient.Modules.Helpers
 {
@@ -18,9 +13,7 @@ namespace DesktopClient.Modules.Helpers
         {
             var regexResult = QualityPattern.Matches(text);
             if (regexResult.Count != 0)
-            {
                 return regexResult[0].Groups[0].Value;
-            }
             return "";
         }
 
@@ -28,11 +21,8 @@ namespace DesktopClient.Modules.Helpers
         {
             var regexResult = regexPattern.Matches(text);
             if (regexResult.Count != 0)
-            {
                 return regexResult[0].Groups[5].Value;
-            }
             return "";
-
         }
     }
 }

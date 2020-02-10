@@ -1,14 +1,14 @@
-﻿using Movie.DataManagement.Parsers.TMDB.Models;
-using Standard.Contracts.Exceptions;
-using Standard.Contracts.Models.Movie;
-using Standard.Core.NetworkManager;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Movie.DataManagement.Converter;
+using Movie.DataManagement.Parsers.TMDB.Models;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Movie;
+using Standard.Core.NetworkManager;
 
 namespace Movie.DataManagement.Parsers.TMDB
 {
@@ -26,7 +26,6 @@ namespace Movie.DataManagement.Parsers.TMDB
         private const string _lang = "en-US";
         private const string _key = "e9443688992dbb4fa3940ed77a0a8e1d";
 
-        
 
         public async Task<InternalMovie> GetMovieFromTmdb(string title)
         {
@@ -44,7 +43,7 @@ namespace Movie.DataManagement.Parsers.TMDB
 
                 //var internalMovie = new Converter.Converter().ConvertMongoToInternalMovie(tmdbMovie);
 
-                return new InternalMovie()
+                return new InternalMovie
                 {
                     Title = tmdbMovie.Title,
                     TmdbId = tmdbMovie.TmdbId,
@@ -81,19 +80,17 @@ namespace Movie.DataManagement.Parsers.TMDB
 
         public async Task<bool> IsMovieExistInTmdb(string title)
         {
-            var boolean = await new WebClientManager().Get<List<TmdbMovieSimple>>($"{_endpoint}/3/search/movie?api_key={_key}&language={_lang}&query={title}&page=1&include_adult=false");
+            var boolean =
+                await new WebClientManager().Get<List<TmdbMovieSimple>>(
+                    $"{_endpoint}/3/search/movie?api_key={_key}&language={_lang}&query={title}&page=1&include_adult=false");
             if (boolean.Count > 0)
-            {
                 foreach (var movie in boolean)
                 {
                     var seriesName = RemoveAccent(movie.Title.ToLower());
 
                     if (seriesName == title.ToLower())
-                    {
                         return true;
-                    }
                 }
-            }
 
             return false;
         }
@@ -102,10 +99,10 @@ namespace Movie.DataManagement.Parsers.TMDB
         {
             var decomposed = text.Normalize(NormalizationForm.FormD);
 
-            char[] filtered = decomposed
+            var filtered = decomposed
                 .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 .ToArray();
-            return new String(filtered);
+            return new string(filtered);
         }
     }
 }

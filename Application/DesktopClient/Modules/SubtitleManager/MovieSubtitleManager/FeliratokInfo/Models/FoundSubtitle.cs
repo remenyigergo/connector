@@ -1,18 +1,13 @@
 ﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo.Models
 {
     public class FoundSubtitle
     {
-        public string MagyarNode;
-        public string OriginalNode;
         public string DownloadNode;
         public HtmlDocument htmlDocument;
+        public string MagyarNode;
+        public string OriginalNode;
 
         public FoundSubtitle(string _magyar, string _original, string node, HtmlDocument htmlDoc)
         {
@@ -22,6 +17,8 @@ namespace DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokIn
             htmlDocument = htmlDoc;
         }
 
-        public FoundSubtitle() { }
+        public FoundSubtitle()
+        {
+        }
     }
 }

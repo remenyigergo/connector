@@ -5,17 +5,16 @@ namespace Series.Parsers.TvMaze.Models
 {
     public class TvMazeShow
     {
-
-        public string Id;
-        public string Runtime;
-        public string Name;
-        public List<string> Genres;
+        public TvMazeShowCast Cast;
         public List<string> ExternalIds;
-        public TvMazeRating Rating;
+        public List<string> Genres;
+        public string Id;
         public string Language;
+        public string Name;
+        public TvMazeRating Rating;
+        public string Runtime;
         public string Status;
         public string Summary;
         public string Updated;
-        public TvMazeShowCast Cast;
     }
 }

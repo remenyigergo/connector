@@ -1,9 +1,6 @@
-﻿using Social.DataManagement.MongoDB.Models;
-using Standard.Contracts.Models.Social;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Social.DataManagement.MongoDB.Models;
 
 namespace Social.DataManagement.MongoDB.Repositories
 {

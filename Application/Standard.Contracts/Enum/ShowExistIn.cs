@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Standard.Contracts.Enum
+﻿namespace Standard.Contracts.Enum
 {
     public enum MediaExistIn
     {
@@ -11,6 +7,6 @@ namespace Standard.Contracts.Enum
         NONE = 0,
         MONGO = 1,
         TVMAZE = 2,
-        TMDB = 3,
+        TMDB = 3
     }
 }

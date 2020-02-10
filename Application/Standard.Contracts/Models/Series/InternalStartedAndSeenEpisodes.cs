@@ -1,13 +1,11 @@
-﻿using Series.Service.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Series.Service.Models;
 
 namespace Standard.Contracts.Models.Series.ExtendClasses
 {
     public class InternalStartedAndSeenEpisodes
     {
-        public List<InternalEpisodeStartedModel> startedEpisodeList;
         public List<InternalEpisodeSeen> seenEpisodeList;
+        public List<InternalEpisodeStartedModel> startedEpisodeList;
     }
 }

@@ -6,8 +6,27 @@ namespace Standard.Contracts.Models.Series
 {
     public class InternalSeries
     {
+        //TODO: EXTERNAL ID FELKÉRÉS
+
+        //TMDB
+        public List<InternalCreator> CreatedBy;
+
+        public List<string> EpisodeRunTime;
+        public string FirstAirDate;
+        public List<InternalGenre> Genres;
+        public InternalEpisodeSimple LastEpisodeSimpleToAir;
+        public List<InternalNetwork> Networks;
+        public string OriginalLanguage;
+        public string Popularity;
+        public List<InternalProductionCompany> ProductionCompanies;
+        public string Status;
+        public string Type;
+
+        public int VoteCount;
+
         //TVMAZE
         public string Id { get; set; }
+
         public string TvMazeId { get; set; }
         public string TmdbId { get; set; }
         public string Title { get; set; }
@@ -19,22 +38,8 @@ namespace Standard.Contracts.Models.Series
         public string Description { get; set; }
         public int TotalSeasons { get; set; }
         public string LastUpdated { get; set; }
-        public InternalShowCast Cast { get; set; }
-        //TODO: EXTERNAL ID FELKÉRÉS
 
-        //TMDB
-        public List<InternalCreator> CreatedBy;
-        public List<string> EpisodeRunTime;
-        public string FirstAirDate;
-        public List<InternalGenre> Genres;
-        public string OriginalLanguage;
-        public InternalEpisodeSimple LastEpisodeSimpleToAir;
-        public List<InternalNetwork> Networks;
-        public string Popularity;
-        public List<InternalProductionCompany> ProductionCompanies;
-        public string Status;
-        public string Type;
-        public int VoteCount;
+        public InternalShowCast Cast { get; set; }
 
         public void Merge(InternalSeries from)
         {
@@ -58,7 +63,7 @@ namespace Standard.Contracts.Models.Series
             TotalSeasons = from.TotalSeasons;
 
             //Mergeljük a Categoriest és Genret
-            List<InternalGenre> genreList = new List<InternalGenre>();
+            var genreList = new List<InternalGenre>();
             foreach (var category in Categories)
             {
                 var genre = new InternalGenre(category);
@@ -67,16 +72,10 @@ namespace Standard.Contracts.Models.Series
             Genres = genreList;
 
             if (from.Genres.Count > 0)
-            {
                 foreach (var internalGenre in from.Genres)
-                {
                     if (!Genres.Contains(internalGenre))
-                    {
                         Genres.Add(internalGenre);
-                    }
-                }
-            }
-                
+
 
             foreach (var season in from.Seasons)
             {
@@ -90,13 +89,15 @@ namespace Standard.Contracts.Models.Series
                     matchingSeason.Airdate = season.Airdate;
                     matchingSeason.Name = matchingSeason.Name ?? season.Name;
                     matchingSeason.Summary = matchingSeason.Summary ?? season.Summary;
-                    matchingSeason.EpisodesCount = (matchingSeason.EpisodesCount == 0) ? season.EpisodesCount : matchingSeason.EpisodesCount;
+                    matchingSeason.EpisodesCount = matchingSeason.EpisodesCount == 0
+                        ? season.EpisodesCount
+                        : matchingSeason.EpisodesCount;
 
                     if (season.Episodes != null && season.Episodes.Count > 0)
-                    {
                         foreach (var episode in matchingSeason.Episodes)
                         {
-                            var matchingEpisode = season.Episodes.FirstOrDefault(e => e.EpisodeNumber == episode.EpisodeNumber);
+                            var matchingEpisode =
+                                season.Episodes.FirstOrDefault(e => e.EpisodeNumber == episode.EpisodeNumber);
                             if (matchingEpisode == null)
                             {
                                 season.Episodes.Add(episode);
@@ -115,16 +116,13 @@ namespace Standard.Contracts.Models.Series
                                 matchingEpisode.AirDate = matchingEpisode.AirDate ?? episode.AirDate;
                                 matchingEpisode.TmdbShowId = matchingEpisode.TmdbShowId ?? episode.AirDate;
                                 if (matchingEpisode.VoteCount == 0)
-                                {
                                     matchingEpisode.VoteCount = episode.VoteCount;
-                                }
                                 matchingEpisode.Crew = matchingEpisode.Crew ?? episode.Crew;
                                 matchingEpisode.GuestStars = matchingEpisode.GuestStars ?? episode.GuestStars;
-                                
+
                                 // TODO folytatni
                             }
                         }
-                    }
                 }
             }
         }
@@ -142,7 +140,7 @@ namespace Standard.Contracts.Models.Series
 
         public override int GetHashCode()
         {
-            return this.Title.GetHashCode();
+            return Title.GetHashCode();
         }
     }
 }

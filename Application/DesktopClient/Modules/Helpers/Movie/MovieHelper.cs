@@ -1,20 +1,7 @@
-﻿using Standard.Contracts.Requests;
-using Standard.Core.NetworkManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DesktopClient.Modules.Helpers.Series;
-using HtmlAgilityPack;
-using Series.Service.Models;
-using Standard.Contracts.Requests.Movie;
 using DesktopClient.Modules.MPCManager.Model;
-using Standard.Contracts;
-using Standard.Contracts.Enum;
-using System.Windows.Forms;
 
 namespace DesktopClient.Modules.Helpers.Movie
 {
@@ -36,13 +23,10 @@ namespace DesktopClient.Modules.Helpers.Movie
             var regexResult = moviePattern.Matches(text);
 
             if (regexResult.Count > 0)
-            {
                 return regexResult[0].Groups[1].Value.Replace('.', ' ');
-            }
 
             return null;
         }
-
 
 
         public static string TrimDownloadFolders(string folderPath)
@@ -73,7 +57,7 @@ namespace DesktopClient.Modules.Helpers.Movie
             //double totalSeconds = Int32.Parse(dur[0]) * 60 * 60 + Int32.Parse(dur[1]) * 60 + Int32.Parse(dur[2]);
             //double percentage = (100 / totalSeconds) * seenSeconds;
 
-            double seenSeconds = 0.0;
+            var seenSeconds = 0.0;
             if (elapsedTimesInMedia != null)
             {
                 seenSeconds = elapsedTimesInMedia.Position;
@@ -81,14 +65,12 @@ namespace DesktopClient.Modules.Helpers.Movie
             else
             {
                 if (Math.Abs(actualSeenSecondsFromMPC - elapsedTimesInMedia.SeenSeconds) < 60)
-                {
                     seenSeconds = actualSeenSecondsFromMPC;
-                }
             }
 
-            double percentage = (100.0 / (double)elapsedTimesInMedia.Duration) * seenSeconds;
+            var percentage = 100.0 / elapsedTimesInMedia.Duration * seenSeconds;
 
-            InternalStartedMovieUpdateRequest startedMovie = new InternalStartedMovieUpdateRequest()
+            InternalStartedMovieUpdateRequest startedMovie = new InternalStartedMovieUpdateRequest
             {
                 Date = DateTime.Now,
                 HoursElapsed = elapsedTimesInMedia.SeenHours,
@@ -98,7 +80,7 @@ namespace DesktopClient.Modules.Helpers.Movie
                 ImdbId = "",
                 Title = showName,
                 TmdbId = null,
-                UserId = 1  //TODO
+                UserId = 1 //TODO
             };
 
             //ez megoldja azokat ami alább kivan kommentelve
@@ -127,36 +109,40 @@ namespace DesktopClient.Modules.Helpers.Movie
 
         public static async Task<Result<bool>> UpdateStartedSeries(InternalStartedMovieUpdateRequest internalEpisode)
         {
-
-            var isUpdated = await new WebClientManager().Post<Result<bool>>($"http://localhost:5003/movie/update", internalEpisode);
+            var isUpdated =
+                await new WebClientManager().Post<Result<bool>>($"http://localhost:5003/movie/update", internalEpisode);
             return isUpdated;
         }
 
         public static async Task<int> IsTheMovieExist(string title)
         {
-            var requestbody = new InternalImportRequest() { Title = title };
+            var requestbody = new InternalImportRequest();
+            requestbody.Title = title;
             var showExist = await new WebClientManager().Exist<int>($"http://localhost:5003/movie/exist", requestbody);
             return showExist;
         }
 
         public static async Task<bool> IsItSeen(int userid, string title)
         {
-            var requestbody = new InternalMovieSeenRequest() { UserId = userid, Title = title};
-            var showExist = await new WebClientManager().SeenMovie<bool>($"http://localhost:5003/movie/seen", requestbody);
+            var requestbody = new InternalMovieSeenRequest {UserId = userid, Title = title};
+            var showExist =
+                await new WebClientManager().SeenMovie<bool>($"http://localhost:5003/movie/seen", requestbody);
             return showExist;
         }
 
         public static async Task<bool> IsItStarted(int userid, string title)
         {
-            var requestbody = new InternalMovieSeenRequest() { UserId = userid, Title = title };
-            var showExist = await new WebClientManager().SeenMovie<bool>($"http://localhost:5003/movie/started", requestbody);
+            var requestbody = new InternalMovieSeenRequest {UserId = userid, Title = title};
+            var showExist =
+                await new WebClientManager().SeenMovie<bool>($"http://localhost:5003/movie/started", requestbody);
             return showExist;
         }
 
         public static async Task<int> ImportRequest(string title)
         {
-            var requestbody = new InternalImportRequest() { Title = title };
-            var movieExist = await new WebClientManager().Post<bool>($"http://localhost:5003/movie/import", requestbody);
+            var requestbody = new InternalImportRequest {Title = title};
+            var movieExist =
+                await new WebClientManager().Post<bool>($"http://localhost:5003/movie/import", requestbody);
             return movieExist;
         }
     }

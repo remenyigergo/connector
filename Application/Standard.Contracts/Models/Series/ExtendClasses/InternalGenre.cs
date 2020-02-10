@@ -7,7 +7,7 @@
 
         public InternalGenre(string genre)
         {
-            this.Name = genre;
+            Name = genre;
         }
 
         public override bool Equals(object obj)
@@ -24,6 +24,5 @@
         {
             return Name.GetHashCode();
         }
-
     }
 }

@@ -6,7 +6,6 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels
     {
         public string Name;
 
-        [JsonProperty("origin_country")]
-        public string OriginCountry;
+        [JsonProperty("origin_country")] public string OriginCountry;
     }
 }

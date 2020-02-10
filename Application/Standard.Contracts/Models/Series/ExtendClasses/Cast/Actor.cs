@@ -2,7 +2,7 @@
 {
     public class Actor
     {
-        public string RealName;
         public string CharacterName;
+        public string RealName;
     }
 }

@@ -1,17 +1,13 @@
-﻿using Social.DataManagement.MongoDB.Repositories;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Standard.Core.DataManager.MongoDB;
-using Standard.Core.DataManager.SQL;
-using Standard.Core.Dependency;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using Standard.Contracts.Models.Social;
+using Microsoft.Extensions.DependencyInjection;
 using Social.DataManagement.Converter;
-using Standard.Contracts.Exceptions;
-using Social.DataManagement.MongoDB.Models;
 using Social.DataManagement.MongoDB.Models.ExtendClasses;
+using Social.DataManagement.MongoDB.Repositories;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Social;
+using Standard.Core.Dependency;
 
 namespace Social.Services
 {
@@ -19,17 +15,11 @@ namespace Social.Services
     {
         private readonly ISocialRepository _repo = ServiceDependency.Current.GetService<ISocialRepository>();
 
-        public SocialService()
-        {
-        }
-
         public async Task<List<InternalFeed>> GetAllFeeds()
         {
             var feeds = await _repo.GetAllFeeds();
             if (feeds == null)
-            {
-                throw new InternalException(660,"Null when getting feeds.");
-            }
+                throw new InternalException(660, "Null when getting feeds.");
 
             return new MongoToInternal().Feed(feeds);
         }
@@ -49,9 +39,7 @@ namespace Social.Services
         {
             var messages = await _repo.GetAllMessagesByUserId(userid);
             if (messages == null)
-            {
                 throw new InternalException(661, "Messages null. Error");
-            }
             return new MongoToInternal().Messages(messages);
         }
 
@@ -71,11 +59,9 @@ namespace Social.Services
             var group = await _repo.GetGroupById(groupId);
 
             if (group == null)
-            {
                 throw new InternalException(670, "Group wasnt found.");
-            }
 
-            group.Messages.Add(new MongoGroupMessage()
+            group.Messages.Add(new MongoGroupMessage
             {
                 Date = date,
                 Message = message,

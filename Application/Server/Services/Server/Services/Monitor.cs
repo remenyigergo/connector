@@ -1,41 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Standard.Core.DataManager.MongoDB;
-using Standard.Core.DataManager.SQL;
-using Server.Models;
-using Server.SqlDataManager;
-using System.Diagnostics;
 using Server.DataManagement.SQL.Repositories;
-using Standard.Core.Dependency;
-using Microsoft.Extensions.DependencyInjection;
-using Standard.Contracts.Exceptions;
-using Movie.DataManagement.MongoDB.Repositories;
+using Server.SqlDataManager;
 
 namespace Server.Services
 {
     public class Monitor
     {
-        private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
-
         //private readonly IParser _monitorParser;
         //private readonly MonitorRepository _repo = new MonitorRepository();
 
         private readonly IMonitorRepository _repo = ServiceDependency.Current.GetService<IMonitorRepository>();
-
-        public Monitor()
-        {
-        }
+        private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
 
         public async Task<List<string>> GetAllPrograms()
         {
-            
             var result = await _repo.GetAllPrograms();
             if (result.Count == 0)
-            {
-                throw new InternalException(613,"No programs were found.");
-            }
+                throw new InternalException(613, "No programs were found.");
             return result;
         }
 
@@ -43,19 +25,14 @@ namespace Server.Services
         {
             var s = await _repo.FollowProgramRequest(userId, programId);
             if (s == 0)
-            {
                 throw new InternalException(612, "No program was marked as follow");
-            }
-            
         }
 
         public async Task<int?> CheckProgram(string programName)
         {
             var response = await _repo.CheckProgramRequest(programName);
             if (response == null)
-            {
-                throw new InternalException(613,"No program was found.");
-            }
+                throw new InternalException(613, "No program was found.");
 
             return response;
         }
@@ -64,9 +41,7 @@ namespace Server.Services
         {
             var effectedRows = await _repo.InsertProgram(processes);
             if (effectedRows == 0)
-            {
                 throw new InternalException(603, "No field/line was modified.");
-            }
             return effectedRows;
         }
 
@@ -79,15 +54,12 @@ namespace Server.Services
         {
             var result = await _repo.UpdateFollowedPrograms(userId, programsToUpdate);
             if (result == false)
-            {
-                throw new InternalException(607,"Update failed.");
-
-            }
+                throw new InternalException(607, "Update failed.");
 
             return result;
         }
 
-        public async Task<Dictionary<string,int>> RetrieveFollowedProgramsByUser(int userId)
+        public async Task<Dictionary<string, int>> RetrieveFollowedProgramsByUser(int userId)
         {
             return await _repo.RetrieveFollowedProgramsByUser(userId);
         }

@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Book.DataManagement.Helpers;
 using Book.DataManagement.MongoDB.Models;
 using Book.DataManagement.MongoDB.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Requests.Book;
 using Standard.Core.Dependency;
-using Book.Service.Models.Request;
-using MongoDB.Driver;
-using Standard.Contracts.Exceptions;
 
 namespace Book.Service
 {
     public class BookService
     {
         private readonly IBookRepository _repo = ServiceDependency.Current.GetService<IBookRepository>();
-
-        public BookService() { }
 
         public async Task InsertBook(InternalBook internalBook)
         {
@@ -42,15 +37,13 @@ namespace Book.Service
 
         public async Task<bool> UpdateReadPageNumber(UpdateLog updateLog, int userid, int bookid)
         {
-            
-
-            return await _repo.UpdateReadPageNumber(updateLog,userid,bookid);
+            return await _repo.UpdateReadPageNumber(updateLog, userid, bookid);
         }
 
         public async Task SetFavorite(int userid, InternalBook book)
         {
             var mongoBook = new Converter().ConvertInternalToMongoBook(book);
-            await _repo.SetFavorite(userid,mongoBook);
+            await _repo.SetFavorite(userid, mongoBook);
         }
 
         public async Task<bool> IsItFavoriteAlready(int userid, int bookid)
@@ -99,9 +92,7 @@ namespace Book.Service
         {
             var result = await _repo.GetRecommendationsByUserId(userid);
             if (result.Count == 0 || result == null)
-            {
-                throw new InternalException(615,"Recommendation failed in repository.");
-            }
+                throw new InternalException(615, "Recommendation failed in repository.");
             return result;
         }
 
@@ -110,12 +101,10 @@ namespace Book.Service
             var returnedMongoBooks = await _repo.GetRecommendationsByString(supposedTitle);
             if (returnedMongoBooks != null)
             {
-                List<InternalBook> convertedInternalBooks = new List<InternalBook>();
+                var convertedInternalBooks = new List<InternalBook>();
 
                 foreach (var returnedMongoBook in returnedMongoBooks)
-                {
                     convertedInternalBooks.Add(new Converter().ConvertMongoToInternalBook(returnedMongoBook));
-                }
 
                 return convertedInternalBooks;
             }

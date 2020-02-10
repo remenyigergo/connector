@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace Book.DataManagement.OverallModels
 {
     public enum Genres
     {
-        [Description("Sci-fi")]
-        StarWars=1,
+        [Description("Sci-fi")] StarWars = 1,
         StarTrek,
         MassEffect,
 
-        [Description("Fantasy")]
-        GameOfThrones,
+        [Description("Fantasy")] GameOfThrones,
         Warcraft,
         Withcer,
         AmberChronicles,
 
-        [Description("Crime")]
-        SherlockHolmes,
-        Keresztapa,
+        [Description("Crime")] SherlockHolmes,
+        Keresztapa
     }
 }
