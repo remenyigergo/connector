@@ -5,19 +5,21 @@ namespace Series.DataManagement.MongoDB.Models.Series
 {
     public class MongoEpisode
     {
-        public string Title;
-        public string Length;
-        public double? Rating;
+        public string AirDate;
+        public List<InternalEpisodeCrew> Crew;
+
         //public List<string> MongoCast;
         public string Description;
-        public int SeasonNumber;
+
         public int EpisodeNumber;
+        public List<InternalEpisodeGuest> GuestStars;
+        public string Length;
 
+        public double? Rating;
 
-        public string AirDate;
+        public int SeasonNumber;
+        public string Title;
         public string TmdbShowId;
         public int VoteCount;
-        public List<InternalEpisodeCrew> Crew;
-        public List<InternalEpisodeGuest> GuestStars;
     }
 }

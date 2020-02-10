@@ -1,14 +1,12 @@
-﻿using Social.DataManagement.MongoDB.Models.ExtendClasses;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Social.DataManagement.MongoDB.Models.ExtendClasses;
 
 namespace Social.DataManagement.MongoDB.Models
 {
     public class MongoGroupChat
     {
         public int GroupId;
-        public List<int> Users;
         public List<MongoGroupMessage> Messages;
+        public List<int> Users;
     }
 }

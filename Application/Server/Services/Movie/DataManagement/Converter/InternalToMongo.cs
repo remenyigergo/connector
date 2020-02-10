@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Movie.DataManagement.MongoDB.Models;
 using Movie.DataManagement.Parsers.OMDB.Models.OmdbMovieExtendModels;
 using Movie.DataManagement.Parsers.TMDB.Models.TmdbMovieExtendModels;
 using Standard.Contracts.Models.Movie;
@@ -8,48 +7,35 @@ using Standard.Contracts.Models.Movie.ExtendClasses;
 
 namespace Movie.DataManagement.Converter
 {
-    class InternalToMongo
+    internal class InternalToMongo
     {
-
-        public MongoDB.Models.MongoMovie Movie(InternalMovie internalMovie)
+        public MongoMovie Movie(InternalMovie internalMovie)
         {
             var collection = new Collection();
             if (internalMovie.BelongsToCollection != null)
-            {
-                collection = this.Collection(internalMovie.BelongsToCollection);
-            }
+                collection = Collection(internalMovie.BelongsToCollection);
 
             var genres = new List<Genre>();
-            if (internalMovie.Genres!= null)
-            {
-                genres = this.Genre(internalMovie.Genres);
-            }
+            if (internalMovie.Genres != null)
+                genres = Genre(internalMovie.Genres);
 
             var prodComps = new List<ProductionCompany>();
             if (internalMovie.ProductionCompanies != null)
-            {
-                prodComps = this.ProdCompanies(internalMovie.ProductionCompanies);
-            }
+                prodComps = ProdCompanies(internalMovie.ProductionCompanies);
 
             var prodCountries = new List<ProductionCountry>();
             if (internalMovie.ProductionCountries != null)
-            {
-                prodCountries = this.ProdCountries(internalMovie.ProductionCountries);
-            }
+                prodCountries = ProdCountries(internalMovie.ProductionCountries);
 
             var langs = new List<Language>();
             if (internalMovie.SpokenLanguages != null)
-            {
-                langs = this.SpokenLanguages(internalMovie.SpokenLanguages);
-            }
+                langs = SpokenLanguages(internalMovie.SpokenLanguages);
 
             var ratings = new List<Rating>();
             if (internalMovie.Ratings != null)
-            {
-                ratings = this.Rating(internalMovie.Ratings);
-            }
+                ratings = Rating(internalMovie.Ratings);
 
-            return new MongoDB.Models.MongoMovie()
+            return new MongoMovie
             {
                 Title = internalMovie.Title ?? "",
                 Adult = internalMovie.Adult,
@@ -92,97 +78,84 @@ namespace Movie.DataManagement.Converter
                 Production = internalMovie.Production ?? "",
                 Website = internalMovie.Website ?? ""
             };
-
         }
 
         public Collection Collection(InternalCollection internalCollection)
         {
             if (internalCollection != null)
-            {
-                return new Collection()
+                return new Collection
                 {
                     BackdropPath = internalCollection.BackdropPath,
                     Id = internalCollection.Id,
                     Name = internalCollection.Name,
                     PosterPath = internalCollection.PosterPath
                 };
-            }
             return null;
         }
 
         public List<Genre> Genre(List<InternalGenre> internalGenres)
         {
-            List<Genre> genres = new List<Genre>();
+            var genres = new List<Genre>();
             foreach (var internalGenre in internalGenres)
-            {
-                genres.Add(new Genre()
+                genres.Add(new Genre
                 {
                     Id = internalGenre.Id,
                     Name = internalGenre.Name
                 });
-            }
 
             return genres;
         }
 
         public List<ProductionCompany> ProdCompanies(List<InternalProductionCompany> internalProductionCompanies)
         {
-            List<ProductionCompany> companies = new List<ProductionCompany>();
+            var companies = new List<ProductionCompany>();
             foreach (var internalProdComp in internalProductionCompanies)
-            {
-                companies.Add(new ProductionCompany()
+                companies.Add(new ProductionCompany
                 {
                     Id = internalProdComp.Id,
                     Name = internalProdComp.Name,
                     LogoPath = internalProdComp.LogoPath,
                     OriginCountry = internalProdComp.OriginCountry
                 });
-            }
 
             return companies;
         }
 
         public List<ProductionCountry> ProdCountries(List<string> internalProductionCountries)
         {
-            List<ProductionCountry> countries = new List<ProductionCountry>();
+            var countries = new List<ProductionCountry>();
             foreach (var internalProdCountry in internalProductionCountries)
-            {
-                countries.Add(new ProductionCountry()
+                countries.Add(new ProductionCountry
                 {
                     //IsoNum = internalProdCountry.IsoNum,
                     Name = internalProdCountry
                 });
-            }
 
             return countries;
         }
 
         public List<Language> SpokenLanguages(List<string> internalLanguages)
         {
-            List<Language> languages = new List<Language>();
+            var languages = new List<Language>();
             foreach (var internalLang in internalLanguages)
-            {
-                languages.Add(new Language()
+                languages.Add(new Language
                 {
                     //IsoNum = internalLang.IsoNum,
                     Name = internalLang
                 });
-            }
 
             return languages;
         }
 
         public List<Rating> Rating(List<InternalRating> ratings)
         {
-            List<Rating> ratingList = new List<Rating>();
+            var ratingList = new List<Rating>();
             foreach (var rating in ratings)
-            {
-                ratingList.Add(new Rating()
+                ratingList.Add(new Rating
                 {
                     Source = rating.Source,
                     Value = rating.Value
                 });
-            }
 
             return ratingList;
         }

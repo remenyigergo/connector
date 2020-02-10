@@ -1,8 +1,5 @@
-﻿using Series.Service.Models;
-using Standard.Contracts.Models.Series;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Series.Service.Models;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {

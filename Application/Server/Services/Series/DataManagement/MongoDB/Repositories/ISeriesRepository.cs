@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Standard.Contracts.Models.Series;
 using Series.DataManagement.MongoDB.Models.Series;
-using Series.Service.Models;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
-using Standard.Contracts.Models.Series.ExtendClasses;
+using Series.Service.Models;
+using Standard.Contracts.Models.Series;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {
@@ -23,29 +22,44 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
         Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
         Task<bool> DeleteStartedEpisode(string tvmazeid, string tmdbid, int season, int episode);
-        Task<bool> GetShow(EpisodeStarted episodeStarted,string title);
+        Task<bool> GetShow(EpisodeStarted episodeStarted, string title);
         Task<bool> IsMediaExistInMongoDb(string title);
         Task<InternalSeries> GetSeries(string title);
         Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode);
 
         //TODO: FELFEJLESZTENI
-        Task SetFavoriteSeries(int userid, int tvmazeid, int tmdbid);  //többis lehet
+        Task SetFavoriteSeries(int userid, int tvmazeid, int tmdbid); //többis lehet
+
         Task<List<FavoriteSeries>> GetAllFavoritesSeries(int userid);
         Task<bool> IsSeriesFavoriteAlready(int userid, int tvmazeid, int tmdbid);
-        Task SetFavoriteEpisodes(int userid, int tvmazeid, int tmdbid, int episode, int season); //egy epizód csak 1x, viszont több kedvenc epizód is lehet
+
+        Task SetFavoriteEpisodes(int userid, int tvmazeid, int tmdbid, int episode,
+            int season); //egy epizód csak 1x, viszont több kedvenc epizód is lehet
+
         Task<bool> IsEpisodeFavoriteAlready(int userid, int tvmazeid, int tmdbid, int episode, int season);
-        Task CommentOnSeries(int userid, int tvmazeid, int tmdbid, string message);  //akármennyi komment lehetséges
-        Task CommentOnEpisode(int userid, int tvmazeid, int tmdbid, int episode, int season, string message); //akármennyi lehetséges
-        Task RateSeries(int userid, int tvmazeid, int tmdbid, int rate);  //folyamatos frissítéssel akárhányszor
-        Task<bool> RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season, int rate); //folyamatos frissítéssel akárhányszor
+
+        Task CommentOnSeries(int userid, int tvmazeid, int tmdbid, string message); //akármennyi komment lehetséges
+
+        Task CommentOnEpisode(int userid, int tvmazeid, int tmdbid, int episode, int season,
+            string message); //akármennyi lehetséges
+
+        Task RateSeries(int userid, int tvmazeid, int tmdbid, int rate); //folyamatos frissítéssel akárhányszor
+
+        Task<bool> RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season,
+            int rate); //folyamatos frissítéssel akárhányszor
+
         Task<StartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
         Task<List<InternalSeries>> RecommendSeries(int userid);
-        Task<List<InternalSeries>> RecommendSeries(List<InternalGenre> genre,string username,int userid);
 
-        Task<ReturnSeriesEpisodeModel> GetSeriesByStartedEpisode(string show, int seasonnum, int episodenum, int userid);
-        Task<List<EpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid, int userid);
+        Task<List<Standard.Contracts.Models.Series.InternalSeries>> RecommendSeries(
+            List<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre> genre, string username, int userid);
+
+        Task<ReturnSeriesEpisodeModel>
+            GetSeriesByStartedEpisode(string show, int seasonnum, int episodenum, int userid);
+
+        Task<List<EpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid,
+            int userid);
+
         //Task<List<InternalEpisode>> GetNotSeenEpisodes(int seasonNum, List<int> notSeenEpisodeIds, int tvmazeid, int tmbdid);
     }
 }
-
-

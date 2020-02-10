@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models
+﻿namespace DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models
 {
     public class SubtitleModel
     {
-        public string ShowName;
-        public int SeasonNumber;
         public int EpisodeNumber;
         public string Quality;
         public string Releaser;
+        public int SeasonNumber;
+        public string ShowName;
     }
 }

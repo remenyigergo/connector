@@ -7,5 +7,4 @@ namespace Series.Parsers.TMDB.Models
         public string Page;
         public List<TmdbShow> Results;
     }
-
 }

@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Standard.Core.DataManager.MongoDB.DbModels;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using System.Configuration;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using Standard.Core.DataManager.MongoDB.IRepository;
 using Series.DataManagement.MongoDB.Models.Series;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.DataManager.MongoDB.IRepository;
 
 namespace Standard.Core.DataManager.MongoDB.Repository
 {
     public class FeedRepository : IFeedRepository
     {
-        
-        private readonly BaseMongoDbDataManager _context = null;
+        private readonly BaseMongoDbDataManager _context;
 
         public FeedRepository(IOptions<MongoDbSettings> settings)
         {
@@ -25,7 +18,6 @@ namespace Standard.Core.DataManager.MongoDB.Repository
 
         public async Task<Feed> GetFeeds()
         {
-
             var feeds = await _context.Feeds.FindAsync(x => true);
             return feeds.FirstOrDefault();
 
@@ -38,7 +30,5 @@ namespace Standard.Core.DataManager.MongoDB.Repository
         {
             await _context.Feeds.InsertOneAsync(msg);
         }
-
-       
     }
 }

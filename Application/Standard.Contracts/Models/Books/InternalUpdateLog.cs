@@ -1,9 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using System;
 
 namespace Standard.Contracts.Models.Books
 {
@@ -13,6 +8,5 @@ namespace Standard.Contracts.Models.Books
         public int HoursRead { get; set; }
         public int MinutesRead { get; set; }
         public DateTime UpDateTime { get; set; }
-        
     }
 }

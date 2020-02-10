@@ -11,7 +11,5 @@ namespace Standard.Core.Context
             get => _logicalInstance.Value;
             set => _logicalInstance.Value = value;
         }
-
-        
     }
 }

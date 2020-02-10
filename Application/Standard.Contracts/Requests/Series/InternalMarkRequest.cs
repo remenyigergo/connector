@@ -2,11 +2,11 @@
 {
     public class InternalMarkRequest
     {
-        public int UserId;
-        public string TvMazeId;
-        public string TmdbId;
-        public string ShowName;
-        public int SeasonNumber;
         public int EpisodeNumber;
+        public int SeasonNumber;
+        public string ShowName;
+        public string TmdbId;
+        public string TvMazeId;
+        public int UserId;
     }
 }

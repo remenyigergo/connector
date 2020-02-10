@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Standard.Contracts.Models.Series
+﻿namespace Standard.Contracts.Models.Series
 {
     public class InternalEpisodeSeen
     {

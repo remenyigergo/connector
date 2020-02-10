@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Movie.DataManagement.Parsers.OMDB.Models.OmdbMovieExtendModels;
 using Movie.DataManagement.Parsers.TMDB.Models.TmdbMovieExtendModels;
-using Newtonsoft.Json;
 
 namespace Movie.DataManagement.MongoDB.Models
 {
@@ -15,6 +12,7 @@ namespace Movie.DataManagement.MongoDB.Models
         [BsonIgnoreIfNull]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public string Title { get; set; }
         public bool Adult { get; set; }
         public string BackdropPath { get; set; }

@@ -1,8 +1,5 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Book.DataManagement.MongoDB.Models
 {
@@ -12,6 +9,7 @@ namespace Book.DataManagement.MongoDB.Models
         [BsonIgnoreIfNull]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public int BookId { get; set; }
         public string Title { get; set; }
         public string Writer { get; set; }

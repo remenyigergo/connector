@@ -3,22 +3,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {
-    
     public class MongoSeason
     {
-        
-        [BsonElement("SeasonNumber")]
-        public int SeasonNumber;
-        [BsonElement("EpisodesCount")]
-        public int EpisodesCount;
-        [BsonElement("Episodes")]
-        public List<MongoEpisode> Episodes;
-        [BsonElement("Summary")]
-        public string Summary;
-        [BsonElement("Airdate")]
-        public string Airdate;
-        [BsonElement("Name")]
-        public string Name;
-
+        [BsonElement("Airdate")] public string Airdate;
+        [BsonElement("Episodes")] public List<MongoEpisode> Episodes;
+        [BsonElement("EpisodesCount")] public int EpisodesCount;
+        [BsonElement("Name")] public string Name;
+        [BsonElement("SeasonNumber")] public int SeasonNumber;
+        [BsonElement("Summary")] public string Summary;
     }
 }

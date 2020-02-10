@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Standard.Contracts.Models.Series.ExtendClasses;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {
@@ -9,8 +9,9 @@ namespace Series.DataManagement.MongoDB.Models.Series
     {
         [BsonId]
         [BsonIgnoreIfNull]
-        [BsonRepresentation(BsonType.ObjectId)]        
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public string TvMazeId { get; set; }
         public string TmdbId { get; set; }
         public string SeriesId { get; set; }
@@ -41,5 +42,5 @@ namespace Series.DataManagement.MongoDB.Models.Series
         public string Status { get; set; }
         public string Type { get; set; }
         public int VoteCount { get; set; }
-    }  
+    }
 }

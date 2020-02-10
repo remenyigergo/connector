@@ -6,36 +6,28 @@ namespace Series.Parsers.TMDB.Models
 {
     public class TmdbShow
     {
-        public string Id;
+        [JsonProperty("created_by")] public List<Creator> CreatedBy;
 
+        [JsonProperty("episode_run_time")] public List<string> EpisodeRunTime;
 
-        [JsonProperty("created_by")]
-        public List<Creator> CreatedBy;
-
-        [JsonProperty("episode_run_time")]
-        public List<string> EpisodeRunTime;
-
-        [JsonProperty("first_air_date")]
-        public string FirstAirDate;
+        [JsonProperty("first_air_date")] public string FirstAirDate;
 
         public List<Genre> Genres;
+        public string Id;
 
-        [JsonProperty("original_language")]
-        public string OriginalLanguage;
-
-        [JsonProperty("last_episode_to_air")]
-        public TmdbEpisodeSimple LastEpisodeToAir;
+        [JsonProperty("last_episode_to_air")] public TmdbEpisodeSimple LastEpisodeToAir;
 
         public string Name;
 
         public List<Network> Networks;
 
+        [JsonProperty("original_language")] public string OriginalLanguage;
+
         public string Overview;
 
         public string Popularity;
 
-        [JsonProperty("production_companies")]
-        public List<ProductionCompany> ProductionCompanies;
+        [JsonProperty("production_companies")] public List<ProductionCompany> ProductionCompanies;
 
         public List<TmdbSeasonSimple> Seasons;
 
@@ -43,10 +35,8 @@ namespace Series.Parsers.TMDB.Models
 
         public string Type;
 
-        [JsonProperty("vote_average")]
-        public double? VoteAverage;
+        [JsonProperty("vote_average")] public double? VoteAverage;
 
-        [JsonProperty("vote_count")]
-        public int VoteCount;
-    } 
+        [JsonProperty("vote_count")] public int VoteCount;
+    }
 }

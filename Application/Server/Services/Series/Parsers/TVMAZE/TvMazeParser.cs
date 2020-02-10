@@ -4,13 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Series.Parsers.TMDB.Models.TmdbShowModels;
+using Series.Parsers.TvMaze.Models;
 using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Contracts.Models.Series.ExtendClasses.Cast;
 using Standard.Core.NetworkManager;
-using Series.Parsers.TMDB.Models.TmdbShowModels;
-using Series.Parsers.TvMaze.Models;
 
 namespace Series.Parsers.TvMaze
 {
@@ -27,16 +27,15 @@ namespace Series.Parsers.TvMaze
                     await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
                 var firstSeries = tvMazeSeries[0];
                 var seasons =
-                    await ImportSeasons(firstSeries.Show.Name, Int32.Parse(firstSeries.Show.Id)); //ÖSSZES SZEZON
-                var cast = await GetCast(Int32.Parse(firstSeries.Show.Id));
+                    await ImportSeasons(firstSeries.Show.Name, int.Parse(firstSeries.Show.Id)); //ÖSSZES SZEZON
+                var cast = await GetCast(int.Parse(firstSeries.Show.Id));
 
                 //A végleges belső MongoSeries modelje
                 if (firstSeries != null && seasons != null)
-                {
-                    return new InternalSeries()
+                    return new InternalSeries
                     {
                         TvMazeId = firstSeries.Show.Id,
-                        Runtime = new List<string>() {firstSeries.Show.Runtime},
+                        Runtime = new List<string> {firstSeries.Show.Runtime},
                         Title = firstSeries.Show.Name,
                         Seasons = seasons,
                         Categories = firstSeries.Show.Genres,
@@ -45,28 +44,27 @@ namespace Series.Parsers.TvMaze
                         LastUpdated = firstSeries.Show.Updated,
                         Cast = cast
                     };
-                }
             }
             catch (Exception ex)
             {
                 throw new InternalException(605, "Series not found on TVMAZE.");
             }
-            
+
 
             return null;
         }
 
         public async Task<List<InternalEpisode>> ImportEpisodes(int id)
         {
-            var tvMazeEpisodes = await new WebClientManager().Get<List<TvMazeEpisode>>($"{_endpoint}/shows/{id}/episodes");
+            var tvMazeEpisodes =
+                await new WebClientManager().Get<List<TvMazeEpisode>>($"{_endpoint}/shows/{id}/episodes");
 
             var episodeList = new List<InternalEpisode>();
 
             if (tvMazeEpisodes != null)
             {
                 foreach (var episode in tvMazeEpisodes)
-                {
-                    episodeList.Add(new InternalEpisode()
+                    episodeList.Add(new InternalEpisode
                     {
                         Title = episode.Name,
                         //Rating = episode.Rating,
@@ -75,7 +73,6 @@ namespace Series.Parsers.TvMaze
                         EpisodeNumber = int.Parse(episode.Number),
                         SeasonNumber = int.Parse(episode.Season)
                     });
-                }
                 return episodeList;
             }
 
@@ -91,8 +88,7 @@ namespace Series.Parsers.TvMaze
             if (tvMazeSeasons != null)
             {
                 foreach (var season in tvMazeSeasons)
-                {
-                    seasons.Add(season.SeasonNumber, new InternalSeason()
+                    seasons.Add(season.SeasonNumber, new InternalSeason
                     {
                         Id = season.Id,
                         Summary = season.Summary,
@@ -100,7 +96,6 @@ namespace Series.Parsers.TvMaze
                         SeasonNumber = season.SeasonNumber,
                         Episodes = new List<InternalEpisode>()
                     });
-                }
 
                 await FillEpisodes(id, seasons);
                 return seasons.Values.ToList();
@@ -113,28 +108,23 @@ namespace Series.Parsers.TvMaze
         {
             var episodeList = await ImportEpisodes(id);
             foreach (InternalEpisode episode in episodeList)
-            {
                 seasons[episode.SeasonNumber].Episodes.Add(episode);
-            }
         }
 
         public async Task<InternalShowCast> GetCast(int showId)
         {
-
             List<Actor> personList = new List<Actor>();
-            var tmdbShowCast = await new WebClientManager().Get<List<TvMazeShowCast>>($"{_endpoint}/shows/{showId}/cast");
+            var tmdbShowCast =
+                await new WebClientManager().Get<List<TvMazeShowCast>>($"{_endpoint}/shows/{showId}/cast");
 
             foreach (var character in tmdbShowCast)
-            {
-                personList.Add(new Actor()
+                personList.Add(new Actor
                 {
                     CharacterName = character.Character.Name,
                     RealName = character.Person.Name
                 });
 
-            }
-
-            return new InternalShowCast() { Persons = personList };
+            return new InternalShowCast {Persons = personList};
         }
 
 
@@ -149,9 +139,7 @@ namespace Series.Parsers.TvMaze
                 {
                     var removedAccent = RemoveAccent(s[0].Show.Name.ToLower());
                     if (title.ToLower().Equals(removedAccent))
-                    {
                         return true;
-                    }
                 }
             }
             catch (Exception ex)
@@ -165,18 +153,14 @@ namespace Series.Parsers.TvMaze
         public async Task<bool> IsMediaExistInTvMaze(string title)
         {
             var boolean = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
-            if (boolean.Count>0)
-            {
+            if (boolean.Count > 0)
                 foreach (var series in boolean)
                 {
                     var seriesName = RemoveAccent(series.Show.Name.ToLower());
 
                     if (seriesName == title.ToLower())
-                    {
                         return true;
-                    }
                 }
-            }
 
             return false;
         }
@@ -185,20 +169,20 @@ namespace Series.Parsers.TvMaze
         {
             var decomposed = text.Normalize(NormalizationForm.FormD);
 
-            char[] filtered = decomposed
+            var filtered = decomposed
                 .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 .ToArray();
-            return new String(filtered);
+            return new string(filtered);
         }
+        //        }
+        //            }
+        //                internalSeason.Episodes = internalSeason.Episodes.OrderBy(e => e.EpisodeNumber).ToList();
+        //            {
+        //            foreach (var internalSeason in seasonList)
+        //            seasonList.Values = seasonList.Values.OrderBy(s => s.SeasonNumber).ToList();
+        //        {
 
 
         //        private static void SortSeasonsAndEpisodes(ref Dictionary<int, InternalSeason> seasonList)
-        //        {
-        //            seasonList.Values = seasonList.Values.OrderBy(s => s.SeasonNumber).ToList();
-        //            foreach (var internalSeason in seasonList)
-        //            {
-        //                internalSeason.Episodes = internalSeason.Episodes.OrderBy(e => e.EpisodeNumber).ToList();
-        //            }
-        //        }
     }
 }

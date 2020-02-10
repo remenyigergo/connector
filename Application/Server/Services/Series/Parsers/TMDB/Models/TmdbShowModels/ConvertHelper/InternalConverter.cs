@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
+using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
-using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
 
 namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
 {
     public static class InternalConverter
     {
-
-
         public static List<InternalSeason> ConvertTmdbSeasonToInternalSeason(List<TmdbSeason> tmdbSeasons)
         {
             List<InternalSeason> seasonsConverted = new List<InternalSeason>();
@@ -26,8 +24,7 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                 List<InternalEpisode> episodesConverted = new List<InternalEpisode>();
 
                 foreach (var tmdbEpisode in tmdbSeason.Episodes)
-                {
-                    episodesConverted.Add(new InternalEpisode()
+                    episodesConverted.Add(new InternalEpisode
                     {
                         Title = tmdbEpisode.Name,
                         Length = "",
@@ -40,9 +37,8 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
                         TmdbShowId = tmdbEpisode.ShowId,
                         VoteCount = tmdbEpisode.VoteCount,
                         Crew = ConvertTmdbCrewToInternal(tmdbEpisode.Crew),
-                        GuestStars = ConvertTmdbGuestsToInternal(tmdbEpisode.GuestStars),
+                        GuestStars = ConvertTmdbGuestsToInternal(tmdbEpisode.GuestStars)
                     });
-                }
                 internalSeason.Episodes = episodesConverted;
                 seasonsConverted.Add(internalSeason);
             }
@@ -55,12 +51,10 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             List<InternalCreator> internalCreatorList = new List<InternalCreator>();
 
             foreach (var creator in creators)
-            {
-                internalCreatorList.Add(new InternalCreator()
+                internalCreatorList.Add(new InternalCreator
                 {
                     Name = creator.Name
                 });
-            }
 
             return internalCreatorList;
         }
@@ -70,16 +64,14 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             List<InternalGenre> internalGenreList = new List<InternalGenre>();
 
             foreach (var genre in genres)
-            {
                 internalGenreList.Add(new InternalGenre(genre.Name));
-            }
 
             return internalGenreList;
         }
 
         public static InternalEpisodeSimple ConvertTmdbEpisodeToInternal(TmdbEpisodeSimple tmdbEpisode)
         {
-            return new InternalEpisodeSimple()
+            return new InternalEpisodeSimple
             {
                 Air_date = tmdbEpisode.AirDate,
                 Episode_number = tmdbEpisode.EpisodeNumber,
@@ -95,14 +87,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
         {
             List<InternalEpisodeCrew> crewList = new List<InternalEpisodeCrew>();
             foreach (var crewMember in crew)
-            {
-                crewList.Add(new InternalEpisodeCrew()
+                crewList.Add(new InternalEpisodeCrew
                 {
                     Name = crewMember.Name,
                     Department = crewMember.Department,
                     Job = crewMember.Job
                 });
-            }
             return crewList;
         }
 
@@ -110,13 +100,11 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
         {
             List<InternalEpisodeGuest> guestList = new List<InternalEpisodeGuest>();
             foreach (var guest in guests)
-            {
-                guestList.Add(new InternalEpisodeGuest()
+                guestList.Add(new InternalEpisodeGuest
                 {
                     Name = guest.Name,
                     Character = guest.Character
                 });
-            }
             return guestList;
         }
 
@@ -124,28 +112,25 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
         {
             List<InternalNetwork> networkList = new List<InternalNetwork>();
             foreach (var network in networks)
-            {
-                networkList.Add(new InternalNetwork()
+                networkList.Add(new InternalNetwork
                 {
                     Name = network.Name,
                     Origin_country = network.OriginCountry
                 });
-            }
             return networkList;
         }
 
-        public static List<InternalProductionCompany> ConvertTmdbProductionCompanyToInternal(List<ProductionCompany> companies)
+        public static List<InternalProductionCompany> ConvertTmdbProductionCompanyToInternal(
+            List<ProductionCompany> companies)
         {
             List<InternalProductionCompany> companyList = new List<InternalProductionCompany>();
 
             foreach (var productionCompany in companies)
-            {
-                companyList.Add(new InternalProductionCompany()
+                companyList.Add(new InternalProductionCompany
                 {
                     Name = productionCompany.Name,
                     Origin_country = productionCompany.OriginCountry
                 });
-            }
             return companyList;
         }
     }

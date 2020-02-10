@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Standard.Contracts.Requests
 {
     public class InternalInsertProcessRequest
     {
-        public int UserId;
         public HashSet<string> Processes;
+        public int UserId;
     }
 }

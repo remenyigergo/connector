@@ -1,33 +1,26 @@
-﻿using Movie.DataManagement.Converter;
-using Movie.DataManagement.MongoDB.Repositories;
-using Standard.Contracts.Models.Movie;
-using Standard.Core.Dependency;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using Movie.DataManagement.Parsers.TMDB;
-using Standard.Contracts.Exceptions;
-using Movie.DataManagement.Parsers.OMDB;
-using Movie.DataManagement.MongoDB.Models;
-using Movie.DataManagement.Parsers.OMDB.Models;
-using Movie.DataManagement.Parsers.TMDB.Models;
-using Standard.Contracts.Requests;
-using Standard.Contracts.Enum;
-using System.Text;
-using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Movie.DataManagement.Converter;
+using Movie.DataManagement.MongoDB.Models;
+using Movie.DataManagement.MongoDB.Repositories;
+using Movie.DataManagement.Parsers.OMDB;
+using Movie.DataManagement.Parsers.TMDB;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Movie;
+using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Movie;
-using System.Collections.Generic;
+using Standard.Core.Dependency;
 
 namespace Movie.Service
 {
     public class MovieService
     {
         private readonly IMovieRepository _repo = ServiceDependency.Current.GetService<IMovieRepository>();
-
-        public MovieService()
-        {
-        }
 
 
         public async Task Import(InternalMovie movie)
@@ -38,20 +31,14 @@ namespace Movie.Service
             //Merge all the movies together
 
             if (movieFromOmdb != null && internalMovie != null && internalMovie.ImdbId == movieFromOmdb.ImdbId)
-            {
-                //a movieFromTmdb lesz mindenre használva
-                //Ha nem tudjuk mergelni akkor csak ő lesz beimportálva, különben mind2 bennelesz
                 internalMovie = Merge(internalMovie, movieFromOmdb);
-            }
 
 
             //EZT ÁT KÉNE RAKNI AZ ELEJÉRE HOGY NE LEGYEN MERGELGETÉS MEG ILYENEK ÉS AKKOR UGORJON KI HA MÁR BENNEVAN
             var mongoMovie = new InternalToMongo().Movie(internalMovie);
 
             if (await _repo.CheckIfMovieExistInMongo(mongoMovie))
-            {
                 throw new InternalException(602, "Movie already exist in DB.");
-            }
 
             await _repo.Import(mongoMovie);
         }
@@ -61,71 +48,47 @@ namespace Movie.Service
             //budget
             long? budget = 0;
             if (tmdbMovie.Budget > 0)
-            {
                 budget = tmdbMovie.Budget;
-            }
             else
-            {
                 budget = omdbMovie.Budget;
-            }
 
 
             //popularity
             double? popularity = 0;
             if (tmdbMovie.Popularity > 0)
-            {
                 popularity = tmdbMovie.Popularity;
-            }
             else
-            {
                 popularity = omdbMovie.Popularity;
-            }
 
             //revenue
             long? revenue = 0;
             if (tmdbMovie.Revenue > 0)
-            {
                 revenue = tmdbMovie.Revenue;
-            }
             else
-            {
                 revenue = omdbMovie.Revenue;
-            }
 
             //revenue
             int? runtime = 0;
             if (tmdbMovie.Runtime > 0)
-            {
                 runtime = tmdbMovie.Runtime;
-            }
             else
-            {
                 runtime = omdbMovie.Runtime;
-            }
 
             //vote average
             double? voteavg = 0;
             if (tmdbMovie.VoteAverage > 0)
-            {
                 voteavg = tmdbMovie.VoteAverage;
-            }
             else
-            {
                 voteavg = omdbMovie.VoteAverage;
-            }
 
             //votecount
             int? voteCount = 0;
             if (tmdbMovie.VoteCount > 0)
-            {
                 voteCount = tmdbMovie.VoteCount;
-            }
             else
-            {
                 voteCount = omdbMovie.VoteCount;
-            }
 
-            return new InternalMovie()
+            return new InternalMovie
             {
                 //TMDB RÉSZ
                 Title = tmdbMovie.Title ?? omdbMovie.Title,
@@ -176,18 +139,14 @@ namespace Movie.Service
             if (request != null)
             {
                 if (await IsMovieExistInMongoDb(request.Title))
-                {
                     return (int) MediaExistIn.MONGO;
-                }
                 request.Title = RemoveAccent(request.Title);
                 var tvmazexist = await IsMovieExistInTmdb(request.Title);
                 var tmdbexist = await IsMovieExistInOmdb(request.Title);
                 if (tvmazexist)
                 {
                     if (tmdbexist)
-                    {
                         return (int) MediaExistIn.TMDB;
-                    }
                     return (int) MediaExistIn.TVMAZE;
                 }
                 return (int) MediaExistIn.NONE;
@@ -211,18 +170,15 @@ namespace Movie.Service
 
             if (movieIfExist != null)
             {
-                var movie = new MongoMovie()
+                var movie = new MongoMovie
                 {
                     TmdbId = movieIfExist.TmdbId,
-                    ImdbId = movieIfExist.ImdbId,
+                    ImdbId = movieIfExist.ImdbId
                 };
                 var result = await _repo.IsMovieSeen(movie, model.UserId);
                 return result;
             }
-            else
-            {
-                throw new InternalException(650, "Movie not found");
-            }
+            throw new InternalException(650, "Movie not found");
         }
 
         public async Task<bool> IsMovieStarted(InternalMovieSeenRequest model)
@@ -231,22 +187,17 @@ namespace Movie.Service
 
             if (movieIfExist != null)
             {
-                var movie = new MongoMovie()
+                var movie = new MongoMovie
                 {
                     TmdbId = movieIfExist.TmdbId,
-                    ImdbId = movieIfExist.ImdbId,
+                    ImdbId = movieIfExist.ImdbId
                 };
                 var result = await _repo.IsMovieStarted(model.UserId, movie);
                 if (!result)
-                {
                     throw new InternalException(619, "Movie already started");
-                }
                 return result;
             }
-            else
-            {
-                throw new InternalException(650, "Movie not found");
-            }
+            throw new InternalException(650, "Movie not found");
         }
 
 
@@ -265,10 +216,10 @@ namespace Movie.Service
         {
             var decomposed = text.Normalize(NormalizationForm.FormD);
 
-            char[] filtered = decomposed
+            var filtered = decomposed
                 .Where(c => char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 .ToArray();
-            return new String(filtered);
+            return new string(filtered);
         }
 
 
@@ -288,7 +239,7 @@ namespace Movie.Service
                     if (!isItSeen)
                     {
                         //Létrehozom, hogy tudjuk jelölni mint elkezdett film és törölni is majd onnan.
-                        var startedMovie = new StartedMovie()
+                        var startedMovie = new StartedMovie
                         {
                             Date = requestModel.Date,
                             HoursElapsed = requestModel.HoursElapsed,
@@ -302,47 +253,30 @@ namespace Movie.Service
 
 
                         if (requestModel.WatchedPercentage < 95)
-                        {
-                            //ha létezik, updateljük, különben -**hiba**- importáljuk a sorozatot és berakjuk elkezdett filmek közé
                             if (await IsMovieExistInMongoDb(requestModel.Title))
                             {
-                                
-
                                 //check if movie is started 
-                                bool isItStarted = await _repo.IsMovieStarted(requestModel.UserId, mongoMovie);
+                                var isItStarted = await _repo.IsMovieStarted(requestModel.UserId, mongoMovie);
                                 if (isItStarted)
-                                {
-                                    //update
                                     return await _repo.UpdateStartedMovie(requestModel);
-                                }
 
                                 return await _repo.MarkAsStartedMovie(startedMovie);
                             }
                             else
                             {
-                                await Import(new InternalMovie() {Title = requestModel.Title});
+                                await Import(new InternalMovie {Title = requestModel.Title});
                                 return await _repo.UpdateStartedMovie(requestModel);
                                 //throw new InternalException(650, "Movie not found in MONGODB.");
                             }
-                        }
-                        else
-                        {
-                            //kitöröljük az elkezdett filmek közül
-                            await _repo.RemoveStartedMovie(startedMovie);
+                        //kitöröljük az elkezdett filmek közül
+                        await _repo.RemoveStartedMovie(startedMovie);
 
-                            //bejelöljük látottnak
-                            return await _repo.MarkAsSeenMovie(mongoMovie, requestModel.UserId);
-                        }
+                        //bejelöljük látottnak
+                        return await _repo.MarkAsSeenMovie(mongoMovie, requestModel.UserId);
                     }
-                    else
-                    {
-                        throw new InternalException(606, "Movie already seen.");
-                    }
+                    throw new InternalException(606, "Movie already seen.");
                 }
-                else
-                {
-                    throw new InternalException(650, "Movie not found by title in DB.");
-                }
+                throw new InternalException(650, "Movie not found by title in DB.");
             }
 
             return false;
@@ -357,9 +291,7 @@ namespace Movie.Service
         {
             var mongoMovie = await _repo.GetMovieByTitle(title);
             if (mongoMovie == null)
-            {
                 throw new InternalException(650, "Movie not found.");
-            }
 
             return new MongoToInternal().Movie(mongoMovie);
         }
@@ -375,25 +307,17 @@ namespace Movie.Service
             var seenMoviesByUser = await _repo.SeenMoviesByUser(userid);
 
             var allMovies = await _repo.GetMovies();
-            List<MongoMovie> moviesSplit = new List<MongoMovie>(allMovies);
+            var moviesSplit = new List<MongoMovie>(allMovies);
 
             foreach (var movie in allMovies)
             {
                 foreach (var startedMovie in startedMoviesByUser)
-                {
                     if (startedMovie.TmdbId == movie.TmdbId || startedMovie.ImdbId == movie.ImdbId)
-                    {
                         moviesSplit.Remove(movie);
-                    }
-                }
 
                 foreach (var seenMovie in seenMoviesByUser)
-                {
                     if (seenMovie.TmdbId == movie.TmdbId || seenMovie.ImdbId == movie.ImdbId)
-                    {
                         moviesSplit.Remove(movie);
-                    }
-                }
             }
 
 
@@ -401,11 +325,9 @@ namespace Movie.Service
             var GenresMostContained = new Dictionary<MongoMovie, int>();
             foreach (var movie in moviesSplit)
             {
-                int genreCountMatched = 0;
+                var genreCountMatched = 0;
                 foreach (var genre in genres)
-                {
                     genreCountMatched += movie.Genres.Count(x => x.Name == genre);
-                }
 
                 GenresMostContained.Add(movie, genreCountMatched);
             }
@@ -425,21 +347,15 @@ namespace Movie.Service
             var lastDaysMoviesStarted = await _repo.GetLastDaysStarted(days, userid);
 
             if (lastDaysMoviesSeen == null && lastDaysMoviesStarted == null)
-            {
                 throw new InternalException(650, "No movies were found in the last " + days + " day(s).");
-            }
-            
-            
+
+
             var internalMovies = new List<InternalMovie>();
             foreach (var lastDaysMovie in lastDaysMoviesSeen)
-            {
                 internalMovies.Add(new MongoToInternal().Movie(lastDaysMovie));
-            }
 
             foreach (var lastDaysMovie in lastDaysMoviesStarted)
-            {
                 internalMovies.Add(new MongoToInternal().Movie(lastDaysMovie));
-            }
 
             return internalMovies;
         }
