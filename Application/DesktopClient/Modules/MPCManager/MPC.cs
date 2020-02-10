@@ -15,6 +15,8 @@ using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
 using DesktopClient.Modules.SubtitleManager;
 using DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo;
 using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Requests;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace DesktopClient.Modules.MPCManager

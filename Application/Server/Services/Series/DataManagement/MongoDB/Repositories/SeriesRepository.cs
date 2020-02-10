@@ -10,6 +10,10 @@ using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Parsers.TvMaze;
 using Series.Service.Models;
+using Standard.Contracts.Models.Series;
+using Standard.Core.DataManager.MongoDB;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.DataManager.MongoDB.Extensions;
 
 /*
     IDE SEMMILYEN LOGIKA NEM KERÜL

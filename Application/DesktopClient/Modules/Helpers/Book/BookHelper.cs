@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Standard.Contracts.Models.Books;
+using Standard.Core.NetworkManager;
+using System.Threading.Tasks;
 
 namespace DesktopClient.Modules.Helpers.Book
 {

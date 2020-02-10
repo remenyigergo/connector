@@ -2,6 +2,8 @@
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Service.Models;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.Converters
 {

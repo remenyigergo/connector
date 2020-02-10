@@ -2,6 +2,10 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DesktopClient.Modules.MPCManager.Model;
+using Standard.Contracts;
+using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Movie;
+using Standard.Core.NetworkManager;
 
 namespace DesktopClient.Modules.Helpers.Movie
 {

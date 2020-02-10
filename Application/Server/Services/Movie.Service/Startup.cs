@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Movie.DataManagement.MongoDB.Repositories;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.Dependency;
 
 namespace Movie.Service
 {

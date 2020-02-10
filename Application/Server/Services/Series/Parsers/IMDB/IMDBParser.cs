@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Series.Parsers.IMDB.Models;
+using Standard.Core.NetworkManager;
 
 namespace Series.Parsers.IMDB
 {

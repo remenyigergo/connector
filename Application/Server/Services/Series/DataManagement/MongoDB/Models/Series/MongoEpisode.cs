@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Standard.Contracts.Models.Series.ExtendClasses;
+using System.Collections.Generic;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {

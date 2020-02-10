@@ -2,7 +2,15 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Book.DataManagement.MongoDB.Models;
+using Book.Service.Models.Request;
 using Microsoft.AspNetCore.Mvc;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Books;
+using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Book;
 
 namespace Book.Service.Controllers
 {

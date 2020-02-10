@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Social.Services;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Social;
 
 namespace Social.Service.Controllers
 {

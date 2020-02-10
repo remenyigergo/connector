@@ -6,6 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Series.Parsers.TMDB.Models.TmdbShowModels;
 using Series.Parsers.TvMaze.Models;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Contracts.Models.Series.ExtendClasses.Cast;
+using Standard.Core.NetworkManager;
 
 namespace Series.Parsers.TvMaze
 {

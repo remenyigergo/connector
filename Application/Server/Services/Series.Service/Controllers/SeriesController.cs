@@ -5,6 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Series.Service.Models;
 using Series.Service.Requests;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Series;
 
 namespace Series.Service.Controllers
 {

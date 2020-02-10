@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {

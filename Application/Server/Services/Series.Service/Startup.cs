@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Series.DataManagement.MongoDB.Repositories;
+using Standard.Core.DataManager.Mongo.Repository;
+using Standard.Core.DataManager.MongoDB.DbModels;
+using Standard.Core.DataManager.MongoDB.IRepository;
+using Standard.Core.DataManager.MongoDB.Repository;
+using Standard.Core.Dependency;
 
 namespace Series.Service
 {

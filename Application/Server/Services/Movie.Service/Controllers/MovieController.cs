@@ -4,6 +4,12 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Movie.Service.Requests;
+using Standard.Contracts;
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Movie;
+using Standard.Contracts.Requests;
+using Standard.Contracts.Requests.Movie;
 
 namespace Movie.Service.Controllers
 {

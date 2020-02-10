@@ -9,7 +9,14 @@ using Series.DataManagement.MongoDB.Repositories;
 using Series.Parsers.TMDB;
 using Series.Parsers.TvMaze;
 using Series.Service.Models;
-
+using Standard.Contracts.Enum;
+using Standard.Contracts.Exceptions;
+using Standard.Contracts.Models.Series;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Contracts.Requests;
+using Standard.Core.NetworkManager;
+using Microsoft.Extensions.DependencyInjection;
+using Standard.Core.Dependency;
 
 /*
     IDE KERÜLNEK A LOGIKAI KÓDOK

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Standard.Core.NetworkManager;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace KeyEventForm.Modules.ApplicationManager.ProcessEqualityComparer

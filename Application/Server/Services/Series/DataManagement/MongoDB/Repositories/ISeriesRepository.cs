@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Service.Models;
+using Standard.Contracts.Models.Series;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {

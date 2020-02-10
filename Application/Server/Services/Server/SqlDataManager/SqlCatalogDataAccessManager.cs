@@ -1,4 +1,6 @@
-﻿namespace Server.SqlDataManager
+﻿using Standard.Core.DataManager.SQL;
+
+namespace Server.SqlDataManager
 {
     public class SqlCatalogDataAccessManager : BaseSqlDataAccessManager
     {
