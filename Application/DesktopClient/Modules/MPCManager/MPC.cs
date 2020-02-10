@@ -97,6 +97,8 @@ namespace DesktopClient.Modules.MPCManager
                         }
                         else
                         {
+                            
+
                             await ManageMovie(path, fileName, userId);
                         }
 
@@ -120,9 +122,7 @@ namespace DesktopClient.Modules.MPCManager
                             //Az adott pozíció elmentése film esetén
                             await Task.Run(async () =>
                             {
-                                var mediaFolderName = MovieHelper.TrimDownloadFolders(path);
-                                var movieTitle = MovieHelper.GetTitle(mediaFolderName);
-                                await MovieHelper.SavePosition(movieTitle, (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
+                                await MovieHelper.SavePosition(tempShowName, (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
                             });
                         }
 
@@ -225,6 +225,7 @@ namespace DesktopClient.Modules.MPCManager
             var movieTitle = MovieHelper.GetTitle(mediaFolderName);
             var SeenMovie = await MovieHelper.IsItSeen(userid, movieTitle);
 
+            tempShowName = movieTitle;
 
             if (!SeenMovie)
             {
@@ -234,7 +235,7 @@ namespace DesktopClient.Modules.MPCManager
                     var isNewMovie = await MovieHelper.IsTheMovieExist(movieTitle);
                     if (isNewMovie != (int) MediaExistIn.MONGO) //nincs a mongoban
                     {
-                        await SeriesHelper.ImportRequest(folderPath);
+                        await MovieHelper.ImportRequest(movieTitle);
                     }
                 }
                 else

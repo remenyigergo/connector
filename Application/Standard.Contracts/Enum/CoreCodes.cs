@@ -27,7 +27,13 @@
 
 
         MovieNotFound = 650,
-        
+        MovieNotSeen = 651,
+        MovieNotStarted = 652,
+
+        FeedsNull = 660,
+        MessagesNull = 661,
+
+        GroupNotFound = 670
 
     }
 }

@@ -13,48 +13,84 @@ namespace Movie.DataManagement.Converter
 
         public MongoDB.Models.MongoMovie Movie(InternalMovie internalMovie)
         {
+            var collection = new Collection();
+            if (internalMovie.BelongsToCollection != null)
+            {
+                collection = this.Collection(internalMovie.BelongsToCollection);
+            }
+
+            var genres = new List<Genre>();
+            if (internalMovie.Genres!= null)
+            {
+                genres = this.Genre(internalMovie.Genres);
+            }
+
+            var prodComps = new List<ProductionCompany>();
+            if (internalMovie.ProductionCompanies != null)
+            {
+                prodComps = this.ProdCompanies(internalMovie.ProductionCompanies);
+            }
+
+            var prodCountries = new List<ProductionCountry>();
+            if (internalMovie.ProductionCountries != null)
+            {
+                prodCountries = this.ProdCountries(internalMovie.ProductionCountries);
+            }
+
+            var langs = new List<Language>();
+            if (internalMovie.SpokenLanguages != null)
+            {
+                langs = this.SpokenLanguages(internalMovie.SpokenLanguages);
+            }
+
+            var ratings = new List<Rating>();
+            if (internalMovie.Ratings != null)
+            {
+                ratings = this.Rating(internalMovie.Ratings);
+            }
+
             return new MongoDB.Models.MongoMovie()
             {
-                Title = internalMovie.Title,
+                Title = internalMovie.Title ?? "",
                 Adult = internalMovie.Adult,
-                BackdropPath = internalMovie.BackdropPath,
-                BelongsToCollection = this.Collection(internalMovie.BelongsToCollection),
-                Budget = internalMovie.Budget,
-                Genres = this.Genre(internalMovie.Genres),
-                Homepage = internalMovie.Homepage,
+                BackdropPath = internalMovie.BackdropPath ?? "",
+                BelongsToCollection = collection,
+                Budget = internalMovie.Budget ?? 0,
+                Genres = genres,
+                Homepage = internalMovie.Homepage ?? "",
                 TmdbId = internalMovie.TmdbId,
                 ImdbId = internalMovie.ImdbId,
-                OriginalLanguage = internalMovie.OriginalLanguage,
-                OriginalTitle = internalMovie.OriginalTitle,
-                Overview = internalMovie.Overview,
+                OriginalLanguage = internalMovie.OriginalLanguage ?? "",
+                OriginalTitle = internalMovie.OriginalTitle ?? "",
+                Overview = internalMovie.Overview ?? "",
                 Popularity = internalMovie.Popularity,
-                PosterPath = internalMovie.PosterPath,
-                ProductionCompanies = this.ProdCompanies(internalMovie.ProductionCompanies),
-                ProductionCountries = this.ProdCountries(internalMovie.ProductionCountries),
-                ReleaseDate = internalMovie.ReleaseDate,
+                PosterPath = internalMovie.PosterPath ?? "",
+                ProductionCompanies = prodComps,
+                ProductionCountries = prodCountries,
+                ReleaseDate = internalMovie.ReleaseDate ?? "",
                 Revenue = internalMovie.Revenue,
                 Runtime = internalMovie.Runtime,
-                SpokenLanguages = this.SpokenLanguages(internalMovie.SpokenLanguages),
-                Status = internalMovie.Status,
-                Tagline = internalMovie.Tagline,
+                SpokenLanguages = langs,
+                Status = internalMovie.Status ?? "",
+                Tagline = internalMovie.Tagline ?? "",
                 VoteAverage = internalMovie.VoteAverage,
                 VoteCount = internalMovie.VoteCount,
 
                 //OMDB RÉSZE ÁTALAKÍTÁS
                 Year = internalMovie.Year,
-                Rated = internalMovie.Rated,
-                Director = internalMovie.Director,
-                Writer = internalMovie.Writer,
-                Actors = internalMovie.Actors,
-                Awards = internalMovie.Awards,
-                Ratings = this.Rating(internalMovie.Ratings),
-                Metascore = internalMovie.Metascore,
+                Rated = internalMovie.Rated ?? "",
+                Director = internalMovie.Director ?? "",
+                Writer = internalMovie.Writer ?? new List<string>(),
+                Actors = internalMovie.Actors ?? new List<string>(),
+                Awards = internalMovie.Awards ?? new List<string>(),
+                Ratings = ratings,
+                Metascore = internalMovie.Metascore ?? "",
                 ImdbRating = internalMovie.ImdbRating,
-                ImdbVotes = internalMovie.ImdbVotes,
-                Type = internalMovie.Type,
-                DVD = internalMovie.DVD,
-                Production = internalMovie.Production,
-                Website = internalMovie.Website
+                ImdbVotes = internalMovie.ImdbVotes ?? "",
+                Type = internalMovie.Type ?? "",
+                DVD = internalMovie.DVD ?? "",
+                Production = internalMovie.Production ?? "",
+                Website = internalMovie.Website ?? ""
             };
 
         }

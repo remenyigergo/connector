@@ -10,6 +10,7 @@ using Standard.Contracts;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Movie;
+using Standard.Contracts.Models.Movie.ExtendClasses;
 using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Movie;
 
@@ -26,23 +27,22 @@ namespace Movie.Service.Controllers
             {
                 if (string.IsNullOrEmpty(movie.Title))
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
 
                 await new MovieService().Import(movie);
-
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyImported)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyImported)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    Response.StatusCode = (int) HttpStatusCode.Conflict;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -53,11 +53,11 @@ namespace Movie.Service.Controllers
             }
             catch (Exception e)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -65,7 +65,7 @@ namespace Movie.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Successfully imported."
             };
         }
@@ -77,32 +77,32 @@ namespace Movie.Service.Controllers
             {
                 if (request.Title.Length == 0)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<int>()
                     {
                         Data = -1000,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
 
                 var existEnumType = await new MovieService().IsMovieExist(request);
-                var enumVal = (MediaExistIn)existEnumType;
+                var enumVal = (MediaExistIn) existEnumType;
                 return new Result<int>()
                 {
                     Data = existEnumType,
-                    ResultCode = (int)HttpStatusCode.OK,
+                    ResultCode = (int) HttpStatusCode.OK,
                     ResultMessage = "It exists in" + enumVal.ToString()
                 };
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
                 {
-                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
                     return new Result<int>()
                     {
-                        Data = (int)MediaExistIn.NONE,
+                        Data = (int) MediaExistIn.NONE,
                         ResultCode = ex.ErrorCode,
                         ResultMessage = ex.ErrorMessage
                     };
@@ -110,11 +110,11 @@ namespace Movie.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<int>()
                 {
                     Data = 0,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -122,7 +122,7 @@ namespace Movie.Service.Controllers
             return new Result<int>()
             {
                 Data = 0,
-                ResultCode = (int)CoreCodes.MovieNotFound,
+                ResultCode = (int) CoreCodes.MovieNotFound,
                 ResultMessage = "Movie doesn't exist."
             };
         }
@@ -134,23 +134,22 @@ namespace Movie.Service.Controllers
             {
                 if (requestModel.Title.Length == 0)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "The title cannot be empty."
                     };
                 }
 
                 var result = await new MovieService().UpdateStartedMovie(requestModel);
-                
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
                 {
-                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -159,9 +158,9 @@ namespace Movie.Service.Controllers
                     };
                 }
 
-                if (ex.ErrorCode == (int)CoreCodes.AlreadySeen)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadySeen)
                 {
-                    Response.StatusCode = (int)CoreCodes.AlreadySeen;
+                    Response.StatusCode = (int) CoreCodes.AlreadySeen;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -172,11 +171,11 @@ namespace Movie.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -184,7 +183,7 @@ namespace Movie.Service.Controllers
             return new Result<bool>()
             {
                 Data = true,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.NoError,
                 ResultMessage = "Update was successful."
             };
         }
@@ -196,23 +195,32 @@ namespace Movie.Service.Controllers
             {
                 if (requestModel.UserId == 0 || requestModel.Title == "")
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "Wrong input."
                     };
                 }
 
                 var result = await new MovieService().IsMovieSeen(requestModel);
-                
+
+                if (result)
+                {
+                    return new Result<bool>()
+                    {
+                        Data = true,
+                        ResultCode = (int)CoreCodes.NoError,
+                        ResultMessage = "Movie is seen."
+                    };
+                }
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
                 {
-                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -221,9 +229,9 @@ namespace Movie.Service.Controllers
                     };
                 }
 
-                if (ex.ErrorCode == (int)CoreCodes.AlreadySeen)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadySeen)
                 {
-                    Response.StatusCode = (int)CoreCodes.AlreadySeen;
+                    Response.StatusCode = (int) CoreCodes.AlreadySeen;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -234,20 +242,20 @@ namespace Movie.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
 
             return new Result<bool>()
             {
-                Data = true,
-                ResultCode = (int)CoreCodes.NoError,
-                ResultMessage = "Update was successful."
+                Data = false,
+                ResultCode = (int) CoreCodes.MovieNotSeen,
+                ResultMessage = "Movie is not seen!"
             };
         }
 
@@ -258,23 +266,31 @@ namespace Movie.Service.Controllers
             {
                 if (requestModel.UserId == 0 || requestModel.Title == "")
                 {
-                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
                     return new Result<bool>()
                     {
                         Data = false,
-                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "Wrong input."
                     };
                 }
 
                 var result = await new MovieService().IsMovieStarted(requestModel);
-
+                if (result)
+                {
+                    return new Result<bool>()
+                    {
+                        Data = true,
+                        ResultCode = (int)CoreCodes.NoError,
+                        ResultMessage = "Movie is started."
+                    };
+                }
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
                 {
-                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
                     return new Result<bool>()
                     {
                         Data = false,
@@ -283,9 +299,10 @@ namespace Movie.Service.Controllers
                     };
                 }
 
-                if (ex.ErrorCode == (int)CoreCodes.AlreadyStarted)
+                if (ex.ErrorCode == (int) CoreCodes.AlreadyStarted)
                 {
-                    Response.StatusCode = (int)CoreCodes.AlreadyStarted;
+                    Response.StatusCode = (int) CoreCodes.AlreadyStarted;
+
                     return new Result<bool>()
                     {
                         Data = true,
@@ -296,11 +313,11 @@ namespace Movie.Service.Controllers
             }
             catch (Exception ex)
             {
-                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<bool>()
                 {
                     Data = false,
-                    ResultCode = (int)CoreCodes.CommonGenericError,
+                    ResultCode = (int) CoreCodes.CommonGenericError,
                     ResultMessage = "Common Generic Error"
                 };
             }
@@ -308,8 +325,201 @@ namespace Movie.Service.Controllers
             return new Result<bool>()
             {
                 Data = false,
-                ResultCode = (int)CoreCodes.NoError,
+                ResultCode = (int) CoreCodes.MovieNotStarted,
                 ResultMessage = "Movie is not started."
+            };
+        }
+
+        [HttpPost("mark")]
+        public async Task<Result<bool>> MarkMovieSeen([FromBody] InternalMovieSeenRequest requestModel)
+        {
+            try
+            {
+                if (requestModel.Title == "" || requestModel.UserId == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<bool>
+                    {
+                        Data = false,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "Bad input requests."
+                    };
+                }
+
+                await new MovieService().MarkAsSeenMovie(requestModel.Title, requestModel.UserId);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int) CoreCodes.NoError,
+                ResultMessage = "Movie is marked."
+            };
+        }
+
+        [HttpPost("rate")]
+        public async Task<Result<bool>> RateMovie([FromBody] InternalMovieRateRequest requestModel)
+        {
+            try
+            {
+                if (requestModel.UserId == 0 || requestModel.Rating == 0)
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<bool>
+                    {
+                        Data = false,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "Bad input requests."
+                    };
+                }
+
+                await new MovieService().RateMovie(requestModel);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
+                    return new Result<bool>()
+                    {
+                        Data = false,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+
+
+            return new Result<bool>()
+            {
+                Data = true,
+                ResultCode = (int) CoreCodes.NoError,
+                ResultMessage = "Movie rated successfully."
+            };
+        }
+
+        [HttpGet("get/{title}")]
+        public async Task<Result<InternalMovie>> GetMovie(string title)
+        {
+            try
+            {
+                if (title == "")
+                {
+                    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    return new Result<InternalMovie>
+                    {
+                        Data = null,
+                        ResultCode = (int) CoreCodes.MalformedRequest,
+                        ResultMessage = "Empty title in request."
+                    };
+                }
+
+                var movie = await new MovieService().GetMovie(title);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int) CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int) CoreCodes.MovieNotFound;
+                    return new Result<InternalMovie>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+
+            return new Result<InternalMovie>()
+            {
+                Data = null,
+                ResultCode = (int) CoreCodes.CommonGenericError,
+                ResultMessage = "Error"
+            };
+        }
+
+        [HttpPost("recommend")]
+        public async Task<Result<List<InternalMovie>>> Recommend([FromBody] RecommendByGenreRequest model)
+        {
+            try
+            {
+                if (model.Genres.Count == 0 || model.UserId == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<List<InternalMovie>>
+                    {
+                        Data = null,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Empty title in request."
+                    };
+                }
+
+                await new MovieService().Recommend(model.Genres, model.UserId);
+            }
+            catch (InternalException ex)
+            {
+            }
+
+
+            return new Result<List<InternalMovie>>()
+            {
+                Data = null,
+                ResultCode = (int)CoreCodes.CommonGenericError,
+                ResultMessage = "Error"
+            };
+        }
+
+        [HttpPost("get/days/{days}")]
+        public async Task<Result<List<InternalMovie>>> GetLastDays([FromBody] int userid, int days)
+        {
+            try
+            {
+                if (userid == 0 || days == 0)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return new Result<List<InternalMovie>>
+                    {
+                        Data = null,
+                        ResultCode = (int)CoreCodes.MalformedRequest,
+                        ResultMessage = "Input error."
+                    };
+                }
+
+                await new MovieService().GetLastDays(days, userid);
+            }
+            catch (InternalException ex)
+            {
+                if (ex.ErrorCode == (int)CoreCodes.MovieNotFound)
+                {
+                    Response.StatusCode = (int)CoreCodes.MovieNotFound;
+                    return new Result<List<InternalMovie>>()
+                    {
+                        Data = null,
+                        ResultCode = ex.ErrorCode,
+                        ResultMessage = ex.ErrorMessage
+                    };
+                }
+            }
+
+            return new Result<List<InternalMovie>>
+            {
+                Data = null,
+                ResultCode = (int)CoreCodes.NoError,
+                ResultMessage = "Movies returned. No error."
             };
         }
     }

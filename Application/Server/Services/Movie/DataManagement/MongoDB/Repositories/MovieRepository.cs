@@ -19,6 +19,7 @@ namespace Movie.DataManagement.MongoDB.Repositories
 
         public IMongoCollection<StartedMovie> StartedMovies => Database.GetCollection<StartedMovie>("StartedMovies");
         public IMongoCollection<SeenMovie> SeenMovies => Database.GetCollection<SeenMovie>("SeenMovies");
+        public IMongoCollection<Rate> Rates => Database.GetCollection<Rate>("Rates");
 
         public MovieRepository(IOptions<MongoDbSettings> settings) : base(settings)
         {
@@ -77,14 +78,32 @@ namespace Movie.DataManagement.MongoDB.Repositories
 
         public async Task<bool> MarkAsSeenMovie(MongoMovie mongoMovie, int userid)
         {
-            return SeenMovies.InsertOneAsync(new SeenMovie()
+            await SeenMovies.InsertOneAsync(new SeenMovie()
             {
                 UserId = userid,
                 ImdbId = mongoMovie.ImdbId,
                 TmdbId = mongoMovie.TmdbId,
                 Date = DateTime.Now,
-            }).IsCompleted;
+            });
 
+            return true;
+        }
+
+        public async Task<bool> MarkAsSeenMovie(string title, int userid)
+        {
+            var movie = await GetMovieByTitle(title);
+
+            var seenMovieModel = new SeenMovie()
+            {
+                ImdbId = movie.ImdbId,
+                TmdbId = movie.TmdbId,
+                Date = DateTime.Now,
+                UserId = userid
+            };
+
+            await SeenMovies.InsertOneAsync(seenMovieModel);
+
+            return true;
         }
 
         public async Task<bool> MarkAsStartedMovie(StartedMovie movie)
@@ -107,8 +126,8 @@ namespace Movie.DataManagement.MongoDB.Repositories
         public async Task<bool> RemoveStartedMovie(StartedMovie startedMovie)
         {
             var deleteMovie =
-                await StartedMovies.DeleteOneAsync(movie => movie.TmdbId == startedMovie.TmdbId ||
-                                                          Int32.Parse(movie.ImdbId) == Int32.Parse(startedMovie.ImdbId) &&
+                await StartedMovies.DeleteOneAsync(movie => (movie.TmdbId == startedMovie.TmdbId ||
+                                                          movie.ImdbId == startedMovie.ImdbId) &&
                                                           movie.UserId == startedMovie.UserId);
             return deleteMovie.DeletedCount > 0;
         }
@@ -116,10 +135,93 @@ namespace Movie.DataManagement.MongoDB.Repositories
         public async Task<bool> IsMovieSeen(MongoMovie mongoMovie, int userid)
         {
             var result = await SeenMovies.FindAsynchronous(
-                movie => movie.TmdbId == mongoMovie.TmdbId ||
-                         movie.ImdbId == mongoMovie.ImdbId && movie.UserId == userid);
+                movie => (movie.TmdbId == mongoMovie.TmdbId ||
+                         movie.ImdbId == mongoMovie.ImdbId) && movie.UserId == userid);
 
             return result.Count == 1;
+        }
+        
+        public async Task<bool> RateMovie(int? tmdbid, int? imdbid, int userid, int rating)
+        {
+            var updateDef = Builders<Rate>.Update
+                .Set(o => o.ImdbId, imdbid)
+                .Set(o => o.TmdbId, tmdbid)
+                .Set(o => o.UserId, userid)
+                .Set(o => o.Rating, rating);
+
+            var s = await Rates.UpdateOneAsync(rate => ((rate.ImdbId == imdbid) || (rate.TmdbId == tmdbid)) && rate.UserId == userid, updateDef);
+
+            return s.ModifiedCount == 1;
+
+        }
+
+        public async Task<List<StartedMovie>> StartedMoviesByUser(int userid)
+        {
+            return await StartedMovies.FindAsynchronous(movie=> movie.UserId == userid);
+        }
+
+        public async Task<List<SeenMovie>> SeenMoviesByUser(int userid)
+        {
+            return await SeenMovies.FindAsynchronous(movie => movie.UserId == userid);
+        }
+
+        public async Task<List<MongoMovie>> GetMovies()
+        {
+            return await Movies.FindAsynchronous(m=>m.Title.Length > 0);
+        }
+
+        public async Task<List<MongoMovie>> GetLastDaysSeen(int days, int userid)
+        {
+            //var seenMovies = await SeenMovies.FindAsynchronous(mov => mov.UserId == userid);
+
+            //DateTime dateDaysBefore = DateTime.Now.AddDays(-days);
+
+            //var daysInSeconds = (int)(DateTime.Now - dateDaysBefore).TotalSeconds;
+
+            //List<SeenMovie> moviesLastDays = new List<SeenMovie>();
+
+            //foreach (var seenMovie in seenMovies)
+            //{
+            //    var dateDiffInSeconds = (int)(DateTime.Now - seenMovie.Date).TotalSeconds;
+
+            //    if (dateDiffInSeconds < daysInSeconds)
+            //    {
+            //        moviesLastDays.Add(seenMovie);
+            //    }
+            //}
+
+
+            DateTime dateDaysBefore = DateTime.Now.AddDays(-days);
+            var moviesLastDays = await SeenMovies.FindAsynchronous(m => m.UserId == userid && m.Date >= dateDaysBefore);
+
+            List<MongoMovie> mongoMoviesToReturn = new List<MongoMovie>();
+            foreach (var moviesLastDay in moviesLastDays)
+            {
+                var movie = await Movies.FindAsynchronous(m => m.TmdbId == moviesLastDay.TmdbId || m.ImdbId == moviesLastDay.ImdbId);
+                mongoMoviesToReturn.Add(movie[0]);
+            }
+
+
+
+            return mongoMoviesToReturn;
+        }
+
+
+        public async Task<List<MongoMovie>> GetLastDaysStarted(int days, int userid)
+        {
+            DateTime dateDaysBefore = DateTime.Now.AddDays(-days);
+            var moviesLastDaysStarted = await StartedMovies.FindAsynchronous(m => m.UserId == userid && m.Date >= dateDaysBefore);
+
+            List<MongoMovie> mongoMoviesToReturn = new List<MongoMovie>();
+            foreach (var moviesLastDay in moviesLastDaysStarted)
+            {
+                var movie = await Movies.FindAsynchronous(m => m.TmdbId == moviesLastDay.TmdbId || m.ImdbId == moviesLastDay.ImdbId);
+                mongoMoviesToReturn.Add(movie[0]);
+            }
+
+
+
+            return mongoMoviesToReturn;
         }
     }
 }

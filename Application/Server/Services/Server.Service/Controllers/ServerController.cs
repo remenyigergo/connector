@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models;
 using Server.Services;
-using Server.SqlDataManager;
 using Standard.Contracts;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
-using Standard.Contracts.Requests;
 
 namespace Server.Controllers
 {
@@ -38,7 +32,7 @@ namespace Server.Controllers
             }
             catch (InternalException ex)
             {
-                
+
             }
             catch (Exception ex)
             {
@@ -60,8 +54,6 @@ namespace Server.Controllers
 
         }
 
-
-
         [HttpGet("get/programs/userid={userId}")]
         public async Task<Result<Dictionary<string, int>>> RetrieveFollowedProgramsByUser(int userId)
         {
@@ -69,7 +61,7 @@ namespace Server.Controllers
             {
                 if (userId == 0)
                 {
-                    return new Result<Dictionary<string,int>>()
+                    return new Result<Dictionary<string, int>>()
                     {
                         Data = null,
                         ResultCode = (int)CoreCodes.MalformedRequest,
@@ -501,15 +493,15 @@ namespace Server.Controllers
                 return new Result<int>()
                 {
                     Data = result,
-                    ResultCode = (int) CoreCodes.NoError,
+                    ResultCode = (int)CoreCodes.NoError,
                     ResultMessage = "Userid was fetched successfully."
                 };
             }
             catch (InternalException ex)
             {
-                if (ex.ErrorCode == (int) CoreCodes.ModuleNotActivated)
+                if (ex.ErrorCode == (int)CoreCodes.ModuleNotActivated)
                 {
-                    Response.StatusCode = (int) HttpStatusCode.NoContent;
+                    Response.StatusCode = (int)HttpStatusCode.NoContent;
                     return new Result<int>()
                     {
                         Data = 0,

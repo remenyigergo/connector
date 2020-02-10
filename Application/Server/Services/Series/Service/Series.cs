@@ -42,15 +42,18 @@ namespace Series.Service
 
         public async Task ImportSeries(string title)
         {
-            await IsSeriesImported(title);
+            var isItImported = await IsSeriesImported(title);
+
+            if (isItImported) return;
 
             var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
-            //await _repo.AddInternalSeries(tvMazeInternalSeries);
-
             if (tvMazeInternalSeries != null)
             {
                 var tmdbInternalSeries = await new TmdbParser().ImportTmdbSeries(title);
-                tvMazeInternalSeries.Merge(tmdbInternalSeries);
+
+                if (tmdbInternalSeries != null)
+                    tvMazeInternalSeries.Merge(tmdbInternalSeries);
+
                 tvMazeInternalSeries.Seasons = tvMazeInternalSeries.Seasons.OrderBy(x => x.SeasonNumber).ToList();
 
                 await _repo.AddInternalSeries(tvMazeInternalSeries);
@@ -58,6 +61,9 @@ namespace Series.Service
             else
             {
                 var tmdbSeries = await new TmdbParser().ImportTmdbSeries(title);
+
+                if (tmdbSeries == null) return;
+
                 await _repo.AddInternalSeries(tmdbSeries);
             }
         }
@@ -127,13 +133,14 @@ namespace Series.Service
 
         }
 
-        public async Task IsSeriesImported(string title)
+        public async Task<bool> IsSeriesImported(string title)
         {
             var isImported = await _repo.IsSeriesImported(title);
             if (isImported)
             {
                 throw new InternalException((int)CoreCodes.AlreadyImported, "The series has been already imported.");
             }
+            return isImported;
         }
 
         public async Task CheckSeriesUpdate(InternalSeries internalSeries)
@@ -280,7 +287,7 @@ namespace Series.Service
             var recommends = await _repo.RecommendSeries(userid);
             if (recommends.Count == 0)
             {
-                throw new InternalException(615,"No recommendations are available");
+                throw new InternalException(615, "No recommendations are available");
             }
             return recommends;
         }
@@ -296,7 +303,7 @@ namespace Series.Service
             var userId = await new WebClientManager().GetUserIdFromUsername("http://localhost:5000/users/get/" + username);
             if (userid == 0)
             {
-                throw new InternalException(618,"UserId couldn't be fetched.");
+                throw new InternalException(618, "UserId couldn't be fetched.");
             }
 
             var result = await _repo.RecommendSeries(genreList, username, userid);
@@ -365,7 +372,7 @@ namespace Series.Service
                 }
             }
 
-            throw new InternalException(615,"No recommendation were done.");
+            throw new InternalException(615, "No recommendation were done.");
             //return null;
 
         }

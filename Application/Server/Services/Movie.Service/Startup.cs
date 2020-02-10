@@ -28,10 +28,9 @@ namespace Movie.Service
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
-            
-            services.AddTransient<IMovieRepository, MovieRepository>();
 
+            services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
+            services.AddTransient<IMovieRepository, MovieRepository>();
             ServiceDependency.Current = services.BuildServiceProvider();
         }
 

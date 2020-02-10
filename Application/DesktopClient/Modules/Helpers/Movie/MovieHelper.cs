@@ -152,5 +152,12 @@ namespace DesktopClient.Modules.Helpers.Movie
             var showExist = await new WebClientManager().SeenMovie<bool>($"http://localhost:5003/movie/started", requestbody);
             return showExist;
         }
+
+        public static async Task<int> ImportRequest(string title)
+        {
+            var requestbody = new InternalImportRequest() { Title = title };
+            var movieExist = await new WebClientManager().Post<bool>($"http://localhost:5003/movie/import", requestbody);
+            return movieExist;
+        }
     }
 }

@@ -11,6 +11,7 @@ using Server.DataManagement.SQL.Repositories;
 using Standard.Core.Dependency;
 using Microsoft.Extensions.DependencyInjection;
 using Standard.Contracts.Exceptions;
+using Movie.DataManagement.MongoDB.Repositories;
 
 namespace Server.Services
 {
@@ -19,7 +20,9 @@ namespace Server.Services
         private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
 
         //private readonly IParser _monitorParser;
-        private readonly MonitorRepository _repo = new MonitorRepository();
+        //private readonly MonitorRepository _repo = new MonitorRepository();
+
+        private readonly IMonitorRepository _repo = ServiceDependency.Current.GetService<IMonitorRepository>();
 
         public Monitor()
         {
@@ -27,6 +30,7 @@ namespace Server.Services
 
         public async Task<List<string>> GetAllPrograms()
         {
+            
             var result = await _repo.GetAllPrograms();
             if (result.Count == 0)
             {
@@ -77,6 +81,7 @@ namespace Server.Services
             if (result == false)
             {
                 throw new InternalException(607,"Update failed.");
+
             }
 
             return result;

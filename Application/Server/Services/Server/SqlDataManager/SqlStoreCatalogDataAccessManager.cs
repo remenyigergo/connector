@@ -41,7 +41,7 @@ namespace Server.SqlDataManager
             //};
 
             var parameters = new List<DbParameter>();
-
+            
             using (DbDataReader select = await GetDataReader(commandText, parameters, CommandType.Text))
             {
                 if (select.HasRows)

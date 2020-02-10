@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Movie.DataManagement.MongoDB.Repositories;
+using Server.DataManagement.SQL.Repositories;
+using Standard.Core.Dependency;
 
 namespace Server
 {
@@ -32,11 +35,12 @@ namespace Server
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-//            services.Configure<Settings>(o => { o.IConfigurationRoot = Configuration; } );
-//            services.AddTransient<IUserRepository, UserRepository>();
-//            services.AddTransient<IFeedRepository, FeedRepository>();
-//            services.AddTransient<IChatRepository, ChatRepository>();
-//            services.AddTransient<ISeriesRepository, SeriesRepository>();
+            //            services.Configure<Settings>(o => { o.IConfigurationRoot = Configuration; } );
+            //            services.AddTransient<IUserRepository, UserRepository>();
+            //            services.AddTransient<IFeedRepository, FeedRepository>();
+            //            services.AddTransient<IChatRepository, ChatRepository>();
+            services.AddTransient<IMonitorRepository, MonitorRepository>();
+            ServiceDependency.Current = services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

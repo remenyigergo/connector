@@ -714,6 +714,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             // olyan amit megnézhetnénk akkor nem tudunk ajánlani
 
             // UPDATE először kitörlöm azokat a sorozatokat a Matchelt Genres sorozatokból, amelyeket felvettem már
+            //MÉG AZT MEG KELL VIZSGÁLNI HOGY HA NINCS MEG A 3 SOROZAT AKKOR NE TUDJUNK AJÁNLANI 3AT
             var listOfMatchingGenresSeriesWithoutStarted =
                 new List<KeyValuePair<InternalSeries, int>>(genresCountOrdered);
             foreach (var genreCountSeries in genresCountOrdered)

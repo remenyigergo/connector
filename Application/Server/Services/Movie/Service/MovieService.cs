@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Globalization;
 using Standard.Contracts.Requests.Movie;
+using System.Collections.Generic;
 
 namespace Movie.Service
 {
@@ -44,6 +45,7 @@ namespace Movie.Service
             }
 
 
+            //EZT ÁT KÉNE RAKNI AZ ELEJÉRE HOGY NE LEGYEN MERGELGETÉS MEG ILYENEK ÉS AKKOR UGORJON KI HA MÁR BENNEVAN
             var mongoMovie = new InternalToMongo().Movie(internalMovie);
 
             if (await _repo.CheckIfMovieExistInMongo(mongoMovie))
@@ -175,7 +177,7 @@ namespace Movie.Service
             {
                 if (await IsMovieExistInMongoDb(request.Title))
                 {
-                    return (int)MediaExistIn.MONGO;
+                    return (int) MediaExistIn.MONGO;
                 }
                 request.Title = RemoveAccent(request.Title);
                 var tvmazexist = await IsMovieExistInTmdb(request.Title);
@@ -184,13 +186,13 @@ namespace Movie.Service
                 {
                     if (tmdbexist)
                     {
-                        return (int)MediaExistIn.TMDB;
+                        return (int) MediaExistIn.TMDB;
                     }
-                    return (int)MediaExistIn.TVMAZE;
+                    return (int) MediaExistIn.TVMAZE;
                 }
-                return (int)MediaExistIn.NONE;
+                return (int) MediaExistIn.NONE;
             }
-            return (int)MediaExistIn.REQUESTERROR;
+            return (int) MediaExistIn.REQUESTERROR;
         }
 
         public async Task<bool> IsMovieExistInMongoDb(string title)
@@ -219,7 +221,7 @@ namespace Movie.Service
             }
             else
             {
-                throw new InternalException(650,"Movie not found");
+                throw new InternalException(650, "Movie not found");
             }
         }
 
@@ -237,7 +239,7 @@ namespace Movie.Service
                 var result = await _repo.IsMovieStarted(model.UserId, movie);
                 if (!result)
                 {
-                    throw new InternalException(619,"Movie already started");
+                    throw new InternalException(619, "Movie already started");
                 }
                 return result;
             }
@@ -277,11 +279,14 @@ namespace Movie.Service
                 var mongoMovie = await _repo.GetMovieByTitle(requestModel.Title);
                 if (mongoMovie != null)
                 {
+                    //feltöltjük az üres ID-ket.
+                    requestModel.TmdbId = mongoMovie.TmdbId;
+                    requestModel.ImdbId = mongoMovie.ImdbId;
+
                     //Megnézem, hogy láttuk -e már a filmet, mert ha igen akkor figyelmeztetem
                     var isItSeen = await _repo.IsMovieSeen(mongoMovie, requestModel.UserId);
                     if (!isItSeen)
                     {
-
                         //Létrehozom, hogy tudjuk jelölni mint elkezdett film és törölni is majd onnan.
                         var startedMovie = new StartedMovie()
                         {
@@ -296,14 +301,12 @@ namespace Movie.Service
                         };
 
 
-                        if (requestModel.WatchedPercentage < 98)
+                        if (requestModel.WatchedPercentage < 95)
                         {
                             //ha létezik, updateljük, különben -**hiba**- importáljuk a sorozatot és berakjuk elkezdett filmek közé
                             if (await IsMovieExistInMongoDb(requestModel.Title))
                             {
-                                //feltöltjük az üres ID-ket.
-                                requestModel.TmdbId = mongoMovie.TmdbId;
-                                requestModel.ImdbId = mongoMovie.ImdbId;
+                                
 
                                 //check if movie is started 
                                 bool isItStarted = await _repo.IsMovieStarted(requestModel.UserId, mongoMovie);
@@ -335,7 +338,6 @@ namespace Movie.Service
                     {
                         throw new InternalException(606, "Movie already seen.");
                     }
-
                 }
                 else
                 {
@@ -346,6 +348,100 @@ namespace Movie.Service
             return false;
         }
 
+        public async Task<bool> MarkAsSeenMovie(string title, int userid)
+        {
+            return await _repo.MarkAsSeenMovie(title, userid);
+        }
 
+        public async Task<InternalMovie> GetMovie(string title)
+        {
+            var mongoMovie = await _repo.GetMovieByTitle(title);
+            if (mongoMovie == null)
+            {
+                throw new InternalException(650, "Movie not found.");
+            }
+
+            return new MongoToInternal().Movie(mongoMovie);
+        }
+
+        public async Task<bool> RateMovie(InternalMovieRateRequest model)
+        {
+            return await _repo.RateMovie(model.TmdbId, model.ImdbId, model.UserId, model.Rating);
+        }
+
+        public async Task<List<InternalMovie>> Recommend(List<string> genres, int userid)
+        {
+            var startedMoviesByUser = await _repo.StartedMoviesByUser(userid);
+            var seenMoviesByUser = await _repo.SeenMoviesByUser(userid);
+
+            var allMovies = await _repo.GetMovies();
+            List<MongoMovie> moviesSplit = new List<MongoMovie>(allMovies);
+
+            foreach (var movie in allMovies)
+            {
+                foreach (var startedMovie in startedMoviesByUser)
+                {
+                    if (startedMovie.TmdbId == movie.TmdbId || startedMovie.ImdbId == movie.ImdbId)
+                    {
+                        moviesSplit.Remove(movie);
+                    }
+                }
+
+                foreach (var seenMovie in seenMoviesByUser)
+                {
+                    if (seenMovie.TmdbId == movie.TmdbId || seenMovie.ImdbId == movie.ImdbId)
+                    {
+                        moviesSplit.Remove(movie);
+                    }
+                }
+            }
+
+
+            //összeszedem melyik filmben mennyi genre van egyezésben a paraméterben kapottkak özül
+            var GenresMostContained = new Dictionary<MongoMovie, int>();
+            foreach (var movie in moviesSplit)
+            {
+                int genreCountMatched = 0;
+                foreach (var genre in genres)
+                {
+                    genreCountMatched += movie.Genres.Count(x => x.Name == genre);
+                }
+
+                GenresMostContained.Add(movie, genreCountMatched);
+            }
+
+
+            //sorrendbe teszem
+            var descendingOrder = GenresMostContained.OrderByDescending(x => x.Value);
+
+            var recommendedMovies = descendingOrder.Take(3).Select(x => new MongoToInternal().Movie(x.Key)).ToList();
+
+            return recommendedMovies;
+        }
+
+        public async Task<List<InternalMovie>> GetLastDays(int days, int userid)
+        {
+            var lastDaysMoviesSeen = await _repo.GetLastDaysSeen(days, userid);
+            var lastDaysMoviesStarted = await _repo.GetLastDaysStarted(days, userid);
+
+            if (lastDaysMoviesSeen == null && lastDaysMoviesStarted == null)
+            {
+                throw new InternalException(650, "No movies were found in the last " + days + " day(s).");
+            }
+            
+            
+            var internalMovies = new List<InternalMovie>();
+            foreach (var lastDaysMovie in lastDaysMoviesSeen)
+            {
+                internalMovies.Add(new MongoToInternal().Movie(lastDaysMovie));
+            }
+
+            foreach (var lastDaysMovie in lastDaysMoviesStarted)
+            {
+                internalMovies.Add(new MongoToInternal().Movie(lastDaysMovie));
+            }
+
+            return internalMovies;
+        }
     }
 }

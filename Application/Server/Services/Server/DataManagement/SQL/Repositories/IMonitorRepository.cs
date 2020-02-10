@@ -23,5 +23,9 @@ namespace Server.DataManagement.SQL.Repositories
         Task<bool> IsBookModuleActivated(int userid);
 
         Task<int> GetUserIdFromUsername(string username);
+    
+        Task<bool> UpdateFollowedPrograms(int userId, Dictionary<int, int> programsToUpdate);
+
+        Task<bool> UpdateFollowedProgramCategory(int userId, int programId, int? categoryId);
     }
 }

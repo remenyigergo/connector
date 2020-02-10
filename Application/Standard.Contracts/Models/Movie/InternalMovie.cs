@@ -45,7 +45,7 @@ namespace Standard.Contracts.Models.Movie
         public List<string> Actors;
         public List<string> Awards;
         public List<InternalRating> Ratings;
-        public int Metascore;
+        public string Metascore;
         public double ImdbRating;
         public string ImdbVotes;
         public string Type;

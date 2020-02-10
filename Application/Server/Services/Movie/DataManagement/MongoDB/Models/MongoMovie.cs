@@ -49,7 +49,7 @@ namespace Movie.DataManagement.MongoDB.Models
         public List<string> Actors { get; set; }
         public List<string> Awards { get; set; }
         public List<Rating> Ratings { get; set; }
-        public int Metascore { get; set; }
+        public string Metascore { get; set; }
         public double ImdbRating { get; set; }
         public string ImdbVotes { get; set; }
         public string Type { get; set; }

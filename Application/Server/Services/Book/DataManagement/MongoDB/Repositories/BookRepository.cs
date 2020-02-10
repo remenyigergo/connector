@@ -163,6 +163,7 @@ namespace Book.DataManagement.MongoDB.Repositories
             await Queue.DeleteOneAsync(model => model.UserId == userId && model.Book.BookId == queueBook.BookId);
         }
 
+        //EZT EGYEL FELJEBB KÉNE RECOMMENDELNI NEM ITT
         public async Task<List<InternalBook>> GetRecommendationsByUserId(int userid)
         {
             //Helper változó
@@ -201,11 +202,12 @@ namespace Book.DataManagement.MongoDB.Repositories
             bookGenresCount.OrderByDescending(x => x.Value);
 
             //,k' könyv ajánlása a top 3 legtöbbet olvasott kategóriából véletlenszerűen. -> k>=3
+            var xx = bookGenresCount.Select(x => x.Key).Take(3).ToList();
             List<string> stringListGenres = new List<string>();
-            foreach (var genre in bookGenresCount)
-            {
-                stringListGenres.Add(genre.Key);
-            }
+            //foreach (var genre in bookGenresCount)
+            //{
+            //    stringListGenres.Add(genre.Key);
+            //}
 
             //ajánláshoz megnézem tudunk-e 'k könyvet ajánlani'
             var allBooks = await Books.CountDocumentsAsync(x => x.BookId >= 0);
@@ -215,11 +217,11 @@ namespace Book.DataManagement.MongoDB.Repositories
                 k--;
             }
 
-            return await GetBooksForRecommendation(k, stringListGenres, stringListGenres.Count, onGoingBooksId);
+            return await GetBooksForRecommendation(k, stringListGenres, onGoingBooksId, finishedBooks);
 
         }
 
-        public async Task<List<InternalBook>> GetBooksForRecommendation(int k, List<string> genres, int topX, List<OnGoingBook> onGoingBooks)
+        public async Task<List<InternalBook>> GetBooksForRecommendation(int k, List<string> genres, List<OnGoingBook> onGoingBooks, List<BookManagerModel> finishedBooks)
         {
             List<InternalBook> recommendedBooks = new List<InternalBook>();
             var booksWithSpecificGenre = await Books.FindAsynchronous(x => x.Genre == genres[0]);

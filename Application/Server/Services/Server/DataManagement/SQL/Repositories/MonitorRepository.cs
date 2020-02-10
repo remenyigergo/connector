@@ -8,7 +8,7 @@ using Standard.Contracts.Exceptions;
 
 namespace Server.DataManagement.SQL.Repositories
 {
-    class MonitorRepository : IMonitorRepository
+    public class MonitorRepository : IMonitorRepository
     {
         private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
 
@@ -68,6 +68,8 @@ namespace Server.DataManagement.SQL.Repositories
         {
             return await SqlCatalogDataAccessManager.GetUserIdFromUsername(username);
         }
+
+        //public async Task<Use>
 
     }
 }

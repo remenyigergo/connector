@@ -67,7 +67,7 @@ namespace Movie.DataManagement.Parsers.OMDB
                         Awards = awards,
                         PosterPath = omdbMovie.Poster,
                         Ratings = ratings,
-                        Metascore = Int32.Parse(omdbMovie.Metascore),
+                        Metascore = omdbMovie.Metascore,
                         ImdbRating = Double.Parse(omdbMovie.ImdbRating),
                         ImdbVotes = omdbMovie.ImdbVotes,
                         Type = omdbMovie.Type,

@@ -47,7 +47,7 @@ namespace Standard.Core.DataManager.MongoDB
             {
                 return Database.GetCollection<Chat>("chat");
             }
-        }        
+        }
     }
 
     

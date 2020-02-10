@@ -120,6 +120,7 @@ namespace Standard.Contracts.Models.Series
                                 }
                                 matchingEpisode.Crew = matchingEpisode.Crew ?? episode.Crew;
                                 matchingEpisode.GuestStars = matchingEpisode.GuestStars ?? episode.GuestStars;
+                                
                                 // TODO folytatni
                             }
                         }

@@ -19,12 +19,12 @@ namespace DesktopClient.Modules.Helpers.Series
     {
         //public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)?$";
         public static string Pattern = @"^((.+?)[. _-]+)?s(\d+)[. _-]*e(\d+)(([. _-]*e|-)((?!(1080|720)[pi])\d+))*[. _-]*((.+?)((?<![. _-])-([^-]+))?)\.(mkv|avi|mp4|srt)?$";
-        public static string Quality = "(1080|720)[pi]";
+        //public static string Quality = "(1080|720)[pi]";
         public static string FeliratokInfoSeasonXEpisode = "-(\\s?)(([0-9]{1,2})x([0-9]{1,2}))";
         public static string S01E01Pattern = "s(\\d+)[. _-]*e(\\d+)";
 
         public static Regex regexPattern = new Regex(Pattern, RegexOptions.IgnoreCase);
-        public static Regex QualityPattern = new Regex(Quality, RegexOptions.IgnoreCase);
+        //public static Regex QualityPattern = new Regex(Quality, RegexOptions.IgnoreCase);
         public static Regex SeasonXEpisodePattern = new Regex(FeliratokInfoSeasonXEpisode, RegexOptions.IgnoreCase);
         public static Regex S01E01PatternRegex = new Regex(S01E01Pattern, RegexOptions.IgnoreCase);
 
