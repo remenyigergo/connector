@@ -52,7 +52,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<List<InternalSeries>> RecommendSeries(int userid);
 
         Task<List<Standard.Contracts.Models.Series.InternalSeries>> RecommendSeries(
-            List<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre> genre, string username, int userid);
+            List<Standard.Contracts.Models.Series.ExtendClasses.InternalSeriesGenre> genre, string username, int userid);
 
         Task<ReturnSeriesEpisodeModel>
             GetSeriesByStartedEpisode(string show, int seasonnum, int episodenum, int userid);

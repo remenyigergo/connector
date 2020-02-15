@@ -14,35 +14,37 @@ namespace Series.Service
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfigurationRoot configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
+            //services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IFeedRepository, FeedRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
             services.AddTransient<ISeriesRepository, SeriesRepository>();
 
+            SetConfiguration();
+
             ServiceDependency.Current = services.BuildServiceProvider();
+        }
+
+        private void SetConfiguration()
+        {
+            Configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-//            if (env.IsDevelopment())
-//            {
-//                app.UseDeveloperExceptionPage();
-//            }
-
             app.UseMvc();
         }
     }

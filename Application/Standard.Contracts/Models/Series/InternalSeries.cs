@@ -13,7 +13,7 @@ namespace Standard.Contracts.Models.Series
 
         public List<string> EpisodeRunTime;
         public string FirstAirDate;
-        public List<InternalGenre> Genres;
+        public List<InternalSeriesGenre> Genres;
         public InternalEpisodeSimple LastEpisodeSimpleToAir;
         public List<InternalNetwork> Networks;
         public string OriginalLanguage;
@@ -63,10 +63,10 @@ namespace Standard.Contracts.Models.Series
             TotalSeasons = from.TotalSeasons;
 
             //Mergeljük a Categoriest és Genret
-            var genreList = new List<InternalGenre>();
+            var genreList = new List<InternalSeriesGenre>();
             foreach (var category in Categories)
             {
-                var genre = new InternalGenre(category);
+                var genre = new InternalSeriesGenre(category);
                 genreList.Add(genre);
             }
             Genres = genreList;

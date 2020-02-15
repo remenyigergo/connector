@@ -1,6 +1,6 @@
-﻿namespace Series.Service.Requests
+﻿namespace Series.Dto.RequestDtoModels
 {
-    public class EpisodeRateRequest
+    public class EpisodeRateRequestDto
     {
         public int EpisodeNumber;
         public int Rate;

@@ -1,18 +1,18 @@
 ﻿namespace Standard.Contracts.Models.Series.ExtendClasses
 {
-    public class InternalGenre
+    public class InternalSeriesGenre
     {
         public string Name;
 
 
-        public InternalGenre(string genre)
+        public InternalSeriesGenre(string genre)
         {
             Name = genre;
         }
 
         public override bool Equals(object obj)
         {
-            var key = obj as InternalGenre;
+            var key = obj as InternalSeriesGenre;
 
             if (key == null)
                 return false;

@@ -571,7 +571,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// </summary>
         /// <returns></returns>
         public async Task<List<Standard.Contracts.Models.Series.InternalSeries>> RecommendSeries(
-            List<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre> genre, string username, int userid)
+            List<Standard.Contracts.Models.Series.ExtendClasses.InternalSeriesGenre> genre, string username, int userid)
         {
             const int recommendNumber = 3;
 
@@ -734,8 +734,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task<List<InternalSeries>> RecommendSeries(int userid)
         {
             List<InternalSeries> recommendedSeries = new List<InternalSeries>();
-            Dictionary<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre, int> mostWatchedGenres =
-                new Dictionary<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre, int>();
+            Dictionary<Standard.Contracts.Models.Series.ExtendClasses.InternalSeriesGenre, int> mostWatchedGenres =
+                new Dictionary<Standard.Contracts.Models.Series.ExtendClasses.InternalSeriesGenre, int>();
             //
 
             var startedEpisodes =

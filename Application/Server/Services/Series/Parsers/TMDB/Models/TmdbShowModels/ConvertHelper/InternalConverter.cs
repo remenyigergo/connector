@@ -59,12 +59,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             return internalCreatorList;
         }
 
-        public static List<InternalGenre> ConvertTmdbGenreToInternal(List<Genre> genres)
+        public static List<InternalSeriesGenre> ConvertTmdbGenreToInternal(List<Genre> genres)
         {
-            List<InternalGenre> internalGenreList = new List<InternalGenre>();
+            List<InternalSeriesGenre> internalGenreList = new List<InternalSeriesGenre>();
 
             foreach (var genre in genres)
-                internalGenreList.Add(new InternalGenre(genre.Name));
+                internalGenreList.Add(new InternalSeriesGenre(genre.Name));
 
             return internalGenreList;
         }

@@ -53,11 +53,11 @@ namespace Movie.DataManagement.Converter
             return null;
         }
 
-        public List<InternalGenre> Genre(List<Genre> mongoGenres)
+        public List<InternalMovieGenre> Genre(List<Genre> mongoGenres)
         {
-            var genres = new List<InternalGenre>();
+            var genres = new List<InternalMovieGenre>();
             foreach (var internalGenre in mongoGenres)
-                genres.Add(new InternalGenre
+                genres.Add(new InternalMovieGenre
                 {
                     Id = internalGenre.Id,
                     Name = internalGenre.Name

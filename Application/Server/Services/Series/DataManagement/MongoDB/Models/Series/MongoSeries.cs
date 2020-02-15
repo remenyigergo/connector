@@ -33,7 +33,7 @@ namespace Series.DataManagement.MongoDB.Models.Series
 
         public List<string> EpisodeRunTime { get; set; }
         public string FirstAirDate { get; set; }
-        public List<InternalGenre> Genres { get; set; }
+        public List<InternalSeriesGenre> Genres { get; set; }
         public string OriginalLanguage { get; set; }
         public InternalEpisodeSimple LastEpisodeSimpleToAir { get; set; }
         public List<InternalNetwork> Networks { get; set; }

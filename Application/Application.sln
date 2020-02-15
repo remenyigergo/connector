@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2041
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{07AB7BD1-4674-4D19-AD22-6484EE354C6A}"
 EndProject
@@ -31,9 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Movie.Service", "Server\Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Movie", "Server\Services\Movie\Movie.csproj", "{A9278394-A791-4A53-B0B3-5D5F7599229D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Social.Service", "Server\Services\Social.Service\Social.Service.csproj", "{3B5370B7-C009-4FAB-8142-57FABB682044}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Social.Service", "Server\Services\Social.Service\Social.Service.csproj", "{3B5370B7-C009-4FAB-8142-57FABB682044}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Social", "Server\Services\Social\Social.csproj", "{DC63FBE5-F26D-40DE-ACD7-47A966D38178}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Social", "Server\Services\Social\Social.csproj", "{DC63FBE5-F26D-40DE-ACD7-47A966D38178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Series.Dto", "Series.Dto\Series.Dto.csproj", "{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{DC63FBE5-F26D-40DE-ACD7-47A966D38178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC63FBE5-F26D-40DE-ACD7-47A966D38178}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC63FBE5-F26D-40DE-ACD7-47A966D38178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +116,7 @@ Global
 		{A9278394-A791-4A53-B0B3-5D5F7599229D} = {07AB7BD1-4674-4D19-AD22-6484EE354C6A}
 		{3B5370B7-C009-4FAB-8142-57FABB682044} = {07AB7BD1-4674-4D19-AD22-6484EE354C6A}
 		{DC63FBE5-F26D-40DE-ACD7-47A966D38178} = {07AB7BD1-4674-4D19-AD22-6484EE354C6A}
+		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49} = {07AB7BD1-4674-4D19-AD22-6484EE354C6A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1EBEB5FF-4575-4E98-BF32-F6B101A40A74}

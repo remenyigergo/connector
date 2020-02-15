@@ -1,6 +1,6 @@
-﻿namespace Series.Service.Models
+﻿namespace Series.Dto.RequestDtoModels
 {
-    public class MarkRequest
+    public class MarkRequestDto
     {
         public string EpisodeNumber;
         public string SeasonNumber;

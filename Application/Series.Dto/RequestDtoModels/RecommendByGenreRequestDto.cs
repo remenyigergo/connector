@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Series.Service.Requests
+namespace Series.Dto.RequestDtoModels
 {
-    public class RecommendByGenreRequest
+    public class RecommendByGenreRequestDto
     {
         public List<string> Genres;
         public int userid;

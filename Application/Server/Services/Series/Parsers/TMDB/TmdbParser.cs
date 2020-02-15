@@ -52,7 +52,7 @@ namespace Series.Parsers.TMDB
                     CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator {Name = x.Name}).ToList(),
                     EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
                     FirstAirDate = tmdbShowSimple.FirstAirDate,
-                    Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre(x.Name)).ToList(),
+                    Genres = tmdbShowSimple.Genres.Select(x => new InternalSeriesGenre(x.Name)).ToList(),
                     LastEpisodeSimpleToAir =
                         InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.LastEpisodeToAir),
                     Networks = InternalConverter.ConvertTmdbNetworkToInternal(tmdbShowSimple.Networks),
