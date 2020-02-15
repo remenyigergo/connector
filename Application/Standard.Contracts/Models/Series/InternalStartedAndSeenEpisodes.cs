@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Series.Service.Models;
 
-namespace Standard.Contracts.Models.Series.ExtendClasses
+namespace Standard.Contracts.Models.Series
 {
     public class InternalStartedAndSeenEpisodes
     {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DesktopClient.Modules.MPCManager.Model;
-using Series.Service.Models;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Requests;
 using Standard.Contracts.Requests.Series;

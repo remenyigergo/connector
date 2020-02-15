@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Series.Service.Models
 {
-    public class EpisodeStarted
+    public class EpisodeStartedDao
     {
         public DateTime Date;
         public int EpisodeNumber;

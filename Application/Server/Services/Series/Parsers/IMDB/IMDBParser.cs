@@ -2,16 +2,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Series.Parsers.IMDB.Models;
+using Standard.Contracts.Models.Series;
 using Standard.Core.NetworkManager;
 
 namespace Series.Parsers.IMDB
 {
-    internal class IMDBParser
+    internal class IMDBParser : IParser
     {
         private const string _endpoint = "http://www.omdbapi.com";
         //http://www.omdbapi.com/?t=dexter?&apikey=4eb286e7
 
-        public async Task<Standard.Contracts.Models.Series.InternalSeries> ImportSeries(string title)
+        public async Task<InternalSeries> ImportSeries(string title)
         {
             var IMDBSeries = await new WebClientManager().Get<IMDBSeries>($"{_endpoint}/?t={title}?&apikey=4eb286e7");
 

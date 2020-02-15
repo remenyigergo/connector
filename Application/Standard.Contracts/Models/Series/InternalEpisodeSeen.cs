@@ -1,4 +1,6 @@
-﻿namespace Standard.Contracts.Models.Series
+﻿using System;
+
+namespace Standard.Contracts.Models.Series
 {
     public class InternalEpisodeSeen
     {
@@ -7,5 +9,6 @@
         public string TmdbId { get; set; }
         public int SeasonNumber { get; set; }
         public int EpisodeNumber { get; set; }
+        public DateTime Date { get; set; }
     }
 }

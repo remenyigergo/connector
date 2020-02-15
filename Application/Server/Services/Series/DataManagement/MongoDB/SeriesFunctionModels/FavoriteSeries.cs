@@ -1,6 +1,6 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class FavoriteSeries
+    public class FavoriteSeriesDao
     {
         public string TmdbId;
         public string TvMazeId;

@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class EpisodeSeen
+    public class EpisodeSeenDao
     {
         [BsonId]
         [BsonIgnoreIfNull]
@@ -16,7 +16,6 @@ namespace Series.DataManagement.MongoDB.SeriesFunctionModels
         public string TmdbId { get; set; }
         public int SeasonNumber { get; set; }
         public int EpisodeNumber { get; set; }
-
         public DateTime Date { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Series.Service.Models
+namespace Standard.Contracts.Models.Series
 {
     public class InternalEpisodeStartedModel
     {

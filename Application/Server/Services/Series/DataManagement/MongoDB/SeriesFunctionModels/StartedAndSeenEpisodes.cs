@@ -3,9 +3,9 @@ using Series.Service.Models;
 
 namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class StartedAndSeenEpisodes
+    public class StartedAndSeenEpisodesDao
     {
-        public List<EpisodeSeen> seenEpisodes;
-        public List<EpisodeStarted> startedEpisodes;
+        public List<EpisodeSeenDao> seenEpisodes;
+        public List<EpisodeStartedDao> startedEpisodes;
     }
 }

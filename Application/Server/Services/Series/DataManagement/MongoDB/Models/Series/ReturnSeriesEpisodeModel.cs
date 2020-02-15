@@ -6,6 +6,6 @@ namespace Series.DataManagement.MongoDB.Models.Series
     public class ReturnSeriesEpisodeModel
     {
         public List<MongoSeries> foundSeriesList;
-        public EpisodeStarted startedEpisodesList;
+        public EpisodeStartedDao startedEpisodesList;
     }
 }

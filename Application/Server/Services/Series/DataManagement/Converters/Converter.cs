@@ -109,7 +109,7 @@ namespace Series.DataManagement.Converters
             return internalEpisode;
         }
 
-        public InternalEpisodeSeen ConvertMongoToInternalEpisode(EpisodeSeen mongoEpisode)
+        public InternalEpisodeSeen ConvertMongoToInternalEpisode(EpisodeSeenDao mongoEpisode)
         {
             var internalEpisode = new InternalEpisodeSeen
             {
@@ -204,7 +204,7 @@ namespace Series.DataManagement.Converters
         }
 
         public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(
-            StartedAndSeenEpisodes mongoEpisodes)
+            StartedAndSeenEpisodesDao mongoEpisodes)
         {
             List<InternalEpisodeSeen> seenEpisodes = new List<InternalEpisodeSeen>();
             foreach (var mongoEpisodesSeenEpisode in mongoEpisodes.seenEpisodes)
@@ -222,7 +222,7 @@ namespace Series.DataManagement.Converters
         }
 
 
-        public InternalEpisodeSeen ConvertMongoEpisodeSeenToInternal(EpisodeSeen mongoEpisodeSeen)
+        public InternalEpisodeSeen ConvertMongoEpisodeSeenToInternal(EpisodeSeenDao mongoEpisodeSeen)
         {
             return new InternalEpisodeSeen
             {
@@ -234,9 +234,9 @@ namespace Series.DataManagement.Converters
             };
         }
 
-        public EpisodeSeen ConvertInternalEpisodeSeenToMongo(InternalEpisodeSeen internalEpisodeSeen)
+        public EpisodeSeenDao ConvertInternalEpisodeSeenToMongo(InternalEpisodeSeen internalEpisodeSeen)
         {
-            return new EpisodeSeen
+            return new EpisodeSeenDao
             {
                 EpisodeNumber = internalEpisodeSeen.EpisodeNumber,
                 SeasonNumber = internalEpisodeSeen.SeasonNumber,
@@ -246,7 +246,7 @@ namespace Series.DataManagement.Converters
             };
         }
 
-        public InternalEpisodeStartedModel ConvertMongoToInternalEpisodeStartedModel(EpisodeStarted mongoStartedEpisode)
+        public InternalEpisodeStartedModel ConvertMongoToInternalEpisodeStartedModel(EpisodeStartedDao mongoStartedEpisode)
         {
             return new InternalEpisodeStartedModel
             {

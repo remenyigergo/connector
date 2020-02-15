@@ -3,44 +3,49 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Series.DataManagement.Converters;
-using Series.DataManagement.MongoDB.Models.Series;
-using Series.DataManagement.MongoDB.Repositories;
 using Series.Parsers.TMDB;
 using Series.Parsers.TvMaze;
-using Series.Service.Models;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
-using Standard.Contracts.Models.Series;
-using Standard.Contracts.Models.Series.ExtendClasses;
-using Standard.Contracts.Requests;
 using Standard.Core.NetworkManager;
-using Microsoft.Extensions.DependencyInjection;
-using Standard.Core.Dependency;
+using Series.Dto.RequestDtoModels;
+using Series.DataManagement.MongoDB.Repositories;
+using Series.Dto.RequestDtoModels.SeriesDto;
+using Standard.Core.DataMapping;
+using Series.Service.Models;
+using Standard.Contracts.Models.Series;
+using Series.DataManagement.Converters;
+using Standard.Contracts.Models.Series.ExtendClasses;
+using Series.Dto.RequestDtoModels.SeriesDtos.EpisodeDtos;
+
 namespace Series.Service
 {
     public class Series : ISeries
     {
-        //private readonly ISeriesRepository _repo = ServiceDependency.Current.GetService<SeriesRepository>();
         private readonly ISeriesRepository _seriesRepository;
+        private readonly IDataMapper<EpisodeStartedDto, InternalEpisodeStartedModel> _episodeStartedMapper;
+        private readonly IDataMapper<SeriesDto, InternalSeries> _seriesMapper;
 
-        public Series(ISeriesRepository seriesRepository)
+        public Series(ISeriesRepository seriesRepository, 
+            IDataMapper<EpisodeStartedDto, InternalEpisodeStartedModel> episodeStartedMapper,
+            IDataMapper<SeriesDto, InternalSeries> seriesMapper)
         {
             _seriesRepository = seriesRepository;
+            _episodeStartedMapper = episodeStartedMapper;
+            _seriesMapper = seriesMapper;
         }
 
-        public ISeriesRepository SeriesRepository { get; }
-
+        
         public async Task ImportSeries(string title)
         {
             var isItImported = await IsSeriesImported(title);
 
             if (isItImported) return;
 
-            var tvMazeInternalSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
+            var tvMazeInternalSeries = await new TvMazeParser().ImportSeries(title);
             if (tvMazeInternalSeries != null)
             {
-                var tmdbInternalSeries = await new TmdbParser().ImportTmdbSeries(title);
+                var tmdbInternalSeries = await new TmdbParser().ImportSeries(title);
 
                 if (tmdbInternalSeries != null)
                     tvMazeInternalSeries.Merge(tmdbInternalSeries);
@@ -51,7 +56,7 @@ namespace Series.Service
             }
             else
             {
-                var tmdbSeries = await new TmdbParser().ImportTmdbSeries(title);
+                var tmdbSeries = await new TmdbParser().ImportSeries(title);
 
                 if (tmdbSeries == null) return;
 
@@ -73,7 +78,6 @@ namespace Series.Service
             return false;
         }
 
-
         public async Task AddSeriesToUser(int userid, int seriesid)
         {
             var isAdded = await _seriesRepository.IsSeriesAddedToUser(userid, seriesid);
@@ -83,7 +87,7 @@ namespace Series.Service
                 throw new InternalException(602, "Series already added to the users list.");
         }
 
-        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel, string showName)
+        public async Task MarkEpisodeStarted(InternalEpisodeStartedModel internalEpisodeStartedModel, string showName)
         {
             //var isStarted = await _repo.IsSeriesStarted(episodeStartedModel);
             //var isStarted = false;
@@ -95,20 +99,20 @@ namespace Series.Service
             //{
             //    throw new InternalException(604, "Series is already started by the user.");
             //}
+
             var series = GetSeriesByTitle(showName);
             if (series.Result.Count != 0)
             {
-                episodeStartedModel.TvMazeId = int.Parse(series.Result[0].TvMazeId);
-                episodeStartedModel.TmdbId = int.Parse(series.Result[0].TmdbId);
+                internalEpisodeStartedModel.TvMazeId = int.Parse(series.Result[0].TvMazeId);
+                internalEpisodeStartedModel.TmdbId = int.Parse(series.Result[0].TmdbId);
             }
 
-
-            await _seriesRepository.MarkEpisodeStarted(episodeStartedModel);
+            await _seriesRepository.MarkEpisodeStarted(internalEpisodeStartedModel);
         }
 
         public async Task UpdateSeries(string title)
         {
-            var tvMazeSeries = await new TvMazeParser().ImportSeriesFromTvMaze(title);
+            var tvMazeSeries = await new TvMazeParser().ImportSeries(title);
             await CheckSeriesUpdate(tvMazeSeries);
 
             if (!await _seriesRepository.Update(tvMazeSeries))
@@ -131,14 +135,15 @@ namespace Series.Service
                 throw new InternalException((int) CoreCodes.UpToDate, "The series is up to date.");
         }
 
-        public async Task<bool> GetShow(EpisodeStarted episodeStarted, string title)
+        public async Task<bool> GetShow(EpisodeStartedDto episodeStarted, string title)
         {
-            return await _seriesRepository.GetShow(episodeStarted, title);
+            return await _seriesRepository.GetShow(_episodeStartedMapper.Map(episodeStarted), title);
         }
 
-        public async Task<InternalSeries> GetSeries(string title)
+        public async Task<SeriesDto> GetSeries(string title)
         {
-            return await _seriesRepository.GetSeries(title);
+            var internalSeries = await _seriesRepository.GetSeries(title);
+            return _seriesMapper.Map(internalSeries);
         }
 
         public async Task<bool> IsMediaExistInMongoDb(string title)
@@ -159,19 +164,22 @@ namespace Series.Service
             return await new TmdbParser().IsMediaExistInTmdb(title);
         }
 
-        public async Task<List<MongoSeries>> GetSeriesByTitle(string title)
+        public async Task<List<SeriesDto>> GetSeriesByTitle(string title)
         {
-            return await _seriesRepository.GetSeriesByTitle(title);
+            var internalSeries = await _seriesRepository.GetSeriesByTitle(title);
+            return internalSeries.Select(x=> _seriesMapper.Map(x)).ToList();
         }
 
-        public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel internalEpisode)
+        public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStarted)
         {
-            var isItStarted = await _seriesRepository.IsEpisodeStarted(internalEpisode);
+            var isItStarted = await _seriesRepository.IsEpisodeStarted(episodeStarted);
             return isItStarted;
         }
 
-        public async Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode, string showName)
+        public async Task<bool> UpdateStartedEpisode(EpisodeStartedDto episodeStarted, string showName)
         {
+            var internalEpisode = _episodeStartedMapper.Map(episodeStarted);
+
             if (internalEpisode.WatchedPercentage < 98)
             {
                 var showExist = await IsMediaExistInMongoDb(showName);
@@ -210,26 +218,27 @@ namespace Series.Service
                 throw new InternalException(611, "Episode rating failed.");
         }
 
-        public async Task<InternalStartedAndSeenEpisodes> GetLastDays(int days, int userid)
+        public async Task<StartedAndSeenEpisodesDto> GetLastDays(int days, int userid)
         {
             var results = await _seriesRepository.GetLastDaysEpisodes(days, userid);
-            if (results == null || results.seenEpisodes.Count == 0 && results.startedEpisodes.Count == 0)
+            if (results == null || results.seenEpisodeList.Count == 0 && results.startedEpisodeList.Count == 0)
                 throw new InternalException(616, "No episodes were found in DB. Repository error.");
 
-            var res = new Converter().ConvertMongoStartedAndSeenEpisodesToInternal(results);
+            //var res = new Converter().ConvertMongoStartedAndSeenEpisodesToInternal(results);
 
-            return res;
+            //TODO map InternalStartedAndSeenEpisodes to Dto
+            return null;
         }
 
-        public async Task<int> IsShowExist(InternalImportRequest request)
+        public async Task<int> IsShowExist(ImportSeriesDto series)
         {
-            if (request != null)
+            if (series != null)
             {
-                if (await IsMediaExistInMongoDb(request.Title))
+                if (await IsMediaExistInMongoDb(series.Title))
                     return (int) MediaExistIn.MONGO;
-                request.Title = RemoveAccent(request.Title);
-                var tvmazexist = await IsMediaExistInTvMaze(request.Title);
-                var tmdbexist = await IsMediaExistInTmdb(request.Title);
+                series.Title = RemoveAccent(series.Title);
+                var tvmazexist = await IsMediaExistInTvMaze(series.Title);
+                var tmdbexist = await IsMediaExistInTmdb(series.Title);
                 if (tvmazexist)
                 {
                     if (tmdbexist)
@@ -241,15 +250,15 @@ namespace Series.Service
             return (int) MediaExistIn.REQUESTERROR;
         }
 
-        public async Task<List<InternalSeries>> RecommendSeriesFromDb(int userid)
+        public async Task<List<SeriesDto>> RecommendSeriesFromDb(int userid)
         {
             var recommends = await _seriesRepository.RecommendSeries(userid);
             if (recommends.Count == 0)
                 throw new InternalException(615, "No recommendations are available");
-            return recommends;
+            return recommends.Select(x=>_seriesMapper.Map(x)).ToList();
         }
 
-        public async Task<List<InternalSeries>> RecommendSeriesFromDbByGenre(List<string> genres, string username,
+        public async Task<List<SeriesDto>> RecommendSeriesFromDbByGenre(List<string> genres, string username,
             int userid)
         {
             List<InternalSeriesGenre> genreList =
@@ -267,21 +276,20 @@ namespace Series.Service
             if (result == null || result.Count == 0)
                 throw new InternalException(615, "Recommend failed.");
 
-            return result;
+            return result.Select(x=>_seriesMapper.Map(x)).ToList();
         }
 
-        public async Task<List<InternalEpisode>> PreviousEpisodeSeen(string showTitle, int seasonNum, int episodeNum,
+        public async Task<List<EpisodeDto>> PreviousEpisodeSeen(string showTitle, int seasonNum, int episodeNum,
             int userid)
         {
-            //a látott sorozatokat és magát a sorozatot keresm ki ahol egyezik az id
+            //a látott sorozatokat és magát a sorozatot keresem ki ahol egyezik az id
             var model = await _seriesRepository.GetSeriesByStartedEpisode(showTitle, seasonNum, episodeNum, userid);
 
-
             var foundSeries = new InternalSeries();
-            foreach (var mongoSeries in model.foundSeriesList)
-                if (int.Parse(mongoSeries.TvMazeId) == model.startedEpisodesList.TvMazeId ||
-                    int.Parse(mongoSeries.TmdbId) == model.startedEpisodesList.TmdbId)
-                    foundSeries = new Converter().ConvertMongoToInternalSeries(mongoSeries);
+            foreach (var internalSeries in model.foundSeriesList)
+                if (int.Parse(internalSeries.TvMazeId) == model.startedEpisodesList.TvMazeId ||
+                    int.Parse(internalSeries.TmdbId) == model.startedEpisodesList.TmdbId)
+                        foundSeries = internalSeries;
 
             if (foundSeries != null)
             {
@@ -291,12 +299,8 @@ namespace Series.Service
                 if (foundSeries.TmdbId == null)
                     foundSeries.TmdbId = "0";
 
-                var seenEpisodesMongo = await _seriesRepository.PreviousEpisodeSeen(seasonNum, episodeNum,
+                var seenEpisodesInternal = await _seriesRepository.PreviousEpisodeSeen(seasonNum, episodeNum,
                     int.Parse(foundSeries.TvMazeId), int.Parse(foundSeries.TmdbId), userid);
-                var seenEpisodesInternal = new List<InternalEpisodeSeen>();
-                //Convert to Internal
-                foreach (var seenEpisode in seenEpisodesMongo)
-                    seenEpisodesInternal.Add(new Converter().ConvertMongoToInternalEpisode(seenEpisode));
 
                 //ebbe fogom gyűjteni azokat az epizódszámokat amelyeket nem láttunk
                 var notSeenEpisodes = new List<int>();
@@ -321,7 +325,22 @@ namespace Series.Service
 
                     //a notSeenEpisodes lista intjei alapján kikeresem azokat a részeket amiket nem láttunk, a returnhoz
                     //var notseen =  await _repo.GetNotSeenEpisodes(seasonNum, notSeenEpisodes, Int32.Parse(foundSeries.TvMazeId), Int32.Parse(foundSeries.TmdbId));
-                    return foundSeries.Seasons[seasonNum].Episodes;
+                    return foundSeries.Seasons[seasonNum].Episodes.Select(x=>new EpisodeDto() {
+                        Title = x.Title,
+                        AirDate = x.AirDate,
+                        Crew = x.Crew.Select(crew=> new EpisodeCrewDto() {
+                            Name = crew.Name,
+                            Department = crew.Department,
+                            Job = crew.Job
+                        }).ToList(),
+                        Description = x.Description,
+                        GuestStars = x.GuestStars.Select(stars => new EpisodeGuestDto() {
+                            Name = stars.Name,
+                            Character = stars.Character
+                        }).ToList(),
+                        Length = x.Length,
+                        TmdbShowId = x.TmdbShowId
+                    }).ToList();
                 }
             }
 
