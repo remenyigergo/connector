@@ -2,7 +2,7 @@
 {
     public interface IDataMapper<TSource, TTarget>
     {
-        TTarget Map(TSource source);
-        TSource Map(TTarget source);
+        TTarget Map(TSource obj);
+        TSource Map(TTarget obj);
     }
 }

@@ -2,6 +2,6 @@
 {
     public class CreatorDto
     {
-        public string Name { get; }
+        public string Name { get; set; }
     }
 }

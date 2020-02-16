@@ -2,11 +2,10 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Series.DataManagement.MongoDB.Models;
-using Standard.Core.DataManager.MongoDB;
 using Standard.Core.DataManager.MongoDB.DbModels;
 using Standard.Core.DataManager.MongoDB.IRepository;
 
-namespace Standard.Core.DataManager.Mongo.Repository
+namespace Standard.Core.DataManager.MongoDB.Repository
 {
     public class UserRepository : IUserRepository
     {

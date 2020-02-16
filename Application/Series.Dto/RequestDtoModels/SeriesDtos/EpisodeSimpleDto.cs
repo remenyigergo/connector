@@ -2,12 +2,12 @@
 {
     public class EpisodeSimpleDto
     {
-        public string AirDate { get; }
-        public int EpisodeNumber { get; }
-        public string Name { get; }
-        public string Overview { get; }
-        public int SeasonNumber { get; }
-        public double? VoteAverage { get; }
-        public int VoteCount { get; }
+        public string AirDate { get; set; }
+        public int EpisodeNumber { get; set; }
+        public string Name { get; set; }
+        public string Overview { get; set; }
+        public int SeasonNumber { get; set; }
+        public double? VoteAverage { get; set; }
+        public int VoteCount { get; set; }
     }
 }

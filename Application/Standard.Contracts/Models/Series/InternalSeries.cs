@@ -86,7 +86,7 @@ namespace Standard.Contracts.Models.Series
                 }
                 else
                 {
-                    matchingSeason.Airdate = season.Airdate;
+                    matchingSeason.AirDate = season.AirDate;
                     matchingSeason.Name = matchingSeason.Name ?? season.Name;
                     matchingSeason.Summary = matchingSeason.Summary ?? season.Summary;
                     matchingSeason.EpisodesCount = matchingSeason.EpisodesCount == 0

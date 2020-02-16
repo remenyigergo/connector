@@ -81,7 +81,7 @@ namespace Series.DataManagement.Converters
                     EpisodesCount = mongoseason.EpisodesCount,
                     Episodes = episodeList,
                     Summary = mongoseason.Summary,
-                    Airdate = mongoseason.Airdate,
+                    AirDate = mongoseason.Airdate,
                     Name = mongoseason.Name
                 });
             }
@@ -196,30 +196,30 @@ namespace Series.DataManagement.Converters
                     EpisodesCount = internalSeason.EpisodesCount,
                     Episodes = episodeList,
                     Summary = internalSeason.Summary,
-                    Airdate = internalSeason.Airdate,
+                    Airdate = internalSeason.AirDate,
                     Name = internalSeason.Name
                 });
             }
             return seasonsList;
         }
 
-        public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(
-            StartedAndSeenEpisodesDao mongoEpisodes)
-        {
-            List<InternalEpisodeSeen> seenEpisodes = new List<InternalEpisodeSeen>();
-            foreach (var mongoEpisodesSeenEpisode in mongoEpisodes.seenEpisodes)
-                seenEpisodes.Add(ConvertMongoEpisodeSeenToInternal(mongoEpisodesSeenEpisode));
+        //public InternalStartedAndSeenEpisodes ConvertMongoStartedAndSeenEpisodesToInternal(
+        //    StartedAndSeenEpisodesDao mongoEpisodes)
+        //{
+        //    List<InternalEpisodeSeen> seenEpisodes = new List<InternalEpisodeSeen>();
+        //    foreach (var mongoEpisodesSeenEpisode in mongoEpisodes.seenEpisodes)
+        //        seenEpisodes.Add(ConvertMongoEpisodeSeenToInternal(mongoEpisodesSeenEpisode));
 
-            List<InternalEpisodeStartedModel> startedEpisodes = new List<InternalEpisodeStartedModel>();
-            foreach (var mongoEpisodesStarted in mongoEpisodes.startedEpisodes)
-                startedEpisodes.Add(ConvertMongoToInternalEpisodeStartedModel(mongoEpisodesStarted));
+        //    List<InternalEpisodeStartedModel> startedEpisodes = new List<InternalEpisodeStartedModel>();
+        //    foreach (var mongoEpisodesStarted in mongoEpisodes.startedEpisodes)
+        //        startedEpisodes.Add(ConvertMongoToInternalEpisodeStartedModel(mongoEpisodesStarted));
 
-            return new InternalStartedAndSeenEpisodes
-            {
-                seenEpisodeList = seenEpisodes,
-                startedEpisodeList = startedEpisodes
-            };
-        }
+        //    return new InternalStartedAndSeenEpisodes
+        //    {
+        //        seenEpisodeList = seenEpisodes,
+        //        startedEpisodeList = startedEpisodes
+        //    };
+        //}
 
 
         public InternalEpisodeSeen ConvertMongoEpisodeSeenToInternal(EpisodeSeenDao mongoEpisodeSeen)
@@ -246,21 +246,5 @@ namespace Series.DataManagement.Converters
             };
         }
 
-        public InternalEpisodeStartedModel ConvertMongoToInternalEpisodeStartedModel(EpisodeStartedDao mongoStartedEpisode)
-        {
-            return new InternalEpisodeStartedModel
-            {
-                Date = mongoStartedEpisode.Date,
-                EpisodeNumber = mongoStartedEpisode.EpisodeNumber,
-                HoursElapsed = mongoStartedEpisode.HoursElapsed,
-                MinutesElapsed = mongoStartedEpisode.MinutesElapsed,
-                SeasonNumber = mongoStartedEpisode.SeasonNumber,
-                SecondsElapsed = mongoStartedEpisode.SecondsElapsed,
-                TmdbId = mongoStartedEpisode.TmdbId,
-                TvMazeId = mongoStartedEpisode.TvMazeId,
-                Userid = mongoStartedEpisode.Userid,
-                WatchedPercentage = mongoStartedEpisode.WatchedPercentage
-            };
-        }
     }
 }

@@ -12,9 +12,7 @@ using Series.Dto.RequestDtoModels;
 using Series.DataManagement.MongoDB.Repositories;
 using Series.Dto.RequestDtoModels.SeriesDto;
 using Standard.Core.DataMapping;
-using Series.Service.Models;
 using Standard.Contracts.Models.Series;
-using Series.DataManagement.Converters;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Series.Dto.RequestDtoModels.SeriesDtos.EpisodeDtos;
 

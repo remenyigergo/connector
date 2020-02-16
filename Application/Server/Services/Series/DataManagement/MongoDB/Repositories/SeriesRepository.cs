@@ -26,17 +26,21 @@ namespace Series.DataManagement.MongoDB.Repositories
     {
         private readonly IDataMapper<InternalSeries, MongoSeries> _seriesMapper;
         private readonly IDataMapper<InternalEpisodeStartedModel, EpisodeStartedDao> _episodeStartedMapper;
+        private readonly IMongoCollection<MongoSeries> _mongoSeriesCollection;
 
+        //TODO IOptions.settings delete
         public SeriesRepository(IOptions<MongoDbSettings> settings,
             IDataMapper<InternalSeries, MongoSeries> seriesMapper,
-            IDataMapper<InternalEpisodeStartedModel, EpisodeStartedDao> episodeStartedMapper) : base(settings)
+            IDataMapper<InternalEpisodeStartedModel, EpisodeStartedDao> episodeStartedMapper,
+            IMongoCollection<MongoSeries> mongoSeriesCollection) : base(settings)
         {
             _seriesMapper = seriesMapper;
             _episodeStartedMapper = episodeStartedMapper;
+            _mongoSeriesCollection = mongoSeriesCollection;
         }
 
-        public IMongoCollection<MongoSeries> Series => 
-            Database.GetCollection<MongoSeries>("Series");
+        //public IMongoCollection<MongoSeries> Series => 
+        //    Database.GetCollection<MongoSeries>("Series");
         private IMongoCollection<EpisodeSeenDao> SeenEpisodes =>
             Database.GetCollection<EpisodeSeenDao>("SeenEpisodes");
         private IMongoCollection<AddedSeries> AddedSeries =>
@@ -56,6 +60,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         private IMongoCollection<EpisodeRate> EpisodeRates =>
             Database.GetCollection<EpisodeRate>("EpisodeRates");
 
+
         /// <summary>
         ///     Sorozat letárolása adatbázisba.
         /// </summary>
@@ -65,7 +70,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             //TODO obsolete
             //var mongoSeries = new Converter().ConvertInternalToMongoSeries(internalSeries);
 
-            await Series.InsertOneAsync(_seriesMapper.Map(internalSeries));
+            await _mongoSeriesCollection.InsertOneAsync(_seriesMapper.Map(internalSeries));
         }
 
         /// <summary>
@@ -76,9 +81,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task DeleteSeriesById(int id)
         {
             //List<Series> seriesList = GetAllSeries().Result;
-            var seriesExistCheck = Series.Find(x => x.TvMazeId == id.ToString() || x.TmdbId == id.ToString());
+            var seriesExistCheck = _mongoSeriesCollection.Find(x => x.TvMazeId == id.ToString() || x.TmdbId == id.ToString());
             if (seriesExistCheck != null)
-                await Series.DeleteOneAsync(Builders<MongoSeries>.Filter.Eq("TvMazeId", id));
+                await _mongoSeriesCollection.DeleteOneAsync(Builders<MongoSeries>.Filter.Eq("TvMazeId", id));
         }
 
         /// <summary>
@@ -88,10 +93,10 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <returns></returns>
         public async Task<List<InternalSeries>> GetSeriesByTitle(string title)
         {
-            var coll = Series.AsQueryable();
+            var coll = _mongoSeriesCollection.AsQueryable();
 
             //var series = coll.Where(b => b.Title == title).ToList();
-            var series = await Series.FindAsynchronous(b => b.Title.ToLower() == title.ToLower());
+            var series = await _mongoSeriesCollection.FindAsynchronous(b => b.Title.ToLower() == title.ToLower());
 
             return series.Select(x=>_seriesMapper.Map(x)).ToList();
         }
@@ -103,7 +108,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <returns></returns>
         public async Task<bool> IsSeriesImported(string title)
         {
-            var s = await Series.CountDocumentsAsync(x => x.Title.ToLower() == title.ToLower());
+            var s = await _mongoSeriesCollection.CountDocumentsAsync(x => x.Title.ToLower() == title.ToLower());
 
             return s > 0;
         }
@@ -118,7 +123,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             //TODO obsolete
             //var mongoSeries = new Converter().ConvertInternalToMongoSeries(internalSeries);
 
-            var result = await Series.ReplaceOneAsync(x => x.Title == internalSeries.Title, _seriesMapper.Map(internalSeries));
+            var result = await _mongoSeriesCollection.ReplaceOneAsync(x => x.Title == internalSeries.Title, _seriesMapper.Map(internalSeries));
             return result.ModifiedCount > 0;
         }
 
@@ -129,9 +134,9 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="updateCode"></param>
         public async Task<bool> IsUpToDate(string title, string updateCode)
         {
-            var series = (await Series.FindAsync(x => x.Title == title)).FirstOrDefault();
+            var series = (await _mongoSeriesCollection.FindAsync(x => x.Title == title)).FirstOrDefault();
             //var a = await Series.Find(x => x.Title == showTitle).Project(x => new MongoSeries() { LastUpdated = x.LastUpdated }).ToListAsync();            
-            var a = await Series.FindAndProject(x => x.Title == title, x => x.LastUpdated);
+            var a = await _mongoSeriesCollection.FindAndProject(x => x.Title == title, x => x.LastUpdated);
 
             if (a.FirstOrDefault() == updateCode)
                 return true;
@@ -270,7 +275,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         [Obsolete]
         public async Task<bool> GetShow(InternalEpisodeStartedModel episodeStarted, string showTitle)
         {
-            var show = await Series.FindAsynchronous(series => series.Title.ToLower() == showTitle.ToLower());
+            var show = await _mongoSeriesCollection.FindAsynchronous(series => series.Title.ToLower() == showTitle.ToLower());
 
             if (show != null)
             {
@@ -313,7 +318,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="title"></param>
         public async Task<bool> IsMediaExistInMongoDb(string title)
         {
-            var exist = await Series.FindAsynchronous(x => x.Title.ToLower() == title.ToLower());
+            var exist = await _mongoSeriesCollection.FindAsynchronous(x => x.Title.ToLower() == title.ToLower());
             return exist.Count > 0;
         }
 
@@ -597,7 +602,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             foreach (var startedSeriesId in startedSeriesIds)
             {
                 var searchedSeries =
-                    await Series.FindAsynchronous(
+                    await _mongoSeriesCollection.FindAsynchronous(
                         series => series.TvMazeId == startedSeriesId[0].ToString() ||
                                   series.TmdbId == startedSeriesId[1].ToString());
 
@@ -611,7 +616,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             var genreParameterCount = genre.Count;
 
             //var allSeriesFromDb = await Series.FindAsynchronous(s => s.Id == s.Id);
-            var allSeriesFromDb = await Series.FindAsynchronous(s => s.Title != "");
+            var allSeriesFromDb = await _mongoSeriesCollection.FindAsynchronous(s => s.Title != "");
             var allSeries = new List<MongoSeries>(allSeriesFromDb);
 
             //kiválogattam azokat amiket nem követünk
@@ -688,7 +693,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         public async Task<InternalReturnSeriesEpisodeModel> GetSeriesByStartedEpisode(string showName, int seasonnum,
             int episodenum, int userid)
         {
-            var seriesDaoList = await Series.FindAsynchronous(show => show.Title == showName);
+            var seriesDaoList = await _mongoSeriesCollection.FindAsynchronous(show => show.Title == showName);
             var internalSeriesList = seriesDaoList.Select(x => _seriesMapper.Map(x)).ToList();
 
             var startedEpisode =
@@ -728,7 +733,7 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="title"></param>
         public async Task<InternalSeries> GetSeries(string title)
         {
-            var seriesList = await Series.FindAsynchronous(x => x.Title == title);
+            var seriesList = await _mongoSeriesCollection.FindAsynchronous(x => x.Title == title);
             var series = seriesList.FirstOrDefault();
             //TODO replace mapper
             if (series != null)
@@ -759,7 +764,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             foreach (var startedSeriesId in startedSeriesIds)
             {
                 var searchedSeries =
-                    await Series.FindAsynchronous(
+                    await _mongoSeriesCollection.FindAsynchronous(
                         series => series.TvMazeId == startedSeriesId[0].ToString() ||
                                   series.TmdbId == startedSeriesId[1].ToString());
 
@@ -785,7 +790,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             //Olyan sorozatot ajánlunk, ahol a genre a mostWatchedból megegyezik, és nem szerepel még a sorozat a listánkon
 
             //1 kiszedem azokat a sorozatokat amelyeknek megegyezik a genre-je a listából
-            var allSeries = await Series.FindAsynchronous(s => s.Title != "");
+            var allSeries = await _mongoSeriesCollection.FindAsynchronous(s => s.Title != "");
             var listOfMatchingGenresSeries = new List<InternalSeries>();
             var mostWatchedGenresCount = mostWatchedGenres.Count();
             Dictionary<InternalSeries, int> genresCountChecked = new Dictionary<InternalSeries, int>();
@@ -867,7 +872,7 @@ namespace Series.DataManagement.MongoDB.Repositories
 
         public async Task<InternalSeries> GetSeriesById(int tvmazeid, int tmdbid)
         {
-            var serieslist = await Series.FindAsynchronous(
+            var serieslist = await _mongoSeriesCollection.FindAsynchronous(
                 series => series.TvMazeId == tvmazeid.ToString() || series.TmdbId == tmdbid.ToString());
             return _seriesMapper.Map(serieslist.FirstOrDefault());
         }

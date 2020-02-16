@@ -2,7 +2,7 @@
 {
     public class ActorDto
     {
-        public string CharacterName { get; }
-        public string RealName { get; }
+        public string CharacterName { get; set; }
+        public string RealName { get; set; }
     }
 }

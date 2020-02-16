@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Series.Dto\Series.Dto.csproj" />
+    <ProjectReference Include="..\..\..\Standard.Core\Standard.Core.csproj" />
     <ProjectReference Include="..\Series\Series.csproj" />
   </ItemGroup>
 

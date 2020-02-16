@@ -2,7 +2,7 @@
 {
     public class NetworkDto
     {
-        public string Name { get; }
-        public string OriginCountry { get; }
+        public string Name { get; set; }
+        public string OriginCountry { get; set; }
     }
 }

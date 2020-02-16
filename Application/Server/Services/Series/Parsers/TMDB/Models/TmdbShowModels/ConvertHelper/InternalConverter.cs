@@ -14,12 +14,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             foreach (var tmdbSeason in tmdbSeasons)
             {
                 InternalSeason internalSeason = new InternalSeason();
-                internalSeason.Id = tmdbSeason.Id;
+                internalSeason.TvMazeId = tmdbSeason.Id;
                 internalSeason.EpisodesCount = tmdbSeason.Episodes.Count;
                 internalSeason.SeasonNumber = tmdbSeason.SeasonNumber;
                 internalSeason.Summary = tmdbSeason.Overview;
                 internalSeason.Name = tmdbSeason.Name;
-                internalSeason.Airdate = tmdbSeason.AirDate;
+                internalSeason.AirDate = tmdbSeason.AirDate;
 
                 List<InternalEpisode> episodesConverted = new List<InternalEpisode>();
 
