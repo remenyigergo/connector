@@ -1,4 +1,4 @@
-﻿namespace Standard.Core
+﻿namespace Standard.Core.Configuration
 {
     public class MongoConnection
     {

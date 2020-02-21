@@ -15,8 +15,14 @@ namespace Series.Service
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
-                .UseConfiguration(SetupConfiguration())
-                .UseStartup<Startup>();
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile(
+                        "appsettings.json", optional: true, reloadOnChange: true);
+                })
+                .UseStartup<Startup>()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseKestrel();
         }
 
         private static IConfigurationRoot SetupConfiguration()

@@ -25,6 +25,7 @@ namespace Series.Service
             services.RegisterServices();
             services.RegisterDtoInternalMappers();
             services.RegisterInternalDaoMappers();
+            services.ConfigureRepositories();
 
             //Build for serviceConfiguration access for Db
             var serviceProvider = services.BuildServiceProvider();

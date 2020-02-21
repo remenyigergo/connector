@@ -9,10 +9,10 @@ namespace Series.Service.ServiceConfigurationExtensions
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IFeedRepository, FeedRepository>();
-            services.AddTransient<IChatRepository, ChatRepository>();
-            services.AddTransient<ISeriesRepository, SeriesRepository>();
+            services.AddTransient<ISeries, Series>();
+
+            
+
         }
     }
 }

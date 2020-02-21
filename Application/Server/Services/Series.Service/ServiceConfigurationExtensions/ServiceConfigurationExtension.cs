@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Standard.Core;
+using Standard.Core.Configuration;
 
 namespace Series.Service.ServiceConfigurationExtensions
 {
@@ -8,7 +8,11 @@ namespace Series.Service.ServiceConfigurationExtensions
     {
         public static void SetConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<ServiceConfiguration>(configuration.GetSection("ApplicationSettings"));
+            var serviceConfig = new ServiceConfiguration();
+            configuration.GetSection("ServiceConfiguration").Get<ServiceConfiguration>();
+
+            //services.Configure<ServiceConfiguration>(configuration.GetSection("MongoConnection"));
+            //services.AddSingleton<ServiceConfiguration>();
         }
     }
 }

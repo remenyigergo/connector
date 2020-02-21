@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using Series.DataManagement.MongoDB.Models.Series;
 using Standard.Core;
+using Standard.Core.Configuration;
 
 namespace Series.Service.ServiceConfigurationExtensions
 {
@@ -16,7 +17,7 @@ namespace Series.Service.ServiceConfigurationExtensions
         public static IMongoDatabase SetupDbConnection(System.IServiceProvider serviceProvider)
         {
             var serviceConfiguration = serviceProvider.GetService<ServiceConfiguration>();
-
+            
             var client = new MongoClient(serviceConfiguration.Connection.ConnectionString);
             return client.GetDatabase(serviceConfiguration.Connection.Database);
         }
