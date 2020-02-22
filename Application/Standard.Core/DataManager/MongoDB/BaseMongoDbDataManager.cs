@@ -4,21 +4,23 @@ using MongoDB.Driver;
 using Series.DataManagement.MongoDB.Models;
 using Series.DataManagement.MongoDB.Models.Series;
 using Standard.Core.DataManager.MongoDB.DbModels;
+using System;
 
 namespace Standard.Core.DataManager.MongoDB
 {
+    [Obsolete]
     public class BaseMongoDbDataManager
     {
         protected readonly IMongoDatabase Database;
 
         public BaseMongoDbDataManager(IOptions<MongoDbSettings> settings)
         {
-            Configuration = (IConfigurationRoot) settings.Value.IConfigurationRoot;
-            settings.Value.ConnectionString = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-            settings.Value.Database = Configuration.GetSection("MongoConnection:Database").Value;
+            //Configuration = (IConfigurationRoot) settings.Value.IConfigurationRoot;
+            //settings.Value.ConnectionString = Configuration.GetSection("MongoConnection:ConnectionString").Value;
+            //settings.Value.Database = Configuration.GetSection("MongoConnection:Database").Value;
 
-            var client = new MongoClient(settings.Value.ConnectionString);
-            Database = client.GetDatabase(settings.Value.Database);
+            //var client = new MongoClient(settings.Value.ConnectionString);
+            //Database = client.GetDatabase(settings.Value.Database);
         }
 
         private IConfigurationRoot Configuration { get; }

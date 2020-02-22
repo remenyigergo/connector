@@ -19,7 +19,7 @@ namespace Series.Parsers.TvMaze
         private const string _endpoint = "http://api.tvmaze.com";
 
         //LESZEDJÜK AZ APIN KERESZTÜL ÉS ÁTALAKÍTJUK SAJÁT SOROZAT FORMÁTUMRA
-        public async Task<Standard.Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title)
+        public async Task<InternalSeries> ImportSeries(string title)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace Series.Parsers.TvMaze
                 foreach (var season in tvMazeSeasons)
                     seasons.Add(season.SeasonNumber, new InternalSeason
                     {
-                        Id = season.Id,
+                        TvMazeId = season.Id,
                         Summary = season.Summary,
                         EpisodesCount = season.EpisodesCount ?? 0,
                         SeasonNumber = season.SeasonNumber,
@@ -113,12 +113,12 @@ namespace Series.Parsers.TvMaze
 
         public async Task<InternalShowCast> GetCast(int showId)
         {
-            List<Actor> personList = new List<Actor>();
+            List<InternalActor> personList = new List<InternalActor>();
             var tmdbShowCast =
                 await new WebClientManager().Get<List<TvMazeShowCast>>($"{_endpoint}/shows/{showId}/cast");
 
             foreach (var character in tmdbShowCast)
-                personList.Add(new Actor
+                personList.Add(new InternalActor
                 {
                     CharacterName = character.Character.Name,
                     RealName = character.Person.Name

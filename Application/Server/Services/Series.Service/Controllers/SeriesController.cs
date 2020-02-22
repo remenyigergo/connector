@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Series.Service.Models;
-using Series.Service.Requests;
+using Series.Dto.RequestDtoModels;
+using Series.Dto.RequestDtoModels.SeriesDto;
 using Standard.Contracts;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
-using Standard.Contracts.Models.Series;
-using Standard.Contracts.Models.Series.ExtendClasses;
-using Standard.Contracts.Requests;
-using Standard.Contracts.Requests.Series;
+
 
 namespace Series.Service.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/")]
     [ApiController]
     public class SeriesController : ControllerBase
     {
+        private readonly ISeries _seriesService;
+
+        public SeriesController(ISeries seriesService)
+        {
+            _seriesService = seriesService;
+        }
+
         [HttpPost("import")]
-        public async Task<Result<bool>> ImportSeries([FromBody] ImportRequest request)
+        public async Task<Result<bool>> ImportSeries([FromBody] ImportSeriesDto request)
         {
             try
             {
@@ -35,7 +39,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                await new Series().ImportSeries(request.Title);
+                await _seriesService.ImportSeries(request.Title);
             }
             catch (InternalException ex)
             {
@@ -70,7 +74,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("mark")]
-        public async Task<Result<bool>> MarkAsSeen([FromBody] MarkRequest request)
+        public async Task<Result<bool>> MarkAsSeen([FromBody] MarkRequestDto request)
         {
             try
             {
@@ -86,7 +90,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                var markseen = await new Series().MarkAsSeen(int.Parse(request.UserId), request.TvMazeId,
+                var markseen = await _seriesService.MarkAsSeen(int.Parse(request.UserId), request.TvMazeId,
                     request.TmdbId,
                     int.Parse(request.SeasonNumber), int.Parse(request.EpisodeNumber), request.ShowName);
                 if (!markseen)
@@ -118,7 +122,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<Result<bool>> AddSeries([FromBody] AddedSeriesRequest request)
+        public async Task<Result<bool>> AddSeries([FromBody] AddedSeriesRequestDto request)
         {
             try
             {
@@ -133,7 +137,7 @@ namespace Series.Service.Controllers
                     };
                 }
                 //TODO: TVMAZE ÉS TMDB CAST & SHOW CREW importálása a későbbiekben
-                await new Series().AddSeriesToUser(int.Parse(request.Userid), int.Parse(request.Seriesid));
+                await _seriesService.AddSeriesToUser(int.Parse(request.Userid), int.Parse(request.Seriesid));
             }
             catch (InternalException ex)
             {
@@ -207,7 +211,7 @@ namespace Series.Service.Controllers
         //}
 
         [HttpPost("update")]
-        public async Task<Result<bool>> UpdateSeries([FromBody] ImportRequest request)
+        public async Task<Result<bool>> UpdateSeries([FromBody] ImportSeriesDto request)
         {
             try
             {
@@ -222,7 +226,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                await new Series().UpdateSeries(request.Title);
+                await _seriesService.UpdateSeries(request.Title);
             }
             catch (InternalException ex)
             {
@@ -268,30 +272,14 @@ namespace Series.Service.Controllers
             };
         }
 
-        //[HttpPost("getshow")]
-        //public async Task<Result<bool>> GetShow([FromBody] GetShowRequest request)
-        //{
-        //    try
-        //    {
-
-        //        await new Series().GetShow(request.Episode, request.Title);
-        //    }
-        //    catch ()
-        //    {
-
-        //    }
-
-
-        //}
-
         [HttpPost("getseries")]
-        public async Task<Result<InternalSeries>> GetSeries([FromBody] GetSeriesRequest request)
+        public async Task<Result<SeriesDto>> GetSeries([FromBody] GetSeriesRequestDto request)
         {
             try
             {
-                var series = await new Series().GetSeries(request.Title);
+                var series = await _seriesService.GetSeries(request.Title);
                 if (series != null)
-                    return new Result<InternalSeries>
+                    return new Result<SeriesDto>
                     {
                         Data = series,
                         ResultCode = (int) HttpStatusCode.OK,
@@ -303,7 +291,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.SeriesNotFound)
                 {
                     Response.StatusCode = (int) CoreCodes.SeriesNotFound;
-                    return new Result<InternalSeries>
+                    return new Result<SeriesDto>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -314,7 +302,7 @@ namespace Series.Service.Controllers
             catch (Exception ex)
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<InternalSeries>
+                return new Result<SeriesDto>
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
@@ -322,7 +310,7 @@ namespace Series.Service.Controllers
                 };
             }
 
-            return new Result<InternalSeries>
+            return new Result<SeriesDto>
             {
                 Data = null,
                 ResultCode = (int) CoreCodes.SeriesNotFound,
@@ -331,7 +319,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("exist")]
-        public async Task<Result<int>> IsShowExist([FromBody] InternalImportRequest request)
+        public async Task<Result<int>> IsShowExist([FromBody] ImportSeriesDto request)
         {
             try
             {
@@ -346,7 +334,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                var existEnumType = await new Series().IsShowExist(request);
+                var existEnumType = await _seriesService.IsShowExist(request);
                 var enumVal = (MediaExistIn) existEnumType;
                 return new Result<int>
                 {
@@ -399,7 +387,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("updateStartedEpisode/{showName}")]
-        public async Task<Result<bool>> UpdateStartedEpisode([FromBody] InternalEpisodeStartedModel internalEpisode,
+        public async Task<Result<bool>> UpdateStartedEpisode([FromBody] EpisodeStartedDto internalEpisode,
             string showName)
         {
             try
@@ -416,7 +404,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                var update = await new Series().UpdateStartedEpisode(internalEpisode, showName);
+                var update = await _seriesService.UpdateStartedEpisode(internalEpisode, showName);
                 if (update)
                 {
                     Response.StatusCode = (int) HttpStatusCode.OK;
@@ -471,7 +459,7 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("rate/episode")]
-        public async Task<Result<bool>> RateEpisode([FromBody] EpisodeRateRequest episodeRate)
+        public async Task<Result<bool>> RateEpisode([FromBody] EpisodeRateRequestDto episodeRate)
         {
             try
             {
@@ -486,7 +474,7 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                await new Series().RateEpisode(episodeRate.UserId, episodeRate.TvMazeId, episodeRate.TmdbId,
+                await _seriesService.RateEpisode(episodeRate.UserId, episodeRate.TvMazeId, episodeRate.TmdbId,
                     episodeRate.EpisodeNumber, episodeRate.SeasonNumber, episodeRate.Rate);
             }
             catch (InternalException ex)
@@ -522,23 +510,23 @@ namespace Series.Service.Controllers
         }
 
         [HttpGet("getdays/{days}")]
-        public async Task<Result<InternalStartedAndSeenEpisodes>> GetLastDaysEpisodes(int days, int userid)
+        public async Task<Result<StartedAndSeenEpisodesDto>> GetLastDaysEpisodes(int days, int userid)
         {
             try
             {
                 if (days == 0 || userid == 0)
                 {
                     Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    return new Result<InternalStartedAndSeenEpisodes>
+                    return new Result<StartedAndSeenEpisodesDto>
                     {
                         Data = null,
                         ResultCode = (int) CoreCodes.MalformedRequest,
                         ResultMessage = "Not a correct input."
                     };
                 }
-                var res = await new Series().GetLastDays(days, userid);
+                var res = await _seriesService.GetLastDays(days, userid);
 
-                return new Result<InternalStartedAndSeenEpisodes>
+                return new Result<StartedAndSeenEpisodesDto>
                 {
                     Data = res,
                     ResultCode = (int) HttpStatusCode.OK,
@@ -550,7 +538,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.EpisodeNotRated)
                 {
                     Response.StatusCode = (int) HttpStatusCode.NotModified;
-                    return new Result<InternalStartedAndSeenEpisodes>
+                    return new Result<StartedAndSeenEpisodesDto>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -561,7 +549,7 @@ namespace Series.Service.Controllers
             catch (Exception ex)
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<InternalStartedAndSeenEpisodes>
+                return new Result<StartedAndSeenEpisodesDto>
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
@@ -569,7 +557,7 @@ namespace Series.Service.Controllers
                 };
             }
 
-            return new Result<InternalStartedAndSeenEpisodes>
+            return new Result<StartedAndSeenEpisodesDto>
             {
                 Data = null,
                 ResultCode = (int) CoreCodes.EpisodeStartedAndSeenNotFound,
@@ -578,14 +566,14 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("recommend")]
-        public async Task<Result<List<InternalSeries>>> RecommendSeriesFromDb([FromBody] int userid)
+        public async Task<Result<List<SeriesDto>>> RecommendSeriesFromDb([FromBody] int userid)
         {
             try
             {
                 if (userid == 0)
                 {
                     Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    return new Result<List<InternalSeries>>
+                    return new Result<List<SeriesDto>>
                     {
                         Data = null,
                         ResultCode = (int) CoreCodes.MalformedRequest,
@@ -593,8 +581,8 @@ namespace Series.Service.Controllers
                     };
                 }
 
-                var result = await new Series().RecommendSeriesFromDb(userid);
-                return new Result<List<InternalSeries>>
+                var result = await _seriesService.RecommendSeriesFromDb(userid);
+                return new Result<List<SeriesDto>>
                 {
                     Data = result,
                     ResultCode = (int) HttpStatusCode.OK,
@@ -606,7 +594,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.RecommendFailed)
                 {
                     Response.StatusCode = (int) HttpStatusCode.NotModified;
-                    return new Result<List<InternalSeries>>
+                    return new Result<List<SeriesDto>>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -617,7 +605,7 @@ namespace Series.Service.Controllers
             catch (Exception ex)
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<List<InternalSeries>>
+                return new Result<List<SeriesDto>>
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
@@ -625,7 +613,7 @@ namespace Series.Service.Controllers
                 };
             }
 
-            return new Result<List<InternalSeries>>
+            return new Result<List<SeriesDto>>
             {
                 Data = null,
                 ResultCode = (int) CoreCodes.RecommendFailed,
@@ -634,14 +622,14 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("recommend/genre")]
-        public async Task<Result<List<InternalSeries>>> RecommendSeriesFromDb([FromBody] RecommendByGenreRequest model)
+        public async Task<Result<List<SeriesDto>>> RecommendSeriesFromDb([FromBody] RecommendByGenreRequestDto model)
         {
             try
             {
                 if (model.userid == 0 || model.username.Length == 0 || model.Genres == null || model.Genres.Count == 0)
                 {
                     Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    return new Result<List<InternalSeries>>
+                    return new Result<List<SeriesDto>>
                     {
                         Data = null,
                         ResultCode = (int) CoreCodes.MalformedRequest,
@@ -650,8 +638,8 @@ namespace Series.Service.Controllers
                 }
 
                 var result =
-                    await new Series().RecommendSeriesFromDbByGenre(model.Genres, model.username, model.userid);
-                return new Result<List<InternalSeries>>
+                    await _seriesService.RecommendSeriesFromDbByGenre(model.Genres, model.username, model.userid);
+                return new Result<List<SeriesDto>>
                 {
                     Data = result,
                     ResultCode = (int) HttpStatusCode.OK,
@@ -663,7 +651,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.RecommendFailed)
                 {
                     Response.StatusCode = (int) CoreCodes.RecommendFailed;
-                    return new Result<List<InternalSeries>>
+                    return new Result<List<SeriesDto>>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -674,7 +662,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.UserNotFound)
                 {
                     Response.StatusCode = (int) CoreCodes.UserNotFound;
-                    return new Result<List<InternalSeries>>
+                    return new Result<List<SeriesDto>>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -685,7 +673,7 @@ namespace Series.Service.Controllers
             catch (Exception ex)
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<List<InternalSeries>>
+                return new Result<List<SeriesDto>>
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
@@ -693,7 +681,7 @@ namespace Series.Service.Controllers
                 };
             }
 
-            return new Result<List<InternalSeries>>
+            return new Result<List<SeriesDto>>
             {
                 Data = null,
                 ResultCode = (int) CoreCodes.RecommendFailed,
@@ -702,15 +690,15 @@ namespace Series.Service.Controllers
         }
 
         [HttpPost("check/seen/previous")]
-        public async Task<Result<List<InternalEpisode>>> PreviousEpisodeSeen(
-            [FromBody] InternalPreviousEpisodeSeenRequest model)
+        public async Task<Result<List<EpisodeDto>>> PreviousEpisodeSeen(
+            [FromBody] EpisodeSeenDto model)
         {
             try
             {
                 if (model.userid == 0 || model.title.Length == 0 || model.episodeNum == 0)
                 {
                     Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    return new Result<List<InternalEpisode>>
+                    return new Result<List<EpisodeDto>>
                     {
                         Data = null,
                         ResultCode = (int) CoreCodes.MalformedRequest,
@@ -720,9 +708,9 @@ namespace Series.Service.Controllers
 
 
                 var result =
-                    await new Series().PreviousEpisodeSeen(model.title, model.seasonNum, model.episodeNum,
+                    await _seriesService.PreviousEpisodeSeen(model.title, model.seasonNum, model.episodeNum,
                         model.userid);
-                return new Result<List<InternalEpisode>>
+                return new Result<List<EpisodeDto>>
                 {
                     Data = result,
                     ResultCode = (int) HttpStatusCode.OK,
@@ -734,7 +722,7 @@ namespace Series.Service.Controllers
                 if (ex.ErrorCode == (int) CoreCodes.RecommendFailed)
                 {
                     Response.StatusCode = (int) CoreCodes.RecommendFailed;
-                    return new Result<List<InternalEpisode>>
+                    return new Result<List<EpisodeDto>>
                     {
                         Data = null,
                         ResultCode = ex.ErrorCode,
@@ -745,7 +733,7 @@ namespace Series.Service.Controllers
             catch (Exception ex)
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                return new Result<List<InternalEpisode>>
+                return new Result<List<EpisodeDto>>
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
@@ -753,7 +741,7 @@ namespace Series.Service.Controllers
                 };
             }
 
-            return new Result<List<InternalEpisode>>
+            return new Result<List<EpisodeDto>>
             {
                 Data = null,
                 ResultCode = (int) CoreCodes.RecommendFailed,

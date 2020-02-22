@@ -3,12 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Series.DataManagement.MongoDB.Repositories;
-using Standard.Core.DataManager.Mongo.Repository;
-using Standard.Core.DataManager.MongoDB.DbModels;
-using Standard.Core.DataManager.MongoDB.IRepository;
-using Standard.Core.DataManager.MongoDB.Repository;
-using Standard.Core.Dependency;
+using Series.Service.ServiceConfigurationExtensions;
 
 namespace Series.Service
 {
@@ -19,30 +14,29 @@ namespace Series.Service
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.Configure<MongoDbSettings>(o => { o.IConfigurationRoot = Configuration; });
 
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IFeedRepository, FeedRepository>();
-            services.AddTransient<IChatRepository, ChatRepository>();
-            services.AddTransient<ISeriesRepository, SeriesRepository>();
+            services.SetConfiguration(Configuration);
+            services.RegisterServices();
+            services.RegisterDtoInternalMappers();
+            services.RegisterInternalDaoMappers();
+            services.ConfigureRepositories();
 
-            ServiceDependency.Current = services.BuildServiceProvider();
+            //Build for serviceConfiguration access for Db
+            var serviceProvider = services.BuildServiceProvider();
+
+            services.HandleDb(serviceProvider);
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-//            if (env.IsDevelopment())
-//            {
-//                app.UseDeveloperExceptionPage();
-//            }
-
             app.UseMvc();
         }
     }

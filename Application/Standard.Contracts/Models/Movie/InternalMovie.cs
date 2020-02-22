@@ -14,7 +14,7 @@ namespace Standard.Contracts.Models.Movie
         public long? Budget;
         public string Director;
         public string DVD;
-        public List<InternalGenre> Genres;
+        public List<InternalMovieGenre> Genres;
         public string Homepage;
         public string ImdbId;
         public double ImdbRating;

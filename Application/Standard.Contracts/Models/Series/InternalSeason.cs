@@ -5,18 +5,14 @@ namespace Standard.Contracts.Models.Series
     public class InternalSeason
     {
         //TMDB
-        public string Airdate;
-
-        public List<InternalEpisode> Episodes;
-
-        public int EpisodesCount;
+        public string AirDate { get; set; }
+        public List<InternalEpisode> Episodes { get; set; }
+        public int EpisodesCount { get; set; }
 
         //TVMAZE
-        public int Id;
-
-        public string Name;
-
-        public int SeasonNumber;
-        public string Summary;
+        public int TvMazeId { get; set; }
+        public string Name { get; set; }
+        public int SeasonNumber { get; set; }
+        public string Summary { get; set; }
     }
 }

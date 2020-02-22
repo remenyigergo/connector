@@ -93,7 +93,7 @@ namespace Movie.DataManagement.Converter
             return null;
         }
 
-        public List<Genre> Genre(List<InternalGenre> internalGenres)
+        public List<Genre> Genre(List<InternalMovieGenre> internalGenres)
         {
             var genres = new List<Genre>();
             foreach (var internalGenre in internalGenres)

@@ -2,14 +2,13 @@
 using System.Threading.Tasks;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
-using Series.Service.Models;
 using Standard.Contracts.Models.Series;
 
 namespace Series.DataManagement.MongoDB.Repositories
 {
     public interface ISeriesRepository
     {
-        Task<List<MongoSeries>> GetSeriesByTitle(string name);
+        Task<List<InternalSeries>> GetSeriesByTitle(string name);
         Task AddInternalSeries(InternalSeries series);
         Task DeleteSeriesById(int id);
         Task<bool> IsSeriesImported(string title);
@@ -22,15 +21,14 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task MarkEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
         Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStartedModel);
         Task<bool> DeleteStartedEpisode(string tvmazeid, string tmdbid, int season, int episode);
-        Task<bool> GetShow(EpisodeStarted episodeStarted, string title);
+        Task<bool> GetShow(InternalEpisodeStartedModel episodeStarted, string title);
         Task<bool> IsMediaExistInMongoDb(string title);
         Task<InternalSeries> GetSeries(string title);
         Task<bool> UpdateStartedEpisode(InternalEpisodeStartedModel internalEpisode);
 
         //TODO: FELFEJLESZTENI
         Task SetFavoriteSeries(int userid, int tvmazeid, int tmdbid); //többis lehet
-
-        Task<List<FavoriteSeries>> GetAllFavoritesSeries(int userid);
+        Task<List<InternalFavoriteSeries>> GetAllFavoritesSeries(int userid);
         Task<bool> IsSeriesFavoriteAlready(int userid, int tvmazeid, int tmdbid);
 
         Task SetFavoriteEpisodes(int userid, int tvmazeid, int tmdbid, int episode,
@@ -48,16 +46,16 @@ namespace Series.DataManagement.MongoDB.Repositories
         Task<bool> RateEpisode(int userid, int? tvmazeid, int? tmdbid, int episode, int season,
             int rate); //folyamatos frissítéssel akárhányszor
 
-        Task<StartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
+        Task<InternalStartedAndSeenEpisodes> GetLastDaysEpisodes(int days, int userid);
         Task<List<InternalSeries>> RecommendSeries(int userid);
 
         Task<List<Standard.Contracts.Models.Series.InternalSeries>> RecommendSeries(
-            List<Standard.Contracts.Models.Series.ExtendClasses.InternalGenre> genre, string username, int userid);
+            List<Standard.Contracts.Models.Series.ExtendClasses.InternalSeriesGenre> genre, string username, int userid);
 
-        Task<ReturnSeriesEpisodeModel>
+        Task<InternalReturnSeriesEpisodeModel>
             GetSeriesByStartedEpisode(string show, int seasonnum, int episodenum, int userid);
 
-        Task<List<EpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid,
+        Task<List<InternalEpisodeSeen>> PreviousEpisodeSeen(int seasonnum, int episodenum, int tvmazeid, int tmbdid,
             int userid);
 
         //Task<List<InternalEpisode>> GetNotSeenEpisodes(int seasonNum, List<int> notSeenEpisodeIds, int tvmazeid, int tmbdid);

@@ -5,8 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Response\" />
-    <Folder Include="wwwroot\" />
+    <Compile Remove="Response\**" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="Response\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Response\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Response\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Series.Dto\Series.Dto.csproj" />
+    <ProjectReference Include="..\..\..\Standard.Core\Standard.Core.csproj" />
     <ProjectReference Include="..\Series\Series.csproj" />
   </ItemGroup>
 

@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Standard.Contracts.Models.Series;
+using System.Threading.Tasks;
 
 namespace Series.Parsers
 {
     public interface IParser
     {
-        Task<Standard.Contracts.Models.Series.InternalSeries> ImportSeriesFromTvMaze(string title);
+        Task<InternalSeries> ImportSeries(string title);
     }
 }

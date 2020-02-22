@@ -6,13 +6,13 @@ namespace Movie.DataManagement.Parsers.OMDB.Converter
 {
     public class OmdbConverter
     {
-        public List<InternalGenre> SplitGenre(string genres)
+        public List<InternalMovieGenre> SplitGenre(string genres)
         {
             var splitGenres = genres.Split(',');
-            var genreList = new List<InternalGenre>();
+            var genreList = new List<InternalMovieGenre>();
 
             foreach (var splitGenre in splitGenres)
-                genreList.Add(new InternalGenre
+                genreList.Add(new InternalMovieGenre
                 {
                     //ID NINCS
                     Name = splitGenre

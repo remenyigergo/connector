@@ -14,7 +14,7 @@ using Standard.Core.NetworkManager;
 
 namespace Series.Parsers.TMDB
 {
-    public class TmdbParser
+    public class TmdbParser : IParser
     {
         //https://api.themoviedb.org/3/search/tv?api_key=e9443688992dbb4fa3940ed77a0a8e1d&language=en-US&page=1&query=fargo  ez egy sorozat keresés
         //https://api.themoviedb.org/3/tv/60622?api_key=e9443688992dbb4fa3940ed77a0a8e1d&language=en-US ez mindennel együtt visszaadja de ID kell hozzá
@@ -24,7 +24,7 @@ namespace Series.Parsers.TMDB
         private const string _lang = "en-US";
         private const string _key = "e9443688992dbb4fa3940ed77a0a8e1d";
 
-        public async Task<InternalSeries> ImportTmdbSeries(string title)
+        public async Task<InternalSeries> ImportSeries(string title)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Series.Parsers.TMDB
                     CreatedBy = tmdbShowSimple.CreatedBy.Select(x => new InternalCreator {Name = x.Name}).ToList(),
                     EpisodeRunTime = tmdbShowSimple.EpisodeRunTime,
                     FirstAirDate = tmdbShowSimple.FirstAirDate,
-                    Genres = tmdbShowSimple.Genres.Select(x => new InternalGenre(x.Name)).ToList(),
+                    Genres = tmdbShowSimple.Genres.Select(x => new InternalSeriesGenre(x.Name)).ToList(),
                     LastEpisodeSimpleToAir =
                         InternalConverter.ConvertTmdbEpisodeToInternal(tmdbShowSimple.LastEpisodeToAir),
                     Networks = InternalConverter.ConvertTmdbNetworkToInternal(tmdbShowSimple.Networks),

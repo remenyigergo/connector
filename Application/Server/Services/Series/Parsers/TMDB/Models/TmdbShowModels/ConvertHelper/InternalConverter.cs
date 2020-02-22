@@ -14,12 +14,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             foreach (var tmdbSeason in tmdbSeasons)
             {
                 InternalSeason internalSeason = new InternalSeason();
-                internalSeason.Id = tmdbSeason.Id;
+                internalSeason.TvMazeId = tmdbSeason.Id;
                 internalSeason.EpisodesCount = tmdbSeason.Episodes.Count;
                 internalSeason.SeasonNumber = tmdbSeason.SeasonNumber;
                 internalSeason.Summary = tmdbSeason.Overview;
                 internalSeason.Name = tmdbSeason.Name;
-                internalSeason.Airdate = tmdbSeason.AirDate;
+                internalSeason.AirDate = tmdbSeason.AirDate;
 
                 List<InternalEpisode> episodesConverted = new List<InternalEpisode>();
 
@@ -59,12 +59,12 @@ namespace Series.Parsers.TMDB.Models.TmdbShowModels.ConvertHelper
             return internalCreatorList;
         }
 
-        public static List<InternalGenre> ConvertTmdbGenreToInternal(List<Genre> genres)
+        public static List<InternalSeriesGenre> ConvertTmdbGenreToInternal(List<Genre> genres)
         {
-            List<InternalGenre> internalGenreList = new List<InternalGenre>();
+            List<InternalSeriesGenre> internalGenreList = new List<InternalSeriesGenre>();
 
             foreach (var genre in genres)
-                internalGenreList.Add(new InternalGenre(genre.Name));
+                internalGenreList.Add(new InternalSeriesGenre(genre.Name));
 
             return internalGenreList;
         }

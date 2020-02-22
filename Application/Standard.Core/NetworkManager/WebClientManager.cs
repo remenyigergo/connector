@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Series.Service.Models;
 using Standard.Contracts;
 using Standard.Contracts.Models.Books;
 using Standard.Contracts.Models.Series;
