@@ -1,6 +1,6 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class SeriesRate
+    public class SeriesRateDao
     {
         public int Rate;
         public int TmdbId;

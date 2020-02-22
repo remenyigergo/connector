@@ -24,14 +24,5 @@ namespace Series.Service
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseKestrel();
         }
-
-        private static IConfigurationRoot SetupConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false)
-                .Build();
-            return config;
-        }
     }
 }

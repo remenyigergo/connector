@@ -9,10 +9,9 @@ namespace Series.Service.ServiceConfigurationExtensions
         public static void SetConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             var serviceConfig = new ServiceConfiguration();
-            configuration.GetSection("ServiceConfiguration").Get<ServiceConfiguration>();
+            serviceConfig = configuration.GetSection("ServiceConfiguration").Get<ServiceConfiguration>();
 
-            //services.Configure<ServiceConfiguration>(configuration.GetSection("MongoConnection"));
-            //services.AddSingleton<ServiceConfiguration>();
+            services.AddSingleton<ServiceConfiguration>(serviceConfig);
         }
     }
 }

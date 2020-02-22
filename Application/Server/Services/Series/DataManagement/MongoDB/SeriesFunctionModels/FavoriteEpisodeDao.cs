@@ -1,8 +1,9 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class SeriesComment
+    public class FavoriteEpisodeDao
     {
-        public string Message;
+        public int EpisodeNumber;
+        public int SeasonNumber;
         public string TmdbId;
         public string TvMazeId;
         public int UserId;

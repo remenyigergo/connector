@@ -5,7 +5,7 @@ using Standard.Contracts.Models.Series.ExtendClasses;
 
 namespace Series.DataManagement.MongoDB.Models.Series
 {
-    public class MongoSeries
+    public class MongoSeriesDao
     {
         [BsonId]
         [BsonIgnoreIfNull]

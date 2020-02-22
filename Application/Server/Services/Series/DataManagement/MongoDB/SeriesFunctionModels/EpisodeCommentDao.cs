@@ -1,6 +1,6 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class EpisodeComment
+    public class EpisodeCommentDao
     {
         public int EpisodeNumber;
         public string Message;

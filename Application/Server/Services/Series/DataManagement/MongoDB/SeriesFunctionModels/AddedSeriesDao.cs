@@ -1,6 +1,6 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    public class AddedSeries
+    public class AddedSeriesDao
     {
         public int Seriesid;
         public int Userid;

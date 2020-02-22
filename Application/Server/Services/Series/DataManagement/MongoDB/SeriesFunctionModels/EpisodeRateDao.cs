@@ -1,6 +1,6 @@
 ﻿namespace Series.DataManagement.MongoDB.SeriesFunctionModels
 {
-    internal class EpisodeRate
+    internal class EpisodeRateDao
     {
         public int EpisodeNumber;
         public int Rate;

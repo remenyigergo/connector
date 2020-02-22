@@ -12,7 +12,7 @@ using Standard.Contracts.Exceptions;
 
 namespace Series.Service.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]/")]
     [ApiController]
     public class SeriesController : ControllerBase
     {

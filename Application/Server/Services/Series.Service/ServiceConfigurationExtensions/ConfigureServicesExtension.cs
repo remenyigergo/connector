@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Series.DataManagement.MongoDB.Repositories;
-using Standard.Core.DataManager.MongoDB.IRepository;
-using Standard.Core.DataManager.MongoDB.Repository;
 
 namespace Series.Service.ServiceConfigurationExtensions
 {
