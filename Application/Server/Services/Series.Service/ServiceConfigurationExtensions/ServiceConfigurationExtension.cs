@@ -8,10 +8,8 @@ namespace Series.Service.ServiceConfigurationExtensions
     {
         public static void SetConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            var serviceConfig = new ServiceConfiguration();
-            serviceConfig = configuration.GetSection("ServiceConfiguration").Get<ServiceConfiguration>();
-
-            services.AddSingleton<ServiceConfiguration>(serviceConfig);
+            var serviceConfig = configuration.GetSection("ServiceConfiguration").Get<ServiceConfiguration>();
+            services.AddSingleton<IServiceConfiguration>(serviceConfig);
         }
     }
 }

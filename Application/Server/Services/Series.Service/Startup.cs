@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Series.Service.ServiceConfigurationExtensions;
+using Standard.Core.Configuration;
 
 namespace Series.Service
 {
@@ -25,12 +26,15 @@ namespace Series.Service
             services.RegisterServices();
             services.RegisterDtoInternalMappers();
             services.RegisterInternalDaoMappers();
+            services.RegisterSupportedMappers();
             services.ConfigureRepositories();
+            services.RegisterCommonServices();
 
             //Build for serviceConfiguration access for Db
             var serviceProvider = services.BuildServiceProvider();
 
             services.HandleDb(serviceProvider);
+            
         }
 
 

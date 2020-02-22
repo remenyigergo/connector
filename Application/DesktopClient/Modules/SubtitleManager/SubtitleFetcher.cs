@@ -24,7 +24,7 @@ namespace DesktopClient.Modules.SubtitleManager
                 var dirName = new DirectoryInfo(d).Name;
                 var dirNameCleaned = SeriesHelper.GetTitle(dirName);
 
-                var showName = SeriesHelper.GetTitle(new MPC().IsMediaRunning().MainWindowTitle);
+                var showName = SeriesHelper.GetTitle(new MPC().FindProcessByName().MainWindowTitle);
 
 
                 if (dirNameCleaned != null && dirNameCleaned.ToLower() == showName
@@ -35,49 +35,6 @@ namespace DesktopClient.Modules.SubtitleManager
             return "";
         }
 
-        public static string GetFolderPathFromMPCweb()
-        {
-            var path = string.Empty;
-
-            try
-            {
-                using (var client = new WebClient())
-                {
-                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(htmlString);
-                    var xPath = "(/html/body/p)[5]";
-                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
-                    path = node.InnerHtml.Replace(@"\\", @"\");
-                }
-            }
-            catch (WebException WebEx)
-            {
-            }
-            return path;
-        }
-
-        public static string GetFilenameFromMPCweb()
-        {
-            var filename = string.Empty;
-
-            try
-            {
-                using (var client = new WebClient())
-                {
-                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(htmlString);
-                    var xPath = "(/html/body/p)[1]";
-                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
-                    filename = node.InnerHtml.Replace(@"\\", @"\");
-                }
-            }
-            catch (WebException WebEx)
-            {
-            }
-            return filename;
-        }
 
         //public static bool IsThereSubtitles(string folderPath, string showName, int episodeNum, int seasonNum)
         //{

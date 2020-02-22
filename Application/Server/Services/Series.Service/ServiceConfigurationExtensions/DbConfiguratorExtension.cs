@@ -17,7 +17,7 @@ namespace Series.Service.ServiceConfigurationExtensions
 
         public static IMongoDatabase SetupDbConnection(System.IServiceProvider serviceProvider)
         {
-            var serviceConfiguration = serviceProvider.GetService<ServiceConfiguration>();
+            var serviceConfiguration = serviceProvider.GetService<IServiceConfiguration>();
             
             var client = new MongoClient(serviceConfiguration.MongoConnection.ConnectionString);
             return client.GetDatabase(serviceConfiguration.MongoConnection.Database);
@@ -28,7 +28,6 @@ namespace Series.Service.ServiceConfigurationExtensions
             //Is this ok? Yes it is :)
             var mongoSeriesCollection = db.GetCollection<MongoSeriesDao>("Series");
             var seenEpisodesCollection = db.GetCollection<EpisodeSeenDao>("SeenEpisodes");
-
 
             services.AddSingleton(db);
             services.AddSingleton(mongoSeriesCollection);
@@ -51,6 +50,5 @@ namespace Series.Service.ServiceConfigurationExtensions
             //private IMongoCollection<EpisodeRate> EpisodeRates =>
             //    Database.GetCollection<EpisodeRate>("EpisodeRates");
         }
-
     }
 }

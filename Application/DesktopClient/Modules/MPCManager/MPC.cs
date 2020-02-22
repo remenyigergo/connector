@@ -10,14 +10,17 @@ using DesktopClient.Modules.Helpers;
 using DesktopClient.Modules.Helpers.Book;
 using DesktopClient.Modules.Helpers.Movie;
 using DesktopClient.Modules.Helpers.Series;
+using DesktopClient.Modules.Model;
 using DesktopClient.Modules.MPCManager.Model;
 using DesktopClient.Modules.SeriesSubtitleManager.FeliratokInfo.Models;
 using DesktopClient.Modules.SubtitleManager;
 using DesktopClient.Modules.SubtitleManager.MovieSubtitleManager.FeliratokInfo;
 using DesktopClient.Modules.SubtitleManager.SeriesSubtitleManager.FeliratokInfo;
+using Serilog;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Requests;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
+
 
 namespace DesktopClient.Modules.MPCManager
 {
@@ -29,13 +32,26 @@ namespace DesktopClient.Modules.MPCManager
         private static readonly Stopwatch stopWatch = new Stopwatch();
         private static bool mediaJustStarted;
         private Times elapsedTimeInMedia;
-        private string fileName = string.Empty;
-        private string tempShowName = string.Empty;
+        private string fileName;
+        private string tempShowName;
+        private Process playerProcess;
+        private string videoPlayer;
+        private ILogger _log;
 
 
-        public Process IsMediaRunning()
+        public MPC()
         {
-            return new ProcessManager.ProcessManager().FindProcessByName("mpc-hc");
+            mediaJustStarted = false;
+            elapsedTimeInMedia = null;
+            fileName = string.Empty;
+            tempShowName = null;
+            playerProcess = null;
+            videoPlayer = "mpc-hc";
+        }
+
+        public Process FindProcessByName()
+        {
+            return new ProcessManager.ProcessManager().FindProcessByName(videoPlayer);
         }
 
         public async Task<bool> RecognizeMedia(Process playerProcess)
@@ -78,108 +94,62 @@ namespace DesktopClient.Modules.MPCManager
             // TODO get my id
             var userId = 1;
 
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
 
             //await Task.Run(async () =>
             // {
             while (true)
                 try
                 {
-                    var runningMedia = IsMediaRunning();
+                    playerProcess = FindProcessByName();
+                    var path = GetFolderPathFromMPCweb();
+                    var file = GetFilenameFromMPCweb();
 
-                    var path = SubtitleFetcher.GetFolderPathFromMPCweb();
-
-                    var file = SubtitleFetcher.GetFilenameFromMPCweb();
-                    if (file != "")
+                    if (!string.IsNullOrEmpty(file))
                         fileName = file;
 
-                    var showName = SeriesHelper.GetTitle(fileName);
-                    var episodeNumber = SeriesHelper.GetEpisodeNumber(fileName);
-                    var seasonNumber = SeriesHelper.GetSeasonNumber(fileName);
-                    var releaser = SubtitleHelper.GetReleaser(fileName);
-                    var quality = SubtitleHelper.GetQuality(fileName);
+                    var media = new Media(fileName, path);
 
+                    
+                    bool isThereMediaChange = IsThereMediaChange(media);
+                    if (isThereMediaChange)
+                    {
+                        await SavePosition(media);
+                        //await RecommendBook(userId);
+                    }
 
-                    if (showName != null)
-                        tempShowName =
-                            showName; //leálláskor elvesztettük a nevét, mert újrakértem itt, de már nem volt meg    
-
+                    if (media.ShowName != null)
+                        tempShowName = media.ShowName; //leálláskor elvesztettük a nevét, mert újrakértem itt, de már nem volt meg
+                    
 
                     Thread.Sleep(1000); //mert gyorsabban olvasta ki a nevét az MPC-nek, mint ahogy elindult volna
 
-                    //bool isItASeries = false;
-                    //Eldöntjük sorozat vagy film
-                    var isItASeries = SeriesHelper.DoesItContainSeasonAndEpisodeS01E01(fileName);
-
-
-                    if (!mediaJustStarted && runningMedia != null &&
-                        !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
+                    if (IsMediaStarted())
                     {
-                        stopWatch.Start(); //timer indul
+                        stopWatch.Start();
                         mediaJustStarted = true;
 
-                        if (isItASeries)
-                            await ManageSeries(showName, path, episodeNumber, seasonNumber, releaser, quality, fileName,
-                                runningMedia, userId);
+                        if (media.IsItASeries)
+                            await ManageSeries(media.ShowName, path, media.EpisodeNumber, media.SeasonNumber, media.Releaser, media.Quality, fileName,
+                                playerProcess, userId);
                         else
                             await ManageMovie(path, fileName, userId);
-                    }
-                    else if (mediaJustStarted && IsMediaRunning() == null)
-                    {
-                        stopWatch.Stop(); //timer stop
-                        var duration = stopWatch.ElapsedMilliseconds / 1000;
-                        mediaJustStarted = false;
-
-                        if (isItASeries)
-                            await Task.Run(async () =>
-                            {
-                                await SeriesHelper.SavePosition(showName, seasonNumber, episodeNumber,
-                                    (int) stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
-                            });
-                        else
-                            await Task.Run(async () =>
-                            {
-                                await MovieHelper.SavePosition(tempShowName,
-                                    (int) stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
-                            });
-
-                        await RecommendBook(userId);
-                    }
-                    else if (IsMediaRunning() != null && runningMedia != null &&
-                             !runningMedia.MainWindowTitle.StartsWith("Media Player Classic"))
-                    {
-                        //    if (isItASeries)
-                        //    {
-                        //        //Az adott pozíció elmentése sorozat esetén
-                        //        await Task.Run(async () =>
-                        //        {
-                        //            await SeriesHelper.SavePosition(showName, seasonNumber, episodeNumber,
-                        //                mpcVariablesSiteUrl);
-                        //        });
-                        //    }
-                        //    else
-                        //    {
-                        //        //Az adott pozíció elmentése film esetén
-                        //        await Task.Run(async () =>
-                        //        {
-                        //            var mediaFolderName = MovieHelper.TrimDownloadFolders(path);
-                        //            var movieTitle = MovieHelper.GetTitle(mediaFolderName);
-                        //            await MovieHelper.SavePosition(movieTitle, mpcVariablesSiteUrl);
-                        //        });
-                        //    }
 
                         var elapsedTime = GetTimes();
                         if (elapsedTime.SeenSeconds != 0)
                             elapsedTimeInMedia = elapsedTime;
                     }
+                    
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                 }
                 catch (Win32Exception ex)
                 {
+                    _log.Error(ex.Message);
                 }
                 catch (Exception e)
                 {
+                    _log.Error(e.Message);
                 }
             // });
         }
@@ -189,7 +159,7 @@ namespace DesktopClient.Modules.MPCManager
         {
             var isNewSeries = await SeriesHelper.IsTheShowExist(showName);
 
-            if (isNewSeries != (int) MediaExistIn.MONGO) //nincs a mongoban
+            if (isNewSeries != (int)MediaExistIn.MONGO) //nincs a mongoban
                 await SeriesHelper.ImportRequest(showName);
 
             if (!FeliratokInfoSeriesDownloader.IsThereSubtitles(path, showName, episodeNumber, seasonNumber))
@@ -242,7 +212,7 @@ namespace DesktopClient.Modules.MPCManager
                 if (!StartedMovie)
                 {
                     var isNewMovie = await MovieHelper.IsTheMovieExist(movieTitle);
-                    if (isNewMovie != (int) MediaExistIn.MONGO) //nincs a mongoban
+                    if (isNewMovie != (int)MediaExistIn.MONGO) //nincs a mongoban
                         await MovieHelper.ImportRequest(movieTitle);
                 }
                 else
@@ -318,6 +288,86 @@ namespace DesktopClient.Modules.MPCManager
                     SeenMinutes = int.Parse(pos[1])
                 };
             }
+        }
+
+        private bool IsMediaStarted()
+        {
+            return playerProcess != null && !playerProcess.MainWindowTitle.StartsWith("Media Player Classic");
+        }
+
+        private bool IsThereMediaChange(Media media)
+        {
+            if (tempShowName == null)
+            {
+                return false;
+            }
+
+            return tempShowName != media.ShowName;
+        }
+
+        private async Task SavePosition(Media media)
+        {
+            stopWatch.Stop();
+            var duration = stopWatch.ElapsedMilliseconds / 1000;
+            mediaJustStarted = false;
+
+            if (media.IsItASeries)
+                await Task.Run(async () =>
+                {
+                    await SeriesHelper.SavePosition(media.ShowName, media.SeasonNumber, media.EpisodeNumber,
+                        (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
+                });
+            else
+                await Task.Run(async () =>
+                {
+                    await MovieHelper.SavePosition(tempShowName,
+                        (int)stopWatch.ElapsedMilliseconds / 1000, elapsedTimeInMedia);
+                });
+        }
+
+        public string GetFolderPathFromMPCweb()
+        {
+            var path = string.Empty;
+
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(htmlString);
+                    var xPath = "(/html/body/p)[5]";
+                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    path = node.InnerHtml.Replace(@"\\", @"\");
+                }
+            }
+            catch (WebException WebEx)
+            {
+                _log.Error(WebEx.Message);
+            }
+            return path;
+        }
+
+        public string GetFilenameFromMPCweb()
+        {
+            var filename = string.Empty;
+
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(htmlString);
+                    var xPath = "(/html/body/p)[1]";
+                    var node = htmlDocument.DocumentNode.SelectSingleNode(xPath);
+                    filename = node.InnerHtml.Replace(@"\\", @"\");
+                }
+            }
+            catch (WebException WebEx)
+            {
+            }
+            return filename;
         }
     }
 }

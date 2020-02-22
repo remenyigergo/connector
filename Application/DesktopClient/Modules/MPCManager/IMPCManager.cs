@@ -5,7 +5,7 @@ namespace DesktopClient.Modules.MPCManager
 {
     public interface IMPCManager
     {
-        Process IsMediaRunning();
+        Process FindProcessByName();
 
         Task<bool> RecognizeMedia(Process process);
 

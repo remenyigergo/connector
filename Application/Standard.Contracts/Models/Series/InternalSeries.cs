@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Standard.Contracts.Models.Series.ExtendClasses;
 
@@ -6,27 +7,24 @@ namespace Standard.Contracts.Models.Series
 {
     public class InternalSeries
     {
-        //TODO: EXTERNAL ID FELKÉRÉS
+        public Dictionary<string, string> ExternalIds { get; set; }
+        public string Guid { get; set; }
 
         //TMDB
-        public List<InternalCreator> CreatedBy;
-
-        public List<string> EpisodeRunTime;
-        public string FirstAirDate;
-        public List<InternalSeriesGenre> Genres;
-        public InternalEpisodeSimple LastEpisodeSimpleToAir;
-        public List<InternalNetwork> Networks;
-        public string OriginalLanguage;
-        public string Popularity;
-        public List<InternalProductionCompany> ProductionCompanies;
-        public string Status;
-        public string Type;
-
-        public int VoteCount;
+        public List<InternalCreator> CreatedBy { get; set; }
+        public List<string> EpisodeRunTime { get; set; }
+        public string FirstAirDate { get; set; }
+        public List<InternalSeriesGenre> Genres { get; set; }
+        public InternalEpisodeSimple LastEpisodeSimpleToAir { get; set; }
+        public List<InternalNetwork> Networks { get; set; }
+        public string OriginalLanguage { get; set; }
+        public string Popularity { get; set; }
+        public List<InternalProductionCompany> ProductionCompanies { get; set; }
+        public string Status { get; set; }
+        public string Type { get; set; }
+        public int VoteCount { get; set; }
 
         //TVMAZE
-        public string Id { get; set; }
-
         public string TvMazeId { get; set; }
         public string TmdbId { get; set; }
         public string Title { get; set; }
@@ -43,40 +41,39 @@ namespace Standard.Contracts.Models.Series
 
         public void Merge(InternalSeries from)
         {
-            Id = from.TvMazeId;
-            TmdbId = from.TmdbId;
-            EpisodeRunTime = from.EpisodeRunTime;
-            FirstAirDate = from.FirstAirDate;
-            //Genres = from.Genres;
-            LastEpisodeSimpleToAir = from.LastEpisodeSimpleToAir;
-            CreatedBy = from.CreatedBy;
-            Networks = from.Networks;
-            OriginalLanguage = from.OriginalLanguage;
-            Popularity = from.Popularity;
-            ProductionCompanies = from.ProductionCompanies;
-            Rating = from.Rating;
-            VoteCount = from.VoteCount;
-            Status = from.Status;
-            Year = from.Year;
-            Type = from.Type;
-            OriginalLanguage = from.OriginalLanguage;
-            TotalSeasons = from.TotalSeasons;
-
-            //Mergeljük a Categoriest és Genret
-            var genreList = new List<InternalSeriesGenre>();
-            foreach (var category in Categories)
+            if (from != null)
             {
-                var genre = new InternalSeriesGenre(category);
-                genreList.Add(genre);
+                Guid = System.Guid.NewGuid().ToString();
+                if (ExternalIds == null)
+                    ExternalIds = new Dictionary<string, string>();
+
+                ExternalIds = ExternalIds.Union(from.ExternalIds).ToDictionary(x=>x.Key,y=>y.Value);
+                
+                TvMazeId = string.IsNullOrEmpty(from.TvMazeId) ? TvMazeId : from.TvMazeId;
+                TmdbId = string.IsNullOrEmpty(from.TmdbId) ? TmdbId : from.TmdbId;
+                EpisodeRunTime = from.EpisodeRunTime ?? EpisodeRunTime;
+                FirstAirDate = string.IsNullOrEmpty(from.FirstAirDate) ? FirstAirDate : from.FirstAirDate;
+                LastEpisodeSimpleToAir = from.LastEpisodeSimpleToAir ?? LastEpisodeSimpleToAir;
+                CreatedBy = from.CreatedBy ?? CreatedBy;
+                Networks = from.Networks ?? Networks;
+                OriginalLanguage = string.IsNullOrEmpty(from.OriginalLanguage) ? OriginalLanguage : from.OriginalLanguage;
+                Popularity = string.IsNullOrEmpty(from.Popularity) ? Popularity : from.Popularity;
+                ProductionCompanies = from.ProductionCompanies ?? ProductionCompanies;
+                Rating = from.Rating ?? Rating;
+                VoteCount = from.VoteCount <= 0 ? VoteCount : from.VoteCount;
+                Status = string.IsNullOrEmpty(from.Status) ? Status : from.Status;
+                Year = string.IsNullOrEmpty(from.Year) ? Year : from.Year;
+                Type = string.IsNullOrEmpty(from.Type) ? Type : from.Type;
+                OriginalLanguage = string.IsNullOrEmpty(from.OriginalLanguage) ? OriginalLanguage : from.OriginalLanguage;
+                TotalSeasons = from.TotalSeasons <= 0 && from.TotalSeasons != TotalSeasons ? TotalSeasons : from.TotalSeasons;
+
+                MergeGenreCategory();
+                MergeSeasons(from);
             }
-            Genres = genreList;
+        }
 
-            if (from.Genres.Count > 0)
-                foreach (var internalGenre in from.Genres)
-                    if (!Genres.Contains(internalGenre))
-                        Genres.Add(internalGenre);
-
-
+        private void MergeSeasons(InternalSeries from)
+        {
             foreach (var season in from.Seasons)
             {
                 var matchingSeason = Seasons.FirstOrDefault(t => t.SeasonNumber == season.SeasonNumber);
@@ -86,47 +83,60 @@ namespace Standard.Contracts.Models.Series
                 }
                 else
                 {
-                    matchingSeason.AirDate = season.AirDate;
+                    matchingSeason.AirDate = string.IsNullOrEmpty(matchingSeason.AirDate) ? season.AirDate : matchingSeason.AirDate;
                     matchingSeason.Name = matchingSeason.Name ?? season.Name;
                     matchingSeason.Summary = matchingSeason.Summary ?? season.Summary;
                     matchingSeason.EpisodesCount = matchingSeason.EpisodesCount == 0
                         ? season.EpisodesCount
                         : matchingSeason.EpisodesCount;
 
-                    if (season.Episodes != null && season.Episodes.Count > 0)
-                        foreach (var episode in matchingSeason.Episodes)
-                        {
-                            var matchingEpisode =
-                                season.Episodes.FirstOrDefault(e => e.EpisodeNumber == episode.EpisodeNumber);
-                            if (matchingEpisode == null)
-                            {
-                                season.Episodes.Add(episode);
-                            }
-                            else
-                            {
-                                matchingEpisode.Title = matchingEpisode.Title ?? episode.Title;
-                                matchingEpisode.Length = matchingEpisode.Length ?? episode.Length;
-                                matchingEpisode.Rating = matchingEpisode.Rating ?? episode.Rating;
-                                matchingEpisode.Description = matchingEpisode.Description ?? episode.Description;
-                                if (matchingEpisode.SeasonNumber == 0 && matchingEpisode.EpisodeNumber == 0)
-                                {
-                                    matchingEpisode.SeasonNumber = episode.SeasonNumber;
-                                    matchingEpisode.EpisodeNumber = episode.EpisodeNumber;
-                                }
-                                matchingEpisode.AirDate = matchingEpisode.AirDate ?? episode.AirDate;
-                                matchingEpisode.TmdbShowId = matchingEpisode.TmdbShowId ?? episode.AirDate;
-                                if (matchingEpisode.VoteCount == 0)
-                                    matchingEpisode.VoteCount = episode.VoteCount;
-                                matchingEpisode.Crew = matchingEpisode.Crew ?? episode.Crew;
-                                matchingEpisode.GuestStars = matchingEpisode.GuestStars ?? episode.GuestStars;
-
-                                // TODO folytatni
-                            }
-                        }
+                    if (season.Episodes != null && season.Episodes.Count > 0 && matchingSeason.Episodes != null)
+                    {
+                        MergeEpisodes(matchingSeason, season);
+                    }
                 }
             }
         }
 
+        private void MergeEpisodes(InternalSeason actualMatchingSeason, InternalSeason fromSeason)
+        {
+            foreach (var episode in actualMatchingSeason.Episodes)
+            {
+                var matchingEpisode =
+                    fromSeason.Episodes.FirstOrDefault(e => e.EpisodeNumber == episode.EpisodeNumber);
+                if (matchingEpisode == null)
+                {
+                    fromSeason.Episodes.Add(episode);
+                }
+                else
+                {
+                    matchingEpisode.Title = matchingEpisode.Title ?? episode.Title;
+                    matchingEpisode.Length = matchingEpisode.Length ?? episode.Length;
+                    matchingEpisode.Rating = matchingEpisode.Rating ?? episode.Rating;
+                    matchingEpisode.Description = matchingEpisode.Description ?? episode.Description;
+                    if (matchingEpisode.SeasonNumber == 0 && matchingEpisode.EpisodeNumber == 0)
+                    {
+                        matchingEpisode.SeasonNumber = episode.SeasonNumber;
+                        matchingEpisode.EpisodeNumber = episode.EpisodeNumber;
+                    }
+                    matchingEpisode.AirDate = matchingEpisode.AirDate ?? episode.AirDate;
+                    matchingEpisode.TmdbShowId = matchingEpisode.TmdbShowId ?? episode.AirDate;
+                    if (matchingEpisode.VoteCount == 0 && episode.VoteCount > 0)
+                        matchingEpisode.VoteCount = episode.VoteCount;
+                    matchingEpisode.Crew = matchingEpisode.Crew ?? episode.Crew;
+                    matchingEpisode.GuestStars = matchingEpisode.GuestStars ?? episode.GuestStars;
+                }
+            }
+        }
+
+        private void MergeGenreCategory()
+        {
+            var genreList = new HashSet<InternalSeriesGenre>();
+            Categories?.ForEach(x => genreList.Add(new InternalSeriesGenre(x)));
+            if (Genres == null)
+                Genres = new List<InternalSeriesGenre>();
+            Genres = Genres.Union(genreList).ToList();
+        }
 
         public override bool Equals(object obj)
         {

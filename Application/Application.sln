@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Social.Service", "Server\Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Social", "Server\Services\Social\Social.csproj", "{DC63FBE5-F26D-40DE-ACD7-47A966D38178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Series.Dto", "Series.Dto\Series.Dto.csproj", "{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Series.Dto", "Series.Dto\Series.Dto.csproj", "{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest.Series", "UnitTest.Series\UnitTest.Series.csproj", "{6A095563-83E8-4167-8226-00F0E733DAAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F38D5318-ACFE-44DF-BAB1-491F8C97CA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A095563-83E8-4167-8226-00F0E733DAAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A095563-83E8-4167-8226-00F0E733DAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A095563-83E8-4167-8226-00F0E733DAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A095563-83E8-4167-8226-00F0E733DAAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

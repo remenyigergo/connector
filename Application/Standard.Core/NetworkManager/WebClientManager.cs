@@ -15,7 +15,7 @@ using Standard.Contracts.Requests.Series;
 
 namespace Standard.Core.NetworkManager
 {
-    public class WebClientManager
+    public class WebClientManager : IWebClientManager
     {
         public async Task<T> Get<T>(string url)
         {

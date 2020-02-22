@@ -2,9 +2,9 @@
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Core.DataMapping;
 
-namespace Standard.Core.DataMappers.DtoInternal
+namespace Series.DataManagement.DtoInternal
 {
-    public class CreatedByDtoInternal : IDataMapper<CreatorDto, InternalCreator>
+    public class CreatedByDtoInternalMapper : IDataMapper<CreatorDto, InternalCreator>
     {
         public InternalCreator Map(CreatorDto obj)
         {

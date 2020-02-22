@@ -4,7 +4,7 @@ using Standard.Contracts.Models.Series;
 using Standard.Core.DataMapping;
 using System.Linq;
 
-namespace Standard.Core.DataMappers.DtoInternal
+namespace Series.DataManagement.DtoInternal
 {
     public class SeasonDtoInternalMapper : IDataMapper<SeasonDto, InternalSeason>
     {

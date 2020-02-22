@@ -10,12 +10,19 @@ using Series.Parsers.TMDB.Models.TmdbShowModels.SeasonModel;
 using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
+using Standard.Core.Configuration;
 using Standard.Core.NetworkManager;
 
 namespace Series.Parsers.TMDB
 {
-    public class TmdbParser : IParser
+    public class TmdbParser : ITmdbParser, IParser
     {
+        private readonly IServiceConfiguration _configuration;
+        public TmdbParser(IServiceConfiguration config)
+        {
+            _configuration = config;
+        }
+
         //https://api.themoviedb.org/3/search/tv?api_key=e9443688992dbb4fa3940ed77a0a8e1d&language=en-US&page=1&query=fargo  ez egy sorozat keresés
         //https://api.themoviedb.org/3/tv/60622?api_key=e9443688992dbb4fa3940ed77a0a8e1d&language=en-US ez mindennel együtt visszaadja de ID kell hozzá
         //https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}?api_key=<<api_key>>&language=en-US  EZ EGY NEM SIMPLE SEASON
@@ -30,7 +37,7 @@ namespace Series.Parsers.TMDB
             {
                 var tmdbQueryShow =
                     await new WebClientManager().Get<TmdbQueryShow>(
-                        $"{_endpoint}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
+                        $"{_configuration.Endpoints.Tmdb}/3/search/tv?api_key={_key}&language={_lang}&page=1&query={title}");
 
                 var tmdbShowForID = tmdbQueryShow.Results[0];
 
@@ -42,6 +49,7 @@ namespace Series.Parsers.TMDB
 
                 return new InternalSeries
                 {
+                    ExternalIds = new Dictionary<string, string>() { { "TmdbId", tmdbShowSimple.Id } },
                     TmdbId = tmdbShowSimple.Id,
                     Runtime = tmdbShowSimple.EpisodeRunTime.Select(x => x.Length.ToString()).ToList(),
                     Title = tmdbShowSimple.Name,

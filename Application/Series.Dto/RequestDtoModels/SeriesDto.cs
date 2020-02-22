@@ -5,6 +5,8 @@ namespace Series.Dto.RequestDtoModels.SeriesDto
 {
     public class SeriesDto
     {
+        public string Guid { get; set; }
+
         #region IMDB
         public List<CreatorDto> CreatedBy { get; set; }
         public List<string> EpisodeRunTime { get; set; }
@@ -21,7 +23,7 @@ namespace Series.Dto.RequestDtoModels.SeriesDto
         #endregion
 
         #region TvMaze
-        public string Id { get; set; }
+        
         public string TvMazeId { get; set; }
         public string TmdbId { get; set; }
         public string Title { get; set; }
