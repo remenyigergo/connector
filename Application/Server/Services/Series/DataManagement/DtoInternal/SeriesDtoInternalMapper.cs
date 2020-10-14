@@ -5,7 +5,7 @@ using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Core.DataMapping;
 using System.Linq;
 
-namespace Standard.Core.DataMappers.DtoInternal
+namespace Series.DataManagement.DtoInternal
 {
     public class SeriesDtoInternalMapper : IDataMapper<SeriesDto, InternalSeries>
     {
@@ -47,7 +47,7 @@ namespace Standard.Core.DataMappers.DtoInternal
                 EpisodeRunTime = obj.EpisodeRunTime,
                 FirstAirDate = obj.FirstAirDate,
                 Genres = obj.Genres.Select(x=>_genreMapper.Map(x)).ToList(),
-                Id = obj.Id,
+                Guid = obj.Guid,
                 LastEpisodeSimpleToAir = _episodeSimpleMapper.Map(obj.LastEpisodeSimpleToAir),
                 LastUpdated = obj.LastUpdated,
                 Networks = obj.Networks.Select(x=>_networkMapper.Map(x)).ToList(),
@@ -79,7 +79,7 @@ namespace Standard.Core.DataMappers.DtoInternal
                 EpisodeRunTime = obj.EpisodeRunTime,
                 FirstAirDate = obj.FirstAirDate,
                 Genres = obj.Genres.Select(x => _genreMapper.Map(x)).ToList(),
-                Id = obj.Id,
+                Guid = obj.Guid,
                 LastEpisodeSimpleToAir = _episodeSimpleMapper.Map(obj.LastEpisodeSimpleToAir),
                 LastUpdated = obj.LastUpdated,
                 Networks = obj.Networks.Select(x => _networkMapper.Map(x)).ToList(),

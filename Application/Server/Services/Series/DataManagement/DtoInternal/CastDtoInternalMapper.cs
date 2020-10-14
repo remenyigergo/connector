@@ -4,7 +4,7 @@ using Standard.Contracts.Models.Series.ExtendClasses.Cast;
 using Standard.Core.DataMapping;
 using System.Linq;
 
-namespace Standard.Core.DataMappers.DtoInternal
+namespace Series.DataManagement.DtoInternal
 {
     public class CastDtoInternalMapper : IDataMapper<ShowCastDto, InternalShowCast>
     {

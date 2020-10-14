@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Series.Parsers.TMDB;
-using Series.Parsers.TvMaze;
 using Standard.Contracts.Enum;
 using Standard.Contracts.Exceptions;
 using Standard.Core.NetworkManager;
@@ -15,6 +14,11 @@ using Standard.Core.DataMapping;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Series.Dto.RequestDtoModels.SeriesDtos.EpisodeDtos;
+using Series.Parsers;
+using Series.Parsers.TVMAZE;
+using System.Diagnostics;
+using System;
+using Serilog;
 
 namespace Series.Service
 {
@@ -23,54 +27,82 @@ namespace Series.Service
         private readonly ISeriesRepository _seriesRepository;
         private readonly IDataMapper<EpisodeStartedDto, InternalEpisodeStartedModel> _episodeStartedMapper;
         private readonly IDataMapper<SeriesDto, InternalSeries> _seriesMapper;
+        private readonly ITvMazeParser _tvMazeParser;
+        private readonly ITmdbParser _tmdbParser;
+        private readonly IWebClientManager _webClientManager;
+        private readonly ILogger _log;
 
         public Series(ISeriesRepository seriesRepository, 
             IDataMapper<EpisodeStartedDto, InternalEpisodeStartedModel> episodeStartedMapper,
-            IDataMapper<SeriesDto, InternalSeries> seriesMapper)
+            IDataMapper<SeriesDto, InternalSeries> seriesMapper,
+            ITvMazeParser tvMazeParser,
+            ITmdbParser tmdbparser,
+            IWebClientManager webClientManager,
+            ILogger log
+            )
         {
             _seriesRepository = seriesRepository;
             _episodeStartedMapper = episodeStartedMapper;
             _seriesMapper = seriesMapper;
+            _tvMazeParser = tvMazeParser;
+            _tmdbParser = tmdbparser;
+            _webClientManager = webClientManager;
+            _log = log;
         }
 
         
         public async Task ImportSeries(string title)
         {
-            var isItImported = await IsSeriesImported(title);
+            
+            await IsSeriesImported(title);
 
-            if (isItImported) return;
+            var parsers = new List<IParser>();
+            parsers.Add(_tvMazeParser);
+            parsers.Add(_tmdbParser);
 
-            var tvMazeInternalSeries = await new TvMazeParser().ImportSeries(title);
-            if (tvMazeInternalSeries != null)
+            var allSeries = new List<InternalSeries>();
+
+            var importTaskList = new List<Task<InternalSeries>>();
+            foreach (var parser in parsers)
             {
-                var tmdbInternalSeries = await new TmdbParser().ImportSeries(title);
-
-                if (tmdbInternalSeries != null)
-                    tvMazeInternalSeries.Merge(tmdbInternalSeries);
-
-                tvMazeInternalSeries.Seasons = tvMazeInternalSeries.Seasons.OrderBy(x => x.SeasonNumber).ToList();
-
-                await _seriesRepository.AddInternalSeries(tvMazeInternalSeries);
+                importTaskList.Add(parser.ImportSeries(title));
             }
-            else
+
+            var sw = new Stopwatch();
+            sw.Start();
+            Task.WaitAll(importTaskList.ToArray());
+            sw.Stop();
+            Console.WriteLine($"Gather took {sw.ElapsedMilliseconds} milliseconds.");
+
+            foreach (var importTask in importTaskList)
             {
-                var tmdbSeries = await new TmdbParser().ImportSeries(title);
-
-                if (tmdbSeries == null) return;
-
-                await _seriesRepository.AddInternalSeries(tmdbSeries);
+                allSeries.Add(importTask.Result);
             }
+
+            if (allSeries.Count >= 2)
+            {
+                for (int i = 0; i < allSeries.Count - 1; i++)
+                {
+                    allSeries.First().Merge(allSeries[i+1]);
+                }
+            }
+
+            await _seriesRepository.AddInternalSeries(allSeries.FirstOrDefault());
+
         }
 
         public async Task<bool> MarkAsSeen(int userid, string tvmazeid, string tmdbid, int season, int episode,
             string showname)
         {
-            var series = await GetSeriesByTitle(showname);
-            var isitSeen = await _seriesRepository.IsItSeen(userid, series[0].TvMazeId, series[0].TmdbId, season, episode);
+            var seriesList = await GetSeriesByTitle(showname);
+            var series = seriesList.First();
+
+            
+            var isitSeen = await _seriesRepository.IsItSeen(userid, series.TvMazeId, series.TmdbId, season, episode);
             if (!isitSeen)
             {
-                await _seriesRepository.MarkAsSeen(userid, series[0].TvMazeId, series[0].TmdbId, season, episode);
-                await _seriesRepository.DeleteStartedEpisode(series[0].TvMazeId, series[0].TmdbId, season, episode);
+                await _seriesRepository.MarkAsSeen(userid, series.TvMazeId, series.TmdbId, season, episode);
+                await _seriesRepository.DeleteStartedEpisode(series.TvMazeId, series.TmdbId, season, episode);
                 return true;
             }
             return false;
@@ -110,7 +142,7 @@ namespace Series.Service
 
         public async Task UpdateSeries(string title)
         {
-            var tvMazeSeries = await new TvMazeParser().ImportSeries(title);
+            var tvMazeSeries = await _tvMazeParser.ImportSeries(title);
             await CheckSeriesUpdate(tvMazeSeries);
 
             if (!await _seriesRepository.Update(tvMazeSeries))
@@ -119,6 +151,7 @@ namespace Series.Service
 
         public async Task<bool> IsSeriesImported(string title)
         {
+            _log.Information($"Calling IsSeriesImported with title: {title}");
             var isImported = await _seriesRepository.IsSeriesImported(title);
             if (isImported)
                 throw new InternalException((int) CoreCodes.AlreadyImported, "The series has been already imported.");
@@ -154,18 +187,18 @@ namespace Series.Service
 
         public async Task<bool> IsMediaExistInTvMaze(string title)
         {
-            return await new TvMazeParser().IsMediaExistInTvMaze(title);
+            return await _tvMazeParser.IsMediaExistInTvMaze(title);
         }
 
         public async Task<bool> IsMediaExistInTmdb(string title)
         {
-            return await new TmdbParser().IsMediaExistInTmdb(title);
+            return await _tmdbParser.IsMediaExistInTmdb(title);
         }
 
         public async Task<List<SeriesDto>> GetSeriesByTitle(string title)
         {
-            var internalSeries = await _seriesRepository.GetSeriesByTitle(title);
-            return internalSeries.Select(x=> _seriesMapper.Map(x)).ToList();
+            var internalSeriesList = await _seriesRepository.GetSeriesByTitle(title);
+            return internalSeriesList.Select(x=> _seriesMapper.Map(x)).ToList();
         }
 
         public async Task<bool> IsEpisodeStarted(InternalEpisodeStartedModel episodeStarted)
@@ -265,7 +298,7 @@ namespace Series.Service
                 genreList.Add(new InternalSeriesGenre(genre));
 
             var userId =
-                await new WebClientManager().GetUserIdFromUsername("http://localhost:5000/users/get/" + username);
+                await _webClientManager.GetUserIdFromUsername("http://localhost:5000/users/get/" + username);
             if (userid == 0)
                 throw new InternalException(618, "UserId couldn't be fetched.");
 

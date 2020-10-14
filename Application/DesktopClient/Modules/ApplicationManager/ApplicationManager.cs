@@ -54,7 +54,7 @@ namespace DesktopClient.Modules.ApplicationManager
                 else if (program.Value.IsRunning && !running)
                 {
                     program.Value.Stop();
-                    stoppedApps.Add(program.Key, (int) program.Value.ElapsedMilliseconds / 1000);
+                    stoppedApps.Add(program.Key, (int)program.Value.ElapsedMilliseconds / 1000);
 
                     //followedProgramsRunning.Remove(program.Key);
                 }
@@ -136,22 +136,22 @@ namespace DesktopClient.Modules.ApplicationManager
             var notInList = true;
             if (followedPrograms != null)
                 foreach (var followed in followedPrograms)
-                foreach (var process in processes)
-                    try
-                    {
-                        if (followedProgramsRunning.Count != 0)
-                            notInList = CheckIfProgramNotInUpdatedList(followedPrograms, followedProgramsRunning,
-                                process);
-
-                        if (followed.Key == process && notInList)
+                    foreach (var process in processes)
+                        try
                         {
-                            var timer = new Stopwatch();
-                            followedProgramsRunning.Add(followed.Value, timer);
+                            if (followedProgramsRunning.Count != 0)
+                                notInList = CheckIfProgramNotInUpdatedList(followedPrograms, followedProgramsRunning,
+                                    process);
+
+                            if (followed.Key == process && notInList)
+                            {
+                                var timer = new Stopwatch();
+                                followedProgramsRunning.Add(followed.Value, timer);
+                            }
                         }
-                    }
-                    catch (Win32Exception ex)
-                    {
-                    }
+                        catch (Win32Exception ex)
+                        {
+                        }
         }
 
 

@@ -1,4 +1,7 @@
-﻿using System.Windows.Forms;
+﻿using DesktopClient.Modules.ApplicationManager;
+using DesktopClient.Modules.MPCManager;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DesktopClient
 {
@@ -8,16 +11,16 @@ namespace DesktopClient
         {
             InitializeComponent();
 
-            //Task.Run(async () =>
-            //{
-            //    new MPC().MPCManager();
-            //});
+            Task.Run(async () =>
+            {
+                new MPC().MPCManager();
+            });
 
 
-            //Task.Run(async () =>
-            //{
-            //    new ApplicationManager().RunApplicationManager();
-            //});
+            Task.Run(async () =>
+            {
+                new ApplicationManager().RunApplicationManager();
+            });
         }
     }
 }

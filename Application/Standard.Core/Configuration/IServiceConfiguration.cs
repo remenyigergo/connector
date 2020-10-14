@@ -2,6 +2,8 @@
 {
     public interface IServiceConfiguration
     {
-        MongoConnection Connection { get; set; }
+        MongoConnection MongoConnection { get; set; }
+        GatheringSites GatheringSites { get; set; }
+        Endpoints Endpoints { get; set; }
     }
 }

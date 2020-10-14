@@ -10,13 +10,19 @@ using Standard.Contracts.Exceptions;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Contracts.Models.Series.ExtendClasses.Cast;
+using Standard.Core.Configuration;
 using Standard.Core.NetworkManager;
 
-namespace Series.Parsers.TvMaze
+namespace Series.Parsers.TVMAZE
 {
-    public class TvMazeParser : IParser
+    public class TvMazeParser : ITvMazeParser, IParser
     {
-        private const string _endpoint = "http://api.tvmaze.com";
+        private readonly IServiceConfiguration _configuration;
+
+        public TvMazeParser(IServiceConfiguration config)
+        {
+            _configuration = config;
+        }
 
         //LESZEDJÜK AZ APIN KERESZTÜL ÉS ÁTALAKÍTJUK SAJÁT SOROZAT FORMÁTUMRA
         public async Task<InternalSeries> ImportSeries(string title)
@@ -24,7 +30,7 @@ namespace Series.Parsers.TvMaze
             try
             {
                 var tvMazeSeries =
-                    await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
+                    await new WebClientManager().Get<List<TvMazeSeries>>($"{_configuration.Endpoints.TvMaze}/search/shows?q={title}");
                 var firstSeries = tvMazeSeries[0];
                 var seasons =
                     await ImportSeasons(firstSeries.Show.Name, int.Parse(firstSeries.Show.Id)); //ÖSSZES SZEZON
@@ -34,6 +40,7 @@ namespace Series.Parsers.TvMaze
                 if (firstSeries != null && seasons != null)
                     return new InternalSeries
                     {
+                        ExternalIds = new Dictionary<string, string>() { { "TvMaze", firstSeries.Show.Id } },
                         TvMazeId = firstSeries.Show.Id,
                         Runtime = new List<string> {firstSeries.Show.Runtime},
                         Title = firstSeries.Show.Name,
@@ -57,7 +64,7 @@ namespace Series.Parsers.TvMaze
         public async Task<List<InternalEpisode>> ImportEpisodes(int id)
         {
             var tvMazeEpisodes =
-                await new WebClientManager().Get<List<TvMazeEpisode>>($"{_endpoint}/shows/{id}/episodes");
+                await new WebClientManager().Get<List<TvMazeEpisode>>($"{_configuration.Endpoints.TvMaze}/shows/{id}/episodes");
 
             var episodeList = new List<InternalEpisode>();
 
@@ -82,7 +89,7 @@ namespace Series.Parsers.TvMaze
 
         public async Task<List<InternalSeason>> ImportSeasons(string title, int id)
         {
-            var tvMazeSeasons = await new WebClientManager().Get<List<TvMazeSeason>>($"{_endpoint}/shows/{id}/seasons");
+            var tvMazeSeasons = await new WebClientManager().Get<List<TvMazeSeason>>($"{_configuration.Endpoints.TvMaze}/shows/{id}/seasons");
             var seasons = new Dictionary<int, InternalSeason>();
 
             if (tvMazeSeasons != null)
@@ -115,7 +122,7 @@ namespace Series.Parsers.TvMaze
         {
             List<InternalActor> personList = new List<InternalActor>();
             var tmdbShowCast =
-                await new WebClientManager().Get<List<TvMazeShowCast>>($"{_endpoint}/shows/{showId}/cast");
+                await new WebClientManager().Get<List<TvMazeShowCast>>($"{_configuration.Endpoints.TvMaze}/shows/{showId}/cast");
 
             foreach (var character in tmdbShowCast)
                 personList.Add(new InternalActor
@@ -133,7 +140,7 @@ namespace Series.Parsers.TvMaze
         {
             try
             {
-                var s = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
+                var s = await new WebClientManager().Get<List<TvMazeSeries>>($"{_configuration.Endpoints.TvMaze}/search/shows?q={title}");
 
                 if (s.Count > 0)
                 {
@@ -152,7 +159,7 @@ namespace Series.Parsers.TvMaze
 
         public async Task<bool> IsMediaExistInTvMaze(string title)
         {
-            var boolean = await new WebClientManager().Get<List<TvMazeSeries>>($"{_endpoint}/search/shows?q={title}");
+            var boolean = await new WebClientManager().Get<List<TvMazeSeries>>($"{_configuration.Endpoints.TvMaze}/search/shows?q={title}");
             if (boolean.Count > 0)
                 foreach (var series in boolean)
                 {

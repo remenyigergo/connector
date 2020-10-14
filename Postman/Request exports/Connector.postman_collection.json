@@ -1,0 +1,90 @@
+{
+	"id": "137be51a-40fa-e661-6968-218c1acf3f9b",
+	"name": "Connector",
+	"description": "",
+	"order": [],
+	"folders": [
+		{
+			"name": "Series",
+			"description": "",
+			"collectionId": "137be51a-40fa-e661-6968-218c1acf3f9b",
+			"order": [
+				"5f918c78-58a9-739f-393a-aa1099b258ee",
+				"9db9ed0b-5036-46d6-229d-7c447b5b8f1f"
+			],
+			"owner": 0,
+			"folders_order": [],
+			"id": "e455be78-2f82-d925-82b0-015653cb2a9a"
+		}
+	],
+	"folders_order": [
+		"e455be78-2f82-d925-82b0-015653cb2a9a"
+	],
+	"timestamp": 1582387869805,
+	"owner": 0,
+	"public": false,
+	"requests": [
+		{
+			"id": "5f918c78-58a9-739f-393a-aa1099b258ee",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "{{base_url}}/{{service}}/import",
+			"folder": "e455be78-2f82-d925-82b0-015653cb2a9a",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1582394514099,
+			"name": "Import",
+			"description": "",
+			"collectionId": "137be51a-40fa-e661-6968-218c1acf3f9b",
+			"responses": [],
+			"rawModeData": "{\n\t\"Title\": \"Chuck\"\n}"
+		},
+		{
+			"id": "9db9ed0b-5036-46d6-229d-7c447b5b8f1f",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "{{base_url}}/{{service}}/mark",
+			"folder": "e455be78-2f82-d925-82b0-015653cb2a9a",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1582394662073,
+			"name": "mark",
+			"description": "",
+			"collectionId": "137be51a-40fa-e661-6968-218c1acf3f9b",
+			"responses": [],
+			"rawModeData": "{\n    \"EpisodeNumber\" : 1,\n\t\"SeasonNumber\" : 1,\n\t\"ShowName\" : \"Chuck\",\n\t\"TmdbId\" : 1,\n\t\"TvMazeId\" : 1,\n\t\"UserId\": 1\n}"
+		}
+	]
+}

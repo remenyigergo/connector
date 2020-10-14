@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
 using Series.Service.Models;
+using Serilog;
 using Standard.Contracts.Models.Series;
 using Standard.Contracts.Models.Series.ExtendClasses;
 using Standard.Core.DataManager.MongoDB.Extensions;
@@ -21,21 +22,22 @@ namespace Series.DataManagement.MongoDB.Repositories
         private readonly IDataMapper<InternalSeries, MongoSeriesDao> _seriesMapper;
         private readonly IDataMapper<InternalEpisodeStartedModel, EpisodeStartedDao> _episodeStartedMapper;
         private readonly IMongoCollection<MongoSeriesDao> _mongoSeriesCollection;
+        private readonly ILogger _log;
         private readonly IMongoCollection<EpisodeSeenDao> _seenEpisodesCollection;
 
         //TODO IOptions.settings delete
         public SeriesRepository(
             IDataMapper<InternalSeries, MongoSeriesDao> seriesMapper,
             IDataMapper<InternalEpisodeStartedModel, EpisodeStartedDao> episodeStartedMapper,
-            IMongoCollection<MongoSeriesDao> mongoSeriesCollection)
+            IMongoCollection<MongoSeriesDao> mongoSeriesCollection,
+            ILogger log
+            )
         {
             _seriesMapper = seriesMapper;
             _episodeStartedMapper = episodeStartedMapper;
             _mongoSeriesCollection = mongoSeriesCollection;
+            _log = log;
         }
-
-       
-
 
         /// <summary>
         ///     Sorozat letárolása adatbázisba.
@@ -43,10 +45,15 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="internalSeries"></param>
         public async Task AddInternalSeries(InternalSeries internalSeries)
         {
-            //TODO obsolete
-            //var mongoSeries = new Converter().ConvertInternalToMongoSeries(internalSeries);
-
-            await _mongoSeriesCollection.InsertOneAsync(_seriesMapper.Map(internalSeries));
+            try
+            {
+                _log.Information($"Inserting series with Guid: {internalSeries.Guid}");
+                await _mongoSeriesCollection.InsertOneAsync(_seriesMapper.Map(internalSeries));
+            } catch (Exception ex)
+            {
+                _log.Error(ex, "Something went wrong.");
+            }
+            
         }
 
         /// <summary>
@@ -84,9 +91,17 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <returns></returns>
         public async Task<bool> IsSeriesImported(string title)
         {
-            var s = await _mongoSeriesCollection.CountDocumentsAsync(x => x.Title.ToLower() == title.ToLower());
+            try
+            {
+                var s = await _mongoSeriesCollection.CountDocumentsAsync(x => x.Title.ToLower() == title.ToLower());
 
-            return s > 0;
+                return s > 0;
+            } catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -155,7 +170,7 @@ namespace Series.DataManagement.MongoDB.Repositories
             //          ep.SeasonNumber == season && ep.EpisodeNumber == episode);
             //return s > 0;
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -302,9 +317,8 @@ namespace Series.DataManagement.MongoDB.Repositories
         /// <param name="title"></param>
         public async Task<bool> IsMediaExistInMongoDb(string title)
         {
-            //var exist = await _mongoSeriesCollection.FindAsynchronous(x => x.Title.ToLower() == title.ToLower());
-            //return exist.Count > 0;
-            return true;
+            var exist = await _mongoSeriesCollection.FindAsynchronous(x => x.Title.ToLower() == title.ToLower());
+            return exist.Count > 0;
         }
 
         /// <summary>

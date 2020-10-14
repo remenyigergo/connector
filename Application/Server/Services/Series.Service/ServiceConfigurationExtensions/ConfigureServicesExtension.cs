@@ -8,8 +8,6 @@ namespace Series.Service.ServiceConfigurationExtensions
         {
             services.AddTransient<ISeries, Series>();
 
-            
-
         }
     }
 }
