@@ -51,15 +51,21 @@ namespace Standard.Core.DataManager.SQL
 
         protected DbCommand GetCommand(IDbConnection connection, string commandText, CommandType commandType)
         {
-            var command = new SqlCommand(commandText, connection as SqlConnection);
-            command.CommandType = commandType;
+            var command = new SqlCommand(commandText, connection as SqlConnection)
+            {
+                CommandType = commandType
+            };
+
             return command;
         }
 
         protected SqlParameter GetParameter(string parameter, object value, SqlDbType? type = null)
         {
-            var parameterObject = new SqlParameter(parameter, value != null ? value : DBNull.Value);
-            parameterObject.Direction = ParameterDirection.Input;
+            var parameterObject = new SqlParameter(parameter, value ?? DBNull.Value)
+            {
+                Direction = ParameterDirection.Input
+            };
+
             if (type != null)
                 parameterObject.SqlDbType = type.Value;
             return parameterObject;

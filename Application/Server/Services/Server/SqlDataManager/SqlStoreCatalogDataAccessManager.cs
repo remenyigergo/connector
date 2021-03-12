@@ -39,13 +39,15 @@ namespace Server.SqlDataManager
                 if (select.HasRows)
                     while (select.Read())
                     {
-                        user = new User();
-                        user.Id = int.Parse(select["id"].ToString());
-                        user.Username = select["username"].ToString();
-                        user.Password = select["pw"].ToString();
-                        user.Email = select["email"].ToString();
-                        user.ModuleId = int.Parse(select["moduleId"].ToString());
-                        user.SettingId = int.Parse(select["settingId"].ToString());
+                        user = new User
+                        {
+                            Id = int.Parse(select["id"].ToString()),
+                            Username = select["username"].ToString(),
+                            Password = select["pw"].ToString(),
+                            Email = select["email"].ToString(),
+                            ModuleId = int.Parse(select["moduleId"].ToString()),
+                            SettingId = int.Parse(select["settingId"].ToString())
+                        };
                     }
                 else
                     return null;

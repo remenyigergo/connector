@@ -26,7 +26,7 @@ namespace Server.Controllers
                     };
                 await new Monitor().InsertProgram(processes);
             }
-            catch (InternalException ex)
+            catch (InternalException)  // TODO internalException code to HTTP code mapper
             {
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -90,7 +90,7 @@ namespace Server.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -139,7 +139,7 @@ namespace Server.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -192,7 +192,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -243,7 +243,7 @@ namespace Server.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -302,7 +302,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -349,7 +349,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -397,7 +397,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -444,7 +444,7 @@ namespace Server.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -489,7 +489,7 @@ namespace Server.Controllers
                 {
                     Data = 0,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 

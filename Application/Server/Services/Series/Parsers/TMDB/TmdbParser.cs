@@ -74,7 +74,7 @@ namespace Series.Parsers.TMDB
                     //TODO: CAST FELSZEDÉSE
                 };
             }
-            catch (ArgumentOutOfRangeException ex)
+            catch
             {
                 throw new InternalException(605, "Series not found on TMDB.");
             }

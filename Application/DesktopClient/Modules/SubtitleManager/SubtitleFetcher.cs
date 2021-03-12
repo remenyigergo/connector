@@ -15,7 +15,7 @@ namespace DesktopClient.Modules.SubtitleManager
         private const string downloadPath = "D:\\uTorrent";
         private const string mpcVariablesSiteUrl = @"http://localhost:13579/variables.html";
         private const string feliratokInfoEndpoint = @"https://www.feliratok.info";
-        private static string lang = "Magyar";
+        private static readonly string lang = "Magyar";
 
         public static string GetFolderPathByMPCtitle()
         {

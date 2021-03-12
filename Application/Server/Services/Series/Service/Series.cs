@@ -56,9 +56,11 @@ namespace Series.Service
             
             await IsSeriesImported(title);
 
-            var parsers = new List<IParser>();
-            parsers.Add(_tvMazeParser);
-            parsers.Add(_tmdbParser);
+            var parsers = new List<IParser>
+            {
+                _tvMazeParser,
+                _tmdbParser
+            };
 
             var allSeries = new List<InternalSeries>();
 

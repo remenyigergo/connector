@@ -120,8 +120,11 @@ namespace DesktopClient.Modules.Helpers.Movie
 
         public static async Task<int> IsTheMovieExist(string title)
         {
-            var requestbody = new InternalImportRequest();
-            requestbody.Title = title;
+            var requestbody = new InternalImportRequest
+            {
+                Title = title
+            };
+
             var showExist = await new WebClientManager().Exist<int>($"http://localhost:5003/movie/exist", requestbody);
             return showExist;
         }

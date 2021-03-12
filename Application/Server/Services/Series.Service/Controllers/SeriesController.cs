@@ -61,7 +61,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + e.Message
                 };
             }
 
@@ -108,7 +108,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -160,7 +160,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -259,7 +259,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -306,7 +306,7 @@ namespace Series.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -374,7 +374,7 @@ namespace Series.Service.Controllers
                 {
                     Data = 0,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -446,7 +446,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -497,7 +497,7 @@ namespace Series.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -553,7 +553,7 @@ namespace Series.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -609,7 +609,7 @@ namespace Series.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -677,7 +677,7 @@ namespace Series.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -737,7 +737,7 @@ namespace Series.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
