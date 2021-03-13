@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using Series.DataManagement.MongoDB.Models.Series;
 using Series.DataManagement.MongoDB.SeriesFunctionModels;
-using Standard.Core;
+using Series.Service.Models;
 using Standard.Core.Configuration;
 
 namespace Series.Service.ServiceConfigurationExtensions
@@ -28,10 +28,26 @@ namespace Series.Service.ServiceConfigurationExtensions
             //Is this ok? Yes it is :)
             var mongoSeriesCollection = db.GetCollection<MongoSeriesDao>("Series");
             var seenEpisodesCollection = db.GetCollection<EpisodeSeenDao>("SeenEpisodes");
-
+            var addedSeriesCollection = db.GetCollection<AddedSeriesDao>("AddedSeries");
+            var episodeStartedCollection = db.GetCollection<EpisodeStartedDao>("EpisodeStarted");
+            var favoriteSeriesCollection = db.GetCollection<FavoriteSeriesDao>("FavoriteSeries");
+            var favoriteEpisodeCollection = db.GetCollection<FavoriteEpisodeDao>("FavoriteEpisode");
+            var seriesCommentCollection = db.GetCollection<SeriesCommentDao>("SeriesComments");
+            var episodeCommentCollection = db.GetCollection<EpisodeCommentDao>("EpisodeComments");
+            var seriesRatesCollection = db.GetCollection<EpisodeCommentDao>("SeriesRates");
+            var episodeRateCollection = db.GetCollection<EpisodeRateDao>("EpisodeRates");
+            
             services.AddSingleton(db);
             services.AddSingleton(mongoSeriesCollection);
             services.AddSingleton(seenEpisodesCollection);
+            services.AddSingleton(addedSeriesCollection);
+            services.AddSingleton(episodeStartedCollection);
+            services.AddSingleton(favoriteSeriesCollection);
+            services.AddSingleton(favoriteEpisodeCollection);
+            services.AddSingleton(seriesCommentCollection);
+            services.AddSingleton(episodeCommentCollection);
+            services.AddSingleton(seriesRatesCollection);
+            services.AddSingleton(episodeRateCollection);
 
             //private IMongoCollection<AddedSeries> AddedSeries =>
             //    Database.GetCollection<AddedSeries>("AddedSeries");

@@ -93,6 +93,7 @@
     <Compile Include="Modules\ApplicationManager\MPC\MPCTracker.cs" />
     <Compile Include="Modules\ApplicationManager\ProcessEqualityComparer\ProcessEqualityComparer.cs" />
     <Compile Include="Modules\ApplicationManager\RequestManager.cs" />
+    <Compile Include="Modules\Constant\Constants.cs" />
     <Compile Include="Modules\Helpers\Book\BookHelper.cs" />
     <Compile Include="Modules\Helpers\Movie\MovieHelper.cs" />
     <Compile Include="Modules\Helpers\Series\ISeriesHelper.cs" />
