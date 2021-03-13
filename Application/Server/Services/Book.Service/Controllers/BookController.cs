@@ -156,7 +156,7 @@ namespace Book.Service.Controllers
                     };
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                 return new Result<List<InternalBook>>

@@ -14,7 +14,7 @@ namespace Server.Services
         //private readonly MonitorRepository _repo = new MonitorRepository();
 
         private readonly IMonitorRepository _monitorRepository = ServiceDependency.Current.GetService<IMonitorRepository>();
-        private SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
+        private readonly SqlStoreCatalogDataAccessManager SqlCatalogDataAccessManager = new SqlStoreCatalogDataAccessManager();
 
         public async Task<List<string>> GetAllPrograms()
         {

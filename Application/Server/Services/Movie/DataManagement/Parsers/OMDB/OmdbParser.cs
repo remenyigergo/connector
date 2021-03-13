@@ -80,7 +80,7 @@ namespace Movie.DataManagement.Parsers.OMDB
 
                 return null;
             }
-            catch (ArgumentOutOfRangeException ex)
+            catch
             {
                 throw new InternalException(650, "Movie not found on TMDB.");
             }

@@ -168,7 +168,6 @@ namespace Book.DataManagement.MongoDB.Repositories
 
 
             //Top könyvek kiválogatása, a legtöbbet olvasott genre alapján, a két Listából összevetve
-            var max = 0;
             var genres = Enum.GetValues(typeof(Genres));
 
             var bookGenresCount = new Dictionary<string, int>();

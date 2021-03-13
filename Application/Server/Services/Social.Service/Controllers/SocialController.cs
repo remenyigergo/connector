@@ -43,7 +43,7 @@ namespace Social.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -84,7 +84,7 @@ namespace Social.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error. Probably bad insert."
+                    ResultMessage = "Common Generic Error. Probably bad insert. -- " + ex.Message
                 };
             }
         }
@@ -127,7 +127,7 @@ namespace Social.Service.Controllers
                 {
                     Data = null,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -161,7 +161,7 @@ namespace Social.Service.Controllers
                     ResultMessage = "Message were sent."
                 };
             }
-            catch (InternalException ex)
+            catch (InternalException)
             {
             }
             catch (Exception ex)
@@ -171,7 +171,7 @@ namespace Social.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -199,7 +199,7 @@ namespace Social.Service.Controllers
 
                 await new SocialService().CreateGroup(UserIds);
             }
-            catch (InternalException ex)
+            catch (InternalException)
             {
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace Social.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 
@@ -238,7 +238,7 @@ namespace Social.Service.Controllers
 
                 await new SocialService().SendGroupMessage(groupId, message, DateTime.Now, userid);
             }
-            catch (InternalException ex)
+            catch (InternalException)
             {
             }
             catch (Exception ex)
@@ -248,7 +248,7 @@ namespace Social.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + ex.Message
                 };
             }
 

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DesktopClient.Modules.Constant;
 using DesktopClient.Modules.Helpers;
 using DesktopClient.Modules.Helpers.Book;
 using DesktopClient.Modules.Helpers.Movie;
@@ -21,14 +22,10 @@ using Standard.Contracts.Enum;
 using Standard.Contracts.Requests;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
-
 namespace DesktopClient.Modules.MPCManager
 {
     internal class MPC : IMPCManager
     {
-        private const string mpcVariablesSiteUrl = @"http://localhost:13579/variables.html";
-        private const string mpcPlayerSiteUrL = @"http://localhost:13579/controls.html";
-        private const string apiEndpoint = "http://localhost:5001";
         private static readonly Stopwatch stopWatch = new Stopwatch();
         private static bool mediaJustStarted;
         private Times elapsedTimeInMedia;
@@ -143,14 +140,10 @@ namespace DesktopClient.Modules.MPCManager
 
                     Thread.Sleep(200);
                 }
-                catch (Win32Exception ex)
-                {
-                    _log.Error(ex.Message);
-                }
-                catch (Exception e)
-                {
-                    _log.Error(e.Message);
-                }
+                catch (Win32Exception ex) {}
+                catch (Exception ex) {}
+                    //_log.Error(ex.Message);
+                    //_log.Error(e.Message);
             // });
         }
 
@@ -265,7 +258,7 @@ namespace DesktopClient.Modules.MPCManager
 
             using (var client = new WebClient())
             {
-                var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                var htmlString = client.DownloadString(Constants.mpcVariablesSiteUrl);
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(htmlString);
 
@@ -333,7 +326,7 @@ namespace DesktopClient.Modules.MPCManager
             {
                 using (var client = new WebClient())
                 {
-                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlString = client.DownloadString(Constants.mpcVariablesSiteUrl);
                     var htmlDocument = new HtmlDocument();
                     htmlDocument.LoadHtml(htmlString);
                     var xPath = "(/html/body/p)[5]";
@@ -356,7 +349,7 @@ namespace DesktopClient.Modules.MPCManager
             {
                 using (var client = new WebClient())
                 {
-                    var htmlString = client.DownloadString(mpcVariablesSiteUrl);
+                    var htmlString = client.DownloadString(Constants.mpcVariablesSiteUrl);
                     var htmlDocument = new HtmlDocument();
                     htmlDocument.LoadHtml(htmlString);
                     var xPath = "(/html/body/p)[1]";

@@ -14,7 +14,7 @@ namespace DesktopClient.Modules.ApplicationManager
     {
         private readonly Dictionary<int, Stopwatch> followedProgramsRunning = new Dictionary<int, Stopwatch>();
 
-
+#pragma warning disable CS1998
         public async Task RunApplicationManager()
         {
             while (true)
@@ -26,7 +26,7 @@ namespace DesktopClient.Modules.ApplicationManager
                 Thread.Sleep(400);
             }
         }
-
+#pragma warning restore
 
         public async void RunMonitoring(HashSet<string> processes)
         {
@@ -46,7 +46,7 @@ namespace DesktopClient.Modules.ApplicationManager
             //Start each applications timer
             foreach (var program in followedProgramsRunning)
             {
-                var running = isItRunning(program.Key, processes, followedPrograms);
+                var running = IsItRunning(program.Key, processes, followedPrograms);
                 if (!program.Value.IsRunning && running) // és FUT?
                 {
                     program.Value.Start();
@@ -119,7 +119,7 @@ namespace DesktopClient.Modules.ApplicationManager
         /// <param name="processes"></param>
         /// <param name="followedPrograms"></param>
         /// <returns></returns>
-        public bool isItRunning(int Id, HashSet<string> processes, Dictionary<string, int> followedPrograms)
+        public bool IsItRunning(int Id, HashSet<string> processes, Dictionary<string, int> followedPrograms)
         {
             var programName = followedPrograms.FirstOrDefault(x => x.Value == Id).Key;
 
@@ -149,9 +149,7 @@ namespace DesktopClient.Modules.ApplicationManager
                                 followedProgramsRunning.Add(followed.Value, timer);
                             }
                         }
-                        catch (Win32Exception ex)
-                        {
-                        }
+                        catch { }
         }
 
 
@@ -196,10 +194,10 @@ namespace DesktopClient.Modules.ApplicationManager
                 {
                     processes.Add(app.MainModule.ModuleName);
                 }
-                catch (InvalidOperationException IOE)
+                catch (InvalidOperationException)
                 {
                 }
-                catch (Win32Exception WinException)
+                catch (Win32Exception)
                 {
                 }
 

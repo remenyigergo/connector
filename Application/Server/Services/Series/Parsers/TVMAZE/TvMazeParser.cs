@@ -52,7 +52,7 @@ namespace Series.Parsers.TVMAZE
                         Cast = cast
                     };
             }
-            catch (Exception ex)
+            catch
             {
                 throw new InternalException(605, "Series not found on TVMAZE.");
             }
@@ -149,7 +149,7 @@ namespace Series.Parsers.TVMAZE
                         return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new InternalException(605, "Couldn't fetch series!");
             }

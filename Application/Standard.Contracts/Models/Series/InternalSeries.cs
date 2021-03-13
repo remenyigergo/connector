@@ -140,9 +140,7 @@ namespace Standard.Contracts.Models.Series
 
         public override bool Equals(object obj)
         {
-            var series = obj as InternalSeries;
-
-            if (series == null)
+            if (!(obj is InternalSeries series))
                 return false;
 
             return Title.Equals(series.Title);

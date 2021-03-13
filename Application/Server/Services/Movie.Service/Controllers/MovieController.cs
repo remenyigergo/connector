@@ -55,7 +55,7 @@ namespace Movie.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error -- " + e.Message
                 };
             }
 
@@ -112,7 +112,7 @@ namespace Movie.Service.Controllers
                 {
                     Data = 0,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error  --" + ex.Message
                 };
             }
 
@@ -173,7 +173,7 @@ namespace Movie.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -242,7 +242,7 @@ namespace Movie.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -311,7 +311,7 @@ namespace Movie.Service.Controllers
                 {
                     Data = false,
                     ResultCode = (int) CoreCodes.CommonGenericError,
-                    ResultMessage = "Common Generic Error"
+                    ResultMessage = "Common Generic Error --" + ex.Message
                 };
             }
 
@@ -463,9 +463,7 @@ namespace Movie.Service.Controllers
 
                 await new MovieService().Recommend(model.Genres, model.UserId);
             }
-            catch (InternalException ex)
-            {
-            }
+            catch (InternalException) { }
 
 
             return new Result<List<InternalMovie>>

@@ -22,7 +22,7 @@ namespace Social.DataManagement.MongoDB.Repositories
 
         public async Task<List<MongoFeed>> GetAllFeeds()
         {
-            return await Feeds.FindAsynchronous(feed => feed == feed);
+            return await Feeds.FindAsynchronous(feed => Equals(feed, feed));
         }
 
         public async Task<List<MongoFeed>> GetAllFeedsByUserId(int userid)
